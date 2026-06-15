@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>apple-hig — design &amp; review UIs to Apple's Human Interface Guidelines</title>
 <meta name="description" content="A Claude Code plugin (and rules pack for every AI coding tool) that designs and reviews UIs to Apple's Human Interface Guidelines across iOS, iPadOS, macOS, watchOS, tvOS, and visionOS.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230A84FF'/><text x='50' y='70' font-size='58' text-anchor='middle' fill='white' font-family='-apple-system,sans-serif' font-weight='700'>a</text></svg>">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
 <style>
   :root{
     --bg:#fff; --bg2:#f5f5f7; --card:#fff; --text:#1d1d1f; --text2:#6e6e73;
@@ -45,7 +45,7 @@
     backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
   nav{display:flex;align-items:center;gap:24px;height:52px}
   .logo{font-weight:700;font-size:19px;letter-spacing:-.2px;display:flex;align-items:center;gap:9px}
-  .logo .mk{width:26px;height:26px;border-radius:7px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:17px;font-weight:800}
+  .logo .mk{width:26px;height:26px;display:block}
   nav .sp{margin-left:auto}
   nav a.lnk{color:var(--text2);font-size:15px;font-weight:500}
   nav a.lnk:hover{color:var(--text)}
@@ -122,7 +122,7 @@
 <body>
 
 <header><div class="wrap"><nav>
-  <span class="logo"><span class="mk">a</span> apple-hig</span>
+  <span class="logo"><img class="mk" src="icon.svg" alt="" width="26" height="26"> apple-hig</span>
   <span class="sp"></span>
   <a class="lnk" href="#demo">Demo</a>
   <a class="lnk" href="#features">Features</a>

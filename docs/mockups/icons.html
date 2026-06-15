@@ -1,0 +1,80 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+  body{margin:0;background:#f0f0f3;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:40px;width:1040px}
+  h1{font-size:24px;color:#1d1d1f;font-weight:700;margin:0 0 4px}
+  p.s{font-size:14px;color:#6e6e73;margin:0 0 32px}
+  .row{display:flex;gap:36px}
+  .opt{flex:1;background:#fff;border:1px solid #e0e0e4;border-radius:18px;padding:26px 24px;text-align:center}
+  .opt .big{width:132px;height:132px;margin:0 auto}
+  .opt .mini{width:30px;height:30px;margin:14px auto 0}
+  .opt .nm{font-size:15px;font-weight:700;color:#1d1d1f;margin-top:16px}
+  .opt .ds{font-size:12.5px;color:#6e6e73;margin-top:5px;line-height:1.4}
+  .lbl{font-size:11px;color:#86868b;margin-top:10px}
+</style></head><body>
+<h1>apple-hig — app icon concepts</h1>
+<p class="s">Each shown at 132 px and at favicon size (30 px). Gradient squircle, Apple system palette.</p>
+<div class="row">
+
+  <div class="opt">
+    <svg class="big" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34A4FF"/><stop offset="1" stop-color="#5A4CE0"/></linearGradient>
+      <linearGradient id="shA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".26"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#gA)"/>
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#shA)"/>
+      <rect x="104" y="104" width="304" height="304" rx="74" fill="none" stroke="#fff" stroke-width="20"/>
+      <rect x="174" y="174" width="164" height="164" rx="44" fill="none" stroke="#fff" stroke-width="20"/>
+      <rect x="226" y="226" width="60" height="60" rx="18" fill="#fff"/>
+    </svg>
+    <svg class="mini" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#gA)"/>
+      <rect x="104" y="104" width="304" height="304" rx="74" fill="none" stroke="#fff" stroke-width="26"/>
+      <rect x="174" y="174" width="164" height="164" rx="44" fill="none" stroke="#fff" stroke-width="26"/>
+      <rect x="226" y="226" width="60" height="60" rx="18" fill="#fff"/>
+    </svg>
+    <div class="nm">A · Concentric</div>
+    <div class="ds">Nested squircles — Apple's "Harmony" concentric-corner principle. Abstract, scales tiny.</div>
+  </div>
+
+  <div class="opt">
+    <svg class="big" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34A4FF"/><stop offset="1" stop-color="#5A4CE0"/></linearGradient>
+      <linearGradient id="shB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".26"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#gB)"/>
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#shB)"/>
+      <rect x="126" y="138" width="260" height="236" rx="36" fill="#fff"/>
+      <rect x="160" y="180" width="132" height="26" rx="13" fill="#0A84FF"/>
+      <rect x="160" y="230" width="192" height="18" rx="9" fill="#C7C7CC"/>
+      <rect x="160" y="266" width="158" height="18" rx="9" fill="#C7C7CC"/>
+      <rect x="160" y="302" width="110" height="18" rx="9" fill="#C7C7CC"/>
+    </svg>
+    <svg class="mini" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#gB)"/>
+      <rect x="120" y="132" width="272" height="248" rx="40" fill="#fff"/>
+      <rect x="156" y="180" width="150" height="30" rx="15" fill="#0A84FF"/>
+      <rect x="156" y="232" width="200" height="22" rx="11" fill="#C7C7CC"/>
+      <rect x="156" y="276" width="150" height="22" rx="11" fill="#C7C7CC"/>
+    </svg>
+    <div class="nm">B · Spec sheet</div>
+    <div class="ds">A screen with a title and content rules — interface designed to a hierarchy.</div>
+  </div>
+
+  <div class="opt">
+    <svg class="big" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="gC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34A4FF"/><stop offset="1" stop-color="#5A4CE0"/></linearGradient>
+      <linearGradient id="shC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".26"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#gC)"/>
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#shC)"/>
+      <rect x="132" y="132" width="248" height="248" rx="60" fill="#fff"/>
+      <path d="M192 262 l44 44 l92 -104" fill="none" stroke="#0A84FF" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <svg class="mini" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#gC)"/>
+      <rect x="118" y="118" width="276" height="276" rx="66" fill="#fff"/>
+      <path d="M188 262 l46 46 l96 -108" fill="none" stroke="#0A84FF" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="nm">C · Reviewed</div>
+    <div class="ds">A checkmark on a screen — "designed and reviewed to spec." Boldest at tiny sizes.</div>
+  </div>
+
+</div>
+</body></html>

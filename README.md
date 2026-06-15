@@ -1,3 +1,5 @@
+<img src="docs/icon.svg" width="76" alt="apple-hig">
+
 # apple-hig
 
 A Claude Code plugin that makes Claude design and review user interfaces according to Apple's Human

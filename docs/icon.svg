@@ -1,0 +1,20 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="apple-hig">
+  <title>apple-hig</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34A4FF"/>
+      <stop offset="1" stop-color="#5A4CE0"/>
+    </linearGradient>
+    <linearGradient id="sh" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".26"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#g)"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#sh)"/>
+  <rect x="120" y="132" width="272" height="248" rx="40" fill="#ffffff"/>
+  <rect x="156" y="174" width="152" height="32" rx="16" fill="#0A84FF"/>
+  <rect x="156" y="228" width="200" height="22" rx="11" fill="#C7C7CC"/>
+  <rect x="156" y="266" width="156" height="22" rx="11" fill="#C7C7CC"/>
+  <rect x="156" y="304" width="112" height="22" rx="11" fill="#C7C7CC"/>
+</svg>
