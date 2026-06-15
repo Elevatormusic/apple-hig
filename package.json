@@ -1,6 +1,6 @@
 {
   "name": "apple-hig",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Install the Apple Human Interface Guidelines ruleset into your project for any AI coding tool (Cursor, Windsurf, Copilot, Cline, Aider, Gemini CLI, AGENTS.md, and more). Also a Claude Code plugin.",
   "type": "module",
   "bin": {
