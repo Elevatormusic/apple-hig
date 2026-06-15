@@ -106,13 +106,35 @@ inputs, and 29 technologies, plus a consolidated design-token file — every top
 
 ## Install
 
+`apple-hig@apple-hig` is `plugin-name@marketplace-name`. Install it either way:
+
+**In a Claude Code session** (type these as slash commands):
+
 ```text
 /plugin marketplace add elevatormusic/apple-hig
 /plugin install apple-hig@apple-hig
 ```
 
-(The first command adds this repo as a marketplace; the second installs the plugin.
-`apple-hig@apple-hig` is `plugin-name@marketplace-name`.)
+**From a terminal** (the `claude` CLI — no interactive session needed):
+
+```text
+claude plugin marketplace add elevatormusic/apple-hig
+claude plugin install apple-hig@apple-hig
+```
+
+The first command adds this repo as a marketplace; the second installs the plugin (user scope by
+default; add `--scope project` to install it for a single repo). Restart or start a new Claude Code
+session for the plugin to load.
+
+Verify and manage it:
+
+```text
+claude plugin list                       # confirm apple-hig is installed and enabled
+claude plugin details apple-hig          # show the skill, commands, agent, and token cost
+claude plugin update apple-hig           # pull a newer version after the repo is updated
+claude plugin uninstall apple-hig        # remove it
+claude plugin marketplace remove apple-hig
+```
 
 ## Usage
 
