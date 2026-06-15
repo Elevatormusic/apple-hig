@@ -212,6 +212,25 @@ visually — real contrast, spacing, target sizes, and dark mode — not just re
 Then a prompt like "review this screen and **render it to check** contrast and dark mode" will screenshot
 the running UI and report what it sees. (This is exactly how the before/after above was produced.)
 
+## Mandatory review gate
+
+Installing apple-hig turns on a commit gate: when Claude Code runs a `git commit` that stages **UI
+files** (`.tsx .jsx .ts .js .vue .svelte .html .css .swift .kt …`), the commit is **blocked** until a
+HIG review passes. Run `/hig-review --staged`; if it finds no 🔴 high-severity issues it records
+approval (a content-hash marker), and the retried commit goes through. Editing the staged files
+invalidates the marker, so you can't review once and then change the code.
+
+**Scope & limits**
+
+- Only intercepts commits Claude runs in-session (not terminal/IDE commits).
+- "Pass" is judged by the `design-reviewer` agent, not a formal proof.
+
+**Switches**
+
+- `HIG_GATE=off` — disable the gate entirely.
+- `HIG_GATE_BYPASS=1` — allow a single blocked commit (appended to a bypass log).
+- `HIG_GATE_EXT=".tsx,.css,…"` — override the UI file extensions that trigger the gate.
+
 ## Use it in other AI coding tools
 
 The full plugin experience — the auto-activating skill, the `design-reviewer` subagent, and the
