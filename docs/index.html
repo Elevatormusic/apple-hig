@@ -34,10 +34,10 @@
   .btn .btn-chev{font-size:15px;line-height:1}
   .demo-cta{text-align:center;margin-top:24px}
   .demo-eyebrow{text-align:center;color:var(--accent);font-weight:600;font-size:15px;letter-spacing:.2px}
-  .demo-stage{position:relative;max-width:900px;margin:44px auto 0;border-radius:18px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:#0c0c0d}
-  .demo-stage::before{content:"";position:absolute;inset:0;border-radius:18px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);pointer-events:none;z-index:1}
-  .demo-iframe{display:block;width:100%;height:800px;border:0;background:#0c0c0d}
-  @media(max-width:640px){.demo-iframe{height:700px}}
+  .demo-stage{position:relative;max-width:768px;margin:40px auto 0;border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:#0c0c0d}
+  .demo-stage::before{content:"";position:absolute;inset:0;border-radius:16px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);pointer-events:none;z-index:1}
+  .demo-iframe{display:block;width:100%;height:720px;border:0;background:#0c0c0d}
+  @media(max-width:640px){.demo-iframe{height:680px}}
   code,kbd,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
   /* nav */
@@ -71,7 +71,7 @@
   .shot img{width:100%;height:auto;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow)}
   .shot figcaption{color:var(--text2);font-size:14px;text-align:center;margin-top:14px}
   /* before/after slider */
-  .ba{position:relative;max-width:880px;margin:8px auto 0;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);aspect-ratio:1520/1360;background:#0c0c0d;--pos:50%;touch-action:none}
+  .ba{position:relative;max-width:600px;margin:8px auto 0;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);aspect-ratio:1520/1360;background:#0c0c0d;--pos:50%;touch-action:none}
   .ba-base,.ba-top{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
   .ba-top{clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
   .ba-line{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:#fff;transform:translateX(-1px);pointer-events:none}
