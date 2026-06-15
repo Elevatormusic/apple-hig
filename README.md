@@ -6,7 +6,7 @@ A Claude Code plugin that makes Claude design and review user interfaces accordi
 Interface Guidelines (HIG), automatically choosing the correct platform scope — iOS, iPadOS, macOS,
 watchOS, tvOS, or visionOS — for whatever is being built.
 
-![Before and after apple-hig: a real desktop app (EARS Bridge). The "before" has dim low-contrast labels, a cramped layout, an alarming raw error, and empty unreadable meters. The "after", redesigned to Apple's macOS HIG, has semantic colors at 4.5:1+ contrast, a clear grouped hierarchy, a calm plain-language status banner, readable labeled level meters, and an accent capsule action.](docs/before-after.gif?v=2)
+![Before and after apple-hig, shown as an app window on a macOS desktop inside a MacBook Pro. A slider wipes between the two: the "before" is the original EARS Bridge window — dense, dim low-contrast labels, a cramped layout, no device selected, empty unreadable meters. The "after", redesigned to Apple's macOS HIG, has semantic colors at 4.5:1+ contrast, a clear grouped hierarchy, a calm plain-language status line, readable labeled level meters, and an accent capsule action.](docs/before-after.gif?v=3)
 
 **Website:** <https://elevatormusic.github.io/apple-hig/>  ·  **Try the "after" live:** [interactive redesign](https://elevatormusic.github.io/apple-hig/prototype.html)  ·  *(both designed with the plugin)*
 
