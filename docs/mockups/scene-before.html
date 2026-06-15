@@ -2,36 +2,48 @@
 <style>
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ width:1396px; height:903px; overflow:hidden;
-    font-family:"Segoe UI",-apple-system,Roboto,sans-serif; }
-  /* vibrant sunset/bloom wallpaper sampled from the real Windows desktop */
+    font-family:-apple-system,"SF Pro Text","Segoe UI",system-ui,Roboto,sans-serif; }
+  /* shared macOS desktop wallpaper (identical to the after scene) */
   body{ position:relative;
     background:
-      radial-gradient(58% 70% at 12% 6%, rgba(255,122,24,.92), transparent 55%),
-      radial-gradient(60% 72% at 6% 96%, rgba(206,30,108,.88), transparent 56%),
-      radial-gradient(70% 95% at 96% 58%, rgba(96,46,214,.85), transparent 60%),
-      radial-gradient(55% 60% at 64% 96%, rgba(150,40,170,.7), transparent 58%),
-      linear-gradient(135deg,#3a1340 0%,#241046 100%); }
-  .bloom{ position:absolute; inset:0; pointer-events:none;
-    background:radial-gradient(40% 14% at 50% 42%, rgba(255,255,255,.14), transparent 72%);
-    filter:blur(3px); }
-  /* the real Windows app, floating as a window */
-  .winimg{ position:absolute; left:50%; top:92px; transform:translateX(-50%); width:1130px; height:auto;
-    filter:drop-shadow(0 34px 66px rgba(0,0,0,.52)) drop-shadow(0 6px 16px rgba(0,0,0,.4)); }
-  /* Windows 11 taskbar */
-  .taskbar{ position:absolute; left:0; right:0; bottom:0; height:48px; display:flex; align-items:center;
-    justify-content:center; gap:14px; background:rgba(28,26,42,.6);
-    -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); border-top:1px solid rgba(255,255,255,.08); }
-  .taskbar i{ width:26px; height:26px; border-radius:6px; display:block; }
-  .tb-start{ background:conic-gradient(from 0deg,#2f8bff,#2f8bff 90deg,#34c759 90deg,#34c759 180deg,#ffcc00 180deg,#ffcc00 270deg,#ff6a55 270deg); }
-  .tb1{ background:linear-gradient(160deg,#48b07e,#1f6f4a); } .tb2{ background:linear-gradient(160deg,#34c0ff,#0066ff); }
-  .tb3{ background:linear-gradient(160deg,#ffd23f,#ff9f1c); } .tb4{ background:linear-gradient(160deg,#c08cff,#6a3df0); }
-  .taskbar .clock{ position:absolute; right:16px; color:#ececf0; font-size:12px; text-align:right; line-height:1.25; }
+      radial-gradient(120% 90% at 18% 12%, #2b4a78 0%, transparent 55%),
+      radial-gradient(120% 110% at 88% 22%, #2f6f86 0%, transparent 55%),
+      radial-gradient(130% 120% at 70% 100%, #b89bc9 0%, transparent 60%),
+      radial-gradient(120% 120% at 30% 95%, #6f8fc2 0%, transparent 60%),
+      linear-gradient(165deg,#16243f 0%,#27466e 22%,#395f86 45%,#7fa6c4 78%,#cdbcd8 100%);
+    background-color:#27466e; }
+  .menubar{ position:absolute; top:0; left:0; right:0; height:30px; display:flex; align-items:center;
+    gap:18px; padding:0 16px; color:#fff; font-size:13px; font-weight:500;
+    background:rgba(0,0,0,.26); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); }
+  .menubar .apple{ font-size:15px; }
+  .menubar .app{ font-weight:700; }
+  .menubar .mi{ font-weight:400; opacity:.92; }
+  .menubar .right{ margin-left:auto; display:flex; align-items:center; gap:14px; font-weight:400; }
+  .menubar .right .clock{ font-variant-numeric:tabular-nums; }
+  .stage{ position:absolute; left:0; right:0; top:30px; bottom:90px; display:flex; align-items:center; justify-content:center; }
+  .stage img{ display:block; max-width:75%; max-height:87%; width:auto; height:auto;
+    filter:drop-shadow(0 38px 80px rgba(0,0,0,.46)) drop-shadow(0 8px 22px rgba(0,0,0,.34)); }
+  .dock{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
+    display:flex; align-items:flex-end; gap:12px; padding:9px 14px; border-radius:22px;
+    background:rgba(255,255,255,.18); -webkit-backdrop-filter:blur(26px); backdrop-filter:blur(26px);
+    box-shadow:0 16px 40px rgba(0,0,0,.34), inset 0 0 0 1px rgba(255,255,255,.16); }
+  .dock i{ width:48px; height:48px; border-radius:12px; display:block; box-shadow:0 4px 8px rgba(0,0,0,.28); }
+  .dock .sep{ width:1px; height:48px; background:rgba(255,255,255,.3); box-shadow:none; border-radius:0; margin:0 2px; }
+  .i1{ background:linear-gradient(160deg,#34c0ff,#0066ff); } .i2{ background:linear-gradient(160deg,#ff6a55,#d4145a); }
+  .i3{ background:linear-gradient(160deg,#5ad469,#1a8f3c); } .i4{ background:linear-gradient(160deg,#ffd23f,#ff9f1c); }
+  .i5{ background:linear-gradient(160deg,#c08cff,#6a3df0); } .i6{ background:linear-gradient(160deg,#3a3a3c,#1c1c1e); }
+  .i7{ background:linear-gradient(160deg,#9ee7ff,#3aa0d8); }
 </style></head>
 <body>
-  <div class="bloom"></div>
-  <img class="winimg" src="before-window.png" alt="EARS Bridge — the original Windows app">
-  <div class="taskbar">
-    <i class="tb-start"></i><i class="tb1"></i><i class="tb2"></i><i class="tb3"></i><i class="tb4"></i>
-    <span class="clock">9:41 AM<br>6/15/2026</span>
+  <div class="menubar">
+    <span class="apple">&#63743;</span>
+    <span class="app">EARS Bridge</span>
+    <span class="mi">File</span><span class="mi">Edit</span><span class="mi">View</span><span class="mi">Window</span><span class="mi">Help</span>
+    <span class="right"><span>&#9651;</span><span>&#128268;</span><span>&#9685;</span><span>&#128246;</span><span>&#128269;</span><span class="clock">Mon&nbsp;9:41&nbsp;AM</span></span>
+  </div>
+  <div class="stage"><img src="before-window.png" alt="EARS Bridge — the original Windows app, dense and low-contrast"></div>
+  <div class="dock">
+    <i class="i1"></i><i class="i2"></i><i class="i3"></i><i class="i4"></i><i class="i5"></i>
+    <span class="sep"></span><i class="i7"></i><i class="i6"></i>
   </div>
 </body></html>
