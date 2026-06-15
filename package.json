@@ -13,7 +13,8 @@
     "skills/apple-hig/references"
   ],
   "scripts": {
-    "install-rules": "node scripts/install-rules.mjs"
+    "install-rules": "node scripts/install-rules.mjs",
+    "test": "node --test"
   },
   "keywords": [
     "apple",
