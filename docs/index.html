@@ -81,17 +81,12 @@
   .ba-tagA{right:12px;bottom:12px;background:rgba(48,209,88,.92)}
   .ba-range{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize}
   .ba-range:focus-visible + .ba-line .ba-grip{outline:3px solid var(--accent);outline-offset:2px}
-  /* Space-black 16" MacBook Pro frame wrapping the live comparison */
-  .mac{max-width:720px;margin:10px auto 0;filter:drop-shadow(0 26px 44px rgba(0,0,0,.34))}
-  .mac-screen{position:relative;padding:11px;border-radius:22px;background:linear-gradient(157deg,#3b3b3d,#232325 58%,#161618);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 0 0 2px rgba(0,0,0,.55)}
-  .mac-display{position:relative;aspect-ratio:1520/1360;border-radius:11px;overflow:hidden;background:#0c0c0d;box-shadow:inset 0 0 0 1px rgba(0,0,0,.85)}
-  .mac-display .ba{position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;aspect-ratio:auto}
-  .mac-display img{border:0;border-radius:0;box-shadow:none}
-  .mac-notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);z-index:6;width:17%;height:16px;background:#161618;border-radius:0 0 10px 10px;pointer-events:none}
-  .mac-gloss{position:absolute;inset:11px;border-radius:11px;pointer-events:none;z-index:5;background:linear-gradient(122deg,rgba(255,255,255,.09),rgba(255,255,255,0) 36%)}
-  .mac-base{position:relative;width:107%;margin:0 -3.5%;height:15px;border-radius:0 0 12px 12px;background:linear-gradient(to bottom,#1b1b1d,#2c2c2e 26%,#48484c 58%,#2a2a2c);box-shadow:0 3px 6px rgba(0,0,0,.34)}
-  .mac-lip{position:absolute;top:0;left:50%;transform:translateX(-50%);width:15%;height:6px;background:#19191b;border-radius:0 0 7px 7px}
-  @media (max-width:520px){ .mac-notch{width:24%} }
+  /* Real space-black MacBook Pro bezel (PNG, screen knocked out) layered over the live comparison */
+  .macshot{position:relative;max-width:940px;margin:10px auto 0;aspect-ratio:2046/1248;filter:drop-shadow(0 30px 50px rgba(0,0,0,.30))}
+  .macshot .ba{position:absolute;left:15.49%;top:9.46%;width:69.03%;height:73.16%;max-width:none;margin:0;border:0;border-radius:7px;box-shadow:none;overflow:hidden;aspect-ratio:auto;background:#0c0c0d;z-index:1}
+  .macshot .ba img{border:0;border-radius:0;box-shadow:none}
+  .macshot .macshot-bezel{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;border:0;border-radius:0;box-shadow:none;z-index:2}
+  @media (prefers-color-scheme:dark){ .macshot{filter:drop-shadow(0 22px 42px rgba(0,0,0,.6)) drop-shadow(0 0 1px rgba(255,255,255,.22))} }
 
   /* section */
   section.band{padding:72px 0}
@@ -162,24 +157,18 @@
   </section>
 
   <figure class="shot">
-    <div class="mac">
-      <div class="mac-screen">
-        <div class="mac-display">
-          <div class="ba" style="--pos:50%">
-            <img class="ba-base" src="after.png?v=2" alt="EARS Bridge redesigned to Apple's macOS HIG: a config rail, calibration cards, a Start gated until ready, and labeled level meters.">
-            <img class="ba-top" src="before.png?v=2" alt="EARS Bridge before: dim low-contrast labels, a cramped layout, a raw error, and empty meters.">
-            <span class="ba-tag ba-tagB">Before</span>
-            <span class="ba-tag ba-tagA">After</span>
-            <div class="ba-line"><div class="ba-grip">⟺</div></div>
-            <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Drag to compare before and after">
-          </div>
-        </div>
-        <span class="mac-notch"></span>
-        <span class="mac-gloss"></span>
+    <div class="macshot">
+      <div class="ba" style="--pos:50%">
+        <img class="ba-base" src="screen-after.png?v=3" alt="EARS Bridge redesigned to Apple's macOS HIG, running as a window on a Mac desktop: a config rail, calibration cards, a Start gated until ready, and labeled level meters.">
+        <img class="ba-top" src="screen-before.png?v=3" alt="EARS Bridge before: the original Windows app — dim low-contrast labels, a cramped layout, a raw error, and empty meters.">
+        <span class="ba-tag ba-tagB">Before</span>
+        <span class="ba-tag ba-tagA">After</span>
+        <div class="ba-line"><div class="ba-grip">⟺</div></div>
+        <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Drag to compare before and after">
       </div>
-      <div class="mac-base"><span class="mac-lip"></span></div>
+      <img class="macshot-bezel" src="macbook.png?v=1" alt="" aria-hidden="true">
     </div>
-    <figcaption>Drag the handle to compare — the same desktop app running on a Mac, before and after the plugin redesigned it to Apple's macOS HIG.</figcaption>
+    <figcaption>Drag the handle to compare — the same app as a window on the desktop, before and after the plugin redesigned it to Apple's macOS HIG.</figcaption>
   </figure>
 </div>
 
