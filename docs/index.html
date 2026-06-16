@@ -97,7 +97,8 @@
   .ftchip.v{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
   .ftchip.f,.ftchip.s{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent)}
   .ftcap .note{font-size:13px;color:var(--text2)}
-  .ftgal img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);background:#0c0c0d}
+  .liveframe{position:relative;width:100%;aspect-ratio:720/1140;overflow:hidden;border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);background:#0c0c0d}
+  .liveframe iframe{position:absolute;top:0;left:0;width:720px;height:1140px;border:0;transform-origin:top left;background:#0c0c0d}
   @media(max-width:680px){ .ftgal{grid-template-columns:1fr} }
 
   /* section */
@@ -168,19 +169,15 @@
     </div>
   </section>
 
-  <p class="ftlead">One flight tracker, three ways — built with vanilla Claude Code, the <strong>same app</strong> after apple-hig reviews it, and one designed with the plugin from scratch.</p>
+  <p class="ftlead">The same flight tracker, built two ways — <strong>live, not screenshots</strong>. Left, vanilla Claude Code; right, the same app after apple-hig reviews it. (A from-scratch build runs lower down.)</p>
   <div class="ftgal">
     <figure>
       <figcaption class="ftcap"><span class="ftchip v">Vanilla Claude Code</span><span class="note">no plugin</span></figcaption>
-      <img src="ft-vanilla.png?v=1" alt="A flight tracker built by Claude Code without the plugin: an abstract grid stands in for the map, two identical outline buttons give no clear primary action, and the status pills are flat single-tone grays.">
+      <div class="liveframe"><iframe src="mockups/ft-vanilla.html" loading="lazy" title="A flight tracker built with vanilla Claude Code — no plugin: an abstract grid map, two identical outline buttons, flat gray status pills."></iframe></div>
     </figure>
     <figure>
       <figcaption class="ftcap"><span class="ftchip f">+ apple-hig</span><span class="note">same app, reviewed</span></figcaption>
-      <img src="ft-fixed.png?v=1" alt="The same flight tracker after the apple-hig plugin reviewed it: a real labeled map, one prominent capsule Set arrival alert action, semantic color-coded status pills, and a clear title with proper hierarchy.">
-    </figure>
-    <figure class="wide">
-      <figcaption class="ftcap"><span class="ftchip s">Built with apple-hig</span><span class="note">from scratch · live below</span></figcaption>
-      <img src="ft-scratch.png?v=1" alt="Skytrace, a flight tracker designed to Apple's HIG from scratch with the plugin: Liquid Glass navigation and panels float over a dark map content layer, with concentric rounded corners and labeled live metrics.">
+      <div class="liveframe"><iframe src="mockups/ft-fixed.html" loading="lazy" title="The same flight tracker after the apple-hig plugin reviewed it — a real labeled map, one prominent capsule action, semantic color-coded statuses, and a clear hierarchy."></iframe></div>
     </figure>
   </div>
 </div>
@@ -269,11 +266,16 @@ npx github:elevatormusic/apple-hig --tool cursor</pre>
       });
     });
   });
+  // Scale each live mockup iframe (rendered at its 720px design width) to fit its column.
   (function(){
-    var ba=document.querySelector('.ba'); if(!ba) return;
-    var r=ba.querySelector('.ba-range');
-    function upd(){ ba.style.setProperty('--pos', r.value + '%'); }
-    r.addEventListener('input', upd); upd();
+    function fit(){
+      document.querySelectorAll('.liveframe iframe').forEach(function(ifr){
+        ifr.style.transform = 'scale(' + (ifr.parentElement.clientWidth / 720) + ')';
+      });
+    }
+    window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
+    if (document.readyState !== 'loading') fit(); else document.addEventListener('DOMContentLoaded', fit);
   })();
 </script>
 </body>
