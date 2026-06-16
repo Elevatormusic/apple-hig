@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flight tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" rel="stylesheet" />
+<style>
+  :root{
+    --color-background-primary:#ffffff;
+    --color-background-secondary:#f4f3ee;
+    --color-background-tertiary:#eceae1;
+    --color-background-info:#e6f1fb;
+    --color-background-success:#e1f5ee;
+    --color-background-warning:#faeeda;
+    --color-background-danger:#fcebeb;
+    --color-text-primary:#1a1a18;
+    --color-text-secondary:#6b6a63;
+    --color-text-tertiary:#9a988f;
+    --color-text-info:#0c447c;
+    --color-text-success:#0f6e56;
+    --color-text-warning:#854f0b;
+    --color-text-danger:#a32d2d;
+    --color-border-tertiary:rgba(0,0,0,0.10);
+    --color-border-secondary:rgba(0,0,0,0.18);
+    --color-border-primary:rgba(0,0,0,0.28);
+    --border-radius-md:8px;
+    --border-radius-lg:12px;
+    --border-radius-xl:16px;
+    --font-sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --color-background-primary:#262624;
+      --color-background-secondary:#1f1e1d;
+      --color-background-tertiary:#191918;
+      --color-background-info:rgba(55,138,221,0.16);
+      --color-background-success:rgba(29,158,117,0.16);
+      --color-background-warning:rgba(239,159,39,0.16);
+      --color-background-danger:rgba(226,75,74,0.16);
+      --color-text-primary:#ededeb;
+      --color-text-secondary:#a8a69e;
+      --color-text-tertiary:#76746c;
+      --color-text-info:#85b7eb;
+      --color-text-success:#5dcaa5;
+      --color-text-warning:#fac775;
+      --color-text-danger:#f09595;
+      --color-border-tertiary:rgba(255,255,255,0.12);
+      --color-border-secondary:rgba(255,255,255,0.20);
+      --color-border-primary:rgba(255,255,255,0.30);
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--color-background-tertiary);color:var(--color-text-primary);font-family:var(--font-sans);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .page{max-width:720px;margin:0 auto;padding:24px 20px 64px;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+  p{margin:0;}
+  .ft-wrap{display:flex;flex-direction:column;gap:1rem;}
+  .ft-pill{font-size:12px;font-weight:500;padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;}
+  .ft-metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;}
+  .ft-metric .lbl{font-size:12px;color:var(--color-text-secondary);margin:0 0 4px;}
+  .ft-metric .val{font-size:20px;font-weight:500;margin:0;}
+  button{font-family:inherit;}
+  .ft-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);cursor:pointer;background:none;width:100%;text-align:left;color:inherit;}
+  .ft-row:hover{background:var(--color-background-secondary);}
+  .ft-chip{width:36px;height:36px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0;}
+  .btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:500;padding:10px 14px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;transition:background .15s,transform .1s;}
+  .btn:hover{background:var(--color-background-secondary);}
+  .btn:active{transform:scale(0.98);}
+  .lp{width:8px;height:8px;border-radius:50%;background:var(--color-text-success);display:inline-block;animation:pulse 2s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(29,158,117,0.5);}70%{box-shadow:0 0 0 6px rgba(29,158,117,0);}100%{box-shadow:0 0 0 0 rgba(29,158,117,0);}}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--color-text-primary);color:var(--color-background-primary);padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:90%;text-align:center;z-index:10;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="page">
+<h2 class="sr-only">Live flight tracker showing United flight UA 2402 from San Francisco to New York, in the air and on time, 62 percent complete, plus four other tracked flights.</h2>
+
+<div class="ft-wrap">
+
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="flex:1;display:flex;align-items:center;gap:8px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;">
+      <i class="ti ti-search" style="font-size:18px;color:var(--color-text-tertiary);" aria-hidden="true"></i>
+      <span style="font-size:14px;color:var(--color-text-tertiary);">Search flight, route, or airport</span>
+    </div>
+    <span class="ft-pill" style="background:var(--color-background-success);color:var(--color-text-success);"><span class="lp"></span>Live</span>
+  </div>
+
+  <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;display:flex;flex-direction:column;gap:1rem;">
+
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="ft-chip" style="width:44px;height:44px;background:var(--color-background-info);color:var(--color-text-info);font-size:15px;">UA</div>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:16px;font-weight:500;margin:0;">UA 2402 · United Airlines</p>
+        <p style="font-size:12px;color:var(--color-text-secondary);margin:2px 0 0;">Boeing 737-900 · N68821 · Gate B27 → Terminal 4</p>
+      </div>
+      <div style="text-align:right;">
+        <span class="ft-pill" style="background:var(--color-background-success);color:var(--color-text-success);"><i class="ti ti-plane" style="font-size:14px;" aria-hidden="true"></i>In air</span>
+        <p style="font-size:12px;color:var(--color-text-success);margin:4px 0 0;">On time</p>
+      </div>
+    </div>
+
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:6px;">
+      <svg viewBox="0 0 680 300" width="100%" height="auto" style="display:block;" role="img" aria-label="Curved flight path from San Francisco to New York with aircraft 62 percent of the way along the route.">
+        <g style="stroke:var(--color-border-tertiary);" stroke-width="1" stroke-dasharray="2 7" opacity="0.7">
+          <line x1="150" y1="20" x2="150" y2="280"/>
+          <line x1="280" y1="20" x2="280" y2="280"/>
+          <line x1="410" y1="20" x2="410" y2="280"/>
+          <line x1="540" y1="20" x2="540" y2="280"/>
+          <line x1="40" y1="100" x2="640" y2="100"/>
+          <line x1="40" y1="190" x2="640" y2="190"/>
+        </g>
+
+        <path d="M90 230 Q 495 115.8 590 150" fill="none" style="stroke:var(--color-border-secondary);" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round"/>
+        <path d="M90 230 Q 245 124.6 400 119.14" fill="none" stroke="#378ADD" stroke-width="2.5" stroke-linecap="round"/>
+
+        <text x="340" y="104" text-anchor="middle" style="fill:var(--color-text-secondary);font-family:var(--font-sans);font-size:12px;">5h 28m · 982 mi to go</text>
+
+        <circle cx="90" cy="230" r="6" style="fill:var(--color-background-primary);stroke:#185FA5;" stroke-width="2"/>
+        <circle cx="90" cy="230" r="2.5" fill="#185FA5"/>
+        <text x="74" y="254" text-anchor="start" style="fill:var(--color-text-primary);font-family:var(--font-sans);font-size:15px;font-weight:500;">SFO</text>
+        <text x="74" y="270" text-anchor="start" style="fill:var(--color-text-secondary);font-family:var(--font-sans);font-size:11px;">San Francisco</text>
+
+        <circle cx="590" cy="150" r="6" style="fill:var(--color-background-primary);stroke:#185FA5;" stroke-width="2"/>
+        <circle cx="590" cy="150" r="2.5" fill="#185FA5"/>
+        <text x="606" y="155" text-anchor="end" style="fill:var(--color-text-primary);font-family:var(--font-sans);font-size:15px;font-weight:500;">JFK</text>
+        <text x="606" y="171" text-anchor="end" style="fill:var(--color-text-secondary);font-family:var(--font-sans);font-size:11px;">New York</text>
+
+        <g transform="translate(400,119)">
+          <circle r="16" style="fill:var(--color-background-primary);stroke:#378ADD;" stroke-width="1"/>
+          <g transform="rotate(-5) translate(-12 -12) scale(1.05)">
+            <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" fill="#185FA5"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="text-align:left;">
+          <p style="font-size:14px;font-weight:500;margin:0;">08:14</p>
+          <p style="font-size:11px;color:var(--color-text-secondary);margin:0;">SFO · PDT</p>
+        </div>
+        <div style="flex:1;height:6px;background:var(--color-background-secondary);border-radius:999px;position:relative;">
+          <div style="position:absolute;left:0;top:0;height:100%;width:62%;background:#378ADD;border-radius:999px;"></div>
+          <div style="position:absolute;left:62%;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#185FA5;border:2px solid var(--color-background-primary);"></div>
+        </div>
+        <div style="text-align:right;">
+          <p style="font-size:14px;font-weight:500;margin:0;">16:42</p>
+          <p style="font-size:11px;color:var(--color-text-secondary);margin:0;">JFK · EDT</p>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--color-text-secondary);text-align:center;margin:8px 0 0;">62% complete · arriving in 2h 03m</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+      <div class="ft-metric"><p class="lbl">Altitude</p><p class="val">38,000 ft</p></div>
+      <div class="ft-metric"><p class="lbl">Ground speed</p><p class="val">521 mph</p></div>
+      <div class="ft-metric"><p class="lbl">Distance left</p><p class="val">982 mi</p></div>
+      <div class="ft-metric"><p class="lbl">Est. arrival</p><p class="val">16:38</p></div>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="sendPrompt('Arrival alert set for UA 2402 landing at JFK')"><i class="ti ti-bell" style="font-size:16px;" aria-hidden="true"></i>Set arrival alert</button>
+      <button class="btn" onclick="sendPrompt('Opening full flight details for UA 2402')"><i class="ti ti-info-circle" style="font-size:16px;" aria-hidden="true"></i>Flight details</button>
+    </div>
+
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <p style="font-size:14px;font-weight:500;margin:0;">Also tracking</p>
+      <span style="font-size:12px;color:var(--color-text-secondary);">4 flights</span>
+    </div>
+
+    <button class="ft-row" onclick="sendPrompt('Opening DL 415 · Atlanta to Los Angeles')">
+      <div class="ft-chip" style="background:var(--color-background-info);color:var(--color-text-info);">DL</div>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:14px;font-weight:500;margin:0;">DL 415 · ATL → LAX</p>
+        <p style="font-size:12px;color:var(--color-text-secondary);margin:0;">Boarding now · gate A12 · dep 14:05</p>
+      </div>
+      <span class="ft-pill" style="background:var(--color-background-info);color:var(--color-text-info);">Boarding</span>
+      <i class="ti ti-chevron-right" style="font-size:18px;color:var(--color-text-tertiary);" aria-hidden="true"></i>
+    </button>
+
+    <button class="ft-row" onclick="sendPrompt('Opening BA 286 · San Francisco to London Heathrow')">
+      <div class="ft-chip" style="background:var(--color-background-secondary);color:var(--color-text-primary);">BA</div>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:14px;font-weight:500;margin:0;">BA 286 · SFO → LHR</p>
+        <p style="font-size:12px;color:var(--color-text-secondary);margin:0;">Scheduled · dep 19:45 · gate G94</p>
+      </div>
+      <span class="ft-pill" style="background:var(--color-background-secondary);color:var(--color-text-secondary);">Scheduled</span>
+      <i class="ti ti-chevron-right" style="font-size:18px;color:var(--color-text-tertiary);" aria-hidden="true"></i>
+    </button>
+
+    <button class="ft-row" onclick="sendPrompt('Opening LH 441 · Frankfurt to Washington Dulles')">
+      <div class="ft-chip" style="background:var(--color-background-warning);color:var(--color-text-warning);">LH</div>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:14px;font-weight:500;margin:0;">LH 441 · FRA → IAD</p>
+        <p style="font-size:12px;color:var(--color-text-secondary);margin:0;">In air · delayed 35m · arr 18:20</p>
+      </div>
+      <span class="ft-pill" style="background:var(--color-background-warning);color:var(--color-text-warning);">Delayed</span>
+      <i class="ti ti-chevron-right" style="font-size:18px;color:var(--color-text-tertiary);" aria-hidden="true"></i>
+    </button>
+
+    <button class="ft-row" onclick="sendPrompt('Opening AA 100 · New York to London Heathrow')">
+      <div class="ft-chip" style="background:var(--color-background-success);color:var(--color-text-success);">AA</div>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:14px;font-weight:500;margin:0;">AA 100 · JFK → LHR</p>
+        <p style="font-size:12px;color:var(--color-text-secondary);margin:0;">Landed 06:52 · on time · gate T3-12</p>
+      </div>
+      <span class="ft-pill" style="background:var(--color-background-success);color:var(--color-text-success);">Landed</span>
+      <i class="ti ti-chevron-right" style="font-size:18px;color:var(--color-text-tertiary);" aria-hidden="true"></i>
+    </button>
+  </div>
+
+</div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  let toastTimer;
+  function sendPrompt(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2600);
+  }
+</script>
+</body>
+</html>

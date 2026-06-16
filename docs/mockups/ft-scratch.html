@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skytrace — Live flight tracker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<style>
+  /* ---- Apple HIG design tokens (light → dark via prefers-color-scheme) ---- */
+  :root {
+    /* system colors (light) */
+    --blue: #007AFF; --green: #34C759; --orange: #FF9500; --indigo: #5856D6; --red: #FF3B30;
+    /* semantic labels + surfaces (light) */
+    --label: #000000;
+    --label-secondary: rgba(60,60,67,0.60);
+    --label-tertiary: rgba(60,60,67,0.30);
+    --page-bg: #F2F2F7;
+    --frame-bg: #FFFFFF;
+    --frame-field: #F2F2F7;
+    --separator: rgba(60,60,67,0.18);
+    /* in-flight "night map" interior — fixed dark theme, uses dark-mode system values */
+    --map: #0B1622; --map-land: #15263B; --map-land-2: #1B3150;
+    --map-grid: rgba(255,255,255,0.045);     /* graticule lines */
+    --map-route-pending: rgba(255,255,255,0.34); /* not-yet-flown route */
+    --track-bg: rgba(255,255,255,0.18);      /* progress track */
+    --glass: rgba(18,24,34,0.66);            /* opacity raised for text legibility on glass (HIG) */
+    --glass-stroke: rgba(255,255,255,0.14);
+    --glass-fill: rgba(255,255,255,0.10);
+    --hairline: rgba(255,255,255,0.10);
+    --on-glass: #FFFFFF;
+    --on-glass-secondary: rgba(235,235,245,0.60);
+    --on-glass-tertiary: rgba(235,235,245,0.55);
+    --on-accent: #FFFFFF;
+    --blue-d: #0A84FF; --green-d: #30D158; --orange-d: #FF9F0A; --indigo-d: #5E5CE6; --red-d: #FF453A;
+    /* derived material colors (kept in sync with the tokens above) */
+    --status-ontime-bg:    color-mix(in srgb, var(--green-d)  18%, transparent);
+    --status-delayed-bg:   color-mix(in srgb, var(--orange-d) 18%, transparent);
+    --status-cancelled-bg: color-mix(in srgb, var(--red-d)    26%, transparent);
+    --status-cancelled-fg: color-mix(in srgb, var(--red-d)    80%, white);
+    --locator-ring-fill:   color-mix(in srgb, var(--blue-d)   18%, transparent);
+    /* type ramp (iOS Dynamic Type, default Large) — rem so it honors the user's base size */
+    --title2: 1.375rem; --headline: 1.0625rem; --body: 1.0625rem; --subhead: 0.9375rem;
+    --footnote: 0.8125rem; --caption: 0.75rem;
+    /* corner radii (concentric, capsule for prominent controls) */
+    --radius-panel: 20px; --radius-card: 18px; --radius-chrome: 16px; --radius-window: 14px;
+    --radius-control: 12px; --radius-field: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --blue: #0A84FF; --green: #30D158; --orange: #FF9F0A; --indigo: #5E5CE6; --red: #FF453A;
+      --label: #FFFFFF;
+      --label-secondary: rgba(235,235,245,0.60);
+      --label-tertiary: rgba(235,235,245,0.30);
+      --page-bg: #000000;
+      --frame-bg: #1C1C1E;
+      --frame-field: #2C2C2E;
+      --separator: rgba(84,84,88,0.60);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { font-size: 100%; }            /* respect the user's default text size (web Dynamic Type) */
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--label);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Inter", "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: grid;
+    place-items: center;
+    padding: clamp(16px, 4vw, 48px);
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); border: 0;
+  }
+
+  /* ---- browser window frame ---- */
+  .window {
+    width: 100%; max-width: 960px;
+    border-radius: var(--radius-window); overflow: hidden;
+    border: 0.5px solid var(--separator);
+    background: var(--page-bg);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+  }
+  .titlebar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px;
+    background: var(--frame-bg);
+    border-bottom: 0.5px solid var(--separator);
+  }
+  .light { width: 12px; height: 12px; border-radius: 50%; }
+  .addrbar {
+    flex: 1; display: flex; align-items: center; gap: 8px;
+    height: 32px; margin: 0 8px; padding: 0 12px;
+    border-radius: var(--radius-field);
+    background: var(--frame-field);
+    border: 0.5px solid var(--separator);
+    font-size: var(--footnote); color: var(--label-secondary);
+  }
+  .addrbar strong { color: var(--label); font-weight: 600; }
+
+  /* ---- app viewport (live map) ---- */
+  .viewport {
+    position: relative;
+    height: clamp(460px, 62vh, 640px);
+    background: var(--map);
+    overflow: hidden;
+  }
+  .map { position: absolute; inset: 0; display: block; }
+
+  .glass {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(22px) saturate(160%);
+    border: 0.5px solid var(--glass-stroke);
+    box-shadow: 0 10px 34px rgba(0,0,0,0.40);
+  }
+
+  /* floating top navigation bar (iOS 26 inset/floating chrome) */
+  .navbar {
+    position: absolute; top: 14px; left: 14px; right: 14px;
+    height: 54px; border-radius: var(--radius-chrome);
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 8px 0 12px;
+  }
+  .brandmark {
+    width: 32px; height: 32px; border-radius: var(--radius-control);
+    background: var(--blue-d); flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--on-accent); font-size: 1.125rem;
+  }
+  .wordmark { font-size: var(--headline); font-weight: 600; color: var(--on-glass); letter-spacing: -0.2px; }
+  .searchfield {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+    height: 36px; margin: 0 4px; padding: 0 12px;
+    border-radius: var(--radius-field);
+    background: var(--glass-fill);
+    font-size: var(--subhead); color: var(--on-glass-secondary);
+  }
+  .searchfield span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .iconbtn {
+    width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--glass-fill); color: var(--on-glass);
+    border: none; cursor: pointer; font-size: 1.125rem;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .iconbtn:hover { background: rgba(255,255,255,0.18); }
+  .iconbtn:active { transform: scale(0.96); }
+  .avatar { background: var(--indigo-d); font-size: var(--footnote); font-weight: 600; }
+  .avatar:hover { background: var(--indigo-d); filter: brightness(1.1); }
+
+  /* flight identity card */
+  .flightcard {
+    position: absolute; top: 84px; left: 18px;
+    width: 312px; max-width: 64%;
+    border-radius: var(--radius-card); padding: 16px 18px;
+  }
+  .flightcard .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .flightno { font-size: var(--title2); font-weight: 600; color: var(--on-glass); letter-spacing: -0.3px; }
+  .status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: var(--footnote); font-weight: 600;
+    padding: 4px 12px; border-radius: 999px;
+    background: var(--status-ontime-bg); color: var(--green-d);
+  }
+  /* status states — color AND icon change together (never color alone) */
+  .status.delayed   { background: var(--status-delayed-bg);   color: var(--orange-d); }
+  .status.cancelled { background: var(--status-cancelled-bg); color: var(--status-cancelled-fg); }
+  .route { font-size: var(--subhead); color: var(--on-glass-secondary); margin-top: 4px; }
+  .aircraft { font-size: var(--footnote); color: var(--on-glass-tertiary); margin-top: 4px; }
+  .live {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 0.5px solid var(--hairline);
+    font-size: var(--footnote); color: var(--on-glass-secondary);
+  }
+  .livedot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-d); animation: blink 1.8s ease-in-out infinite; }
+
+  /* map zoom / locate controls */
+  .mapctl {
+    position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+    width: 44px; border-radius: var(--radius-chrome); overflow: hidden;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .mapctl button {
+    width: 44px; height: 44px; border: none; background: transparent;
+    color: var(--on-glass); font-size: 1.125rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .mapctl button:hover { background: var(--glass-fill); }
+  .mapctl button:active { transform: scale(0.94); }
+  .mapctl .locate { color: var(--blue-d); }
+  .mapctl .div { height: 0.5px; width: 24px; background: var(--glass-stroke); }
+
+  /* bottom progress + metrics strip */
+  .strip {
+    position: absolute; left: 14px; right: 14px; bottom: 14px;
+    border-radius: var(--radius-panel); padding: 16px 18px 12px;
+  }
+  .track-row { display: flex; align-items: center; gap: 12px; }
+  .endpt { font-size: var(--footnote); font-weight: 600; color: rgba(235,235,245,0.85); }
+  .track { flex: 1; position: relative; height: 5px; border-radius: 3px; background: var(--track-bg); }
+  .track .done { position: absolute; left: 0; top: 0; height: 5px; width: 60%; border-radius: 3px; background: var(--blue-d); }
+  .track .plane { position: absolute; left: 60%; top: 50%; transform: translate(-50%,-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--on-accent); border: 2px solid var(--blue-d); }
+  .eta { text-align: center; font-size: var(--footnote); color: var(--on-glass-secondary); margin-top: 8px; }
+  .metrics {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 0.5px solid var(--hairline);
+  }
+  .metric { flex: 1 1 116px; min-width: 108px; padding: 2px 4px; }
+  .metric + .metric { border-left: 0.5px solid var(--hairline); padding-left: 12px; }
+  .metric .k { display: flex; align-items: center; gap: 4px; font-size: var(--footnote); color: var(--on-glass-secondary); }
+  .metric .v { font-size: var(--headline); font-weight: 600; color: var(--on-glass); margin-top: 4px; }
+  .metric .v small { font-size: var(--footnote); font-weight: 400; color: var(--on-glass-secondary); }
+
+  /* motion: live locator ping + dot blink */
+  .ping { transform-box: fill-box; transform-origin: center; animation: ping 2.6s cubic-bezier(.2,.6,.3,1) infinite; }
+  @keyframes ping { 0% { transform: scale(.55); opacity: .85; } 70% { transform: scale(1.7); opacity: 0; } 100% { opacity: 0; } }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) {
+    .ping { animation: none; opacity: .45; }
+    .livedot { animation: none; }
+    .iconbtn, .mapctl button { transition: none; }
+  }
+
+  @media (max-width: 560px) {
+    .flightcard { max-width: 78%; }
+  }
+</style>
+</head>
+<body>
+  <h2 class="sr-only">Mockup of Skytrace, a live flight-tracking web app. United flight 482 from San Francisco to Tokyo is shown on a dark night map with a great-circle route and a plane at mid-flight, plus glass overlay panels for flight status, a progress bar, and metrics for altitude, ground speed, time remaining and local arrival.</h2>
+
+  <main class="window">
+    <div class="titlebar">
+      <!-- macOS window controls: fixed brand colors, decorative -->
+      <span class="light" style="background:#FF5F57" aria-hidden="true"></span>
+      <span class="light" style="background:#FEBC2E" aria-hidden="true"></span>
+      <span class="light" style="background:#28C840" aria-hidden="true"></span>
+      <div class="addrbar">
+        <i class="ti ti-lock" aria-hidden="true" style="font-size:0.8125rem;color:var(--label-tertiary)"></i>
+        <span>skytrace.app/flights/<strong>UA482</strong></span>
+      </div>
+      <i class="ti ti-refresh" aria-hidden="true" style="font-size:1rem;color:var(--label-tertiary)"></i>
+    </div>
+
+    <div class="viewport">
+      <svg class="map" viewBox="0 0 1000 506" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect x="0" y="0" width="1000" height="506" fill="var(--map)"/>
+        <g stroke="var(--map-grid)" stroke-width="1">
+          <line x1="0" y1="126" x2="1000" y2="126"/><line x1="0" y1="253" x2="1000" y2="253"/><line x1="0" y1="380" x2="1000" y2="380"/>
+          <line x1="200" y1="0" x2="200" y2="506"/><line x1="400" y1="0" x2="400" y2="506"/><line x1="600" y1="0" x2="600" y2="506"/><line x1="800" y1="0" x2="800" y2="506"/>
+        </g>
+        <path d="M-20 232 L120 224 L178 296 L156 372 L96 460 L-20 472 Z" fill="var(--map-land)"/>
+        <path d="M700 70 L1010 52 L1030 316 L872 360 L760 300 L720 196 Z" fill="var(--map-land)"/>
+        <path d="M804 214 L848 196 L872 250 L856 304 L812 292 Z" fill="var(--map-land-2)"/>
+        <path d="M150,300 C360,72 650,72 835,248" fill="none" stroke="var(--map-route-pending)" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 9"/>
+        <path d="M150,300 C360,72 650,72 835,248" fill="none" stroke="var(--blue-d)" stroke-width="3.5" stroke-linecap="round" pathLength="100" stroke-dasharray="55 100"/>
+        <circle cx="150" cy="300" r="6.5" fill="var(--map)" stroke="var(--blue-d)" stroke-width="3"/>
+        <circle cx="835" cy="248" r="6.5" fill="var(--map)" stroke="var(--orange-d)" stroke-width="3"/>
+        <text x="150" y="330" text-anchor="middle" fill="rgba(235,235,245,0.85)" font-size="15" font-weight="600">SFO</text>
+        <text x="835" y="232" text-anchor="middle" fill="rgba(235,235,245,0.85)" font-size="15" font-weight="600">HND</text>
+        <circle class="ping" cx="538" cy="121" r="20" fill="none" stroke="var(--blue-d)" stroke-width="2"/>
+        <circle cx="538" cy="121" r="19" fill="var(--locator-ring-fill)"/>
+        <g transform="translate(538,121) rotate(90) scale(1.7)">
+          <path d="M0,-9 L1.8,-2 L9,1 L9,2.6 L1.8,1.8 L1.4,6 L4,7.4 L4,9 L0,8 L-4,9 L-4,7.4 L-1.4,6 L-1.8,1.8 L-9,2.6 L-9,1 L-1.8,-2 Z" fill="var(--on-accent)" stroke="rgba(0,0,0,0.25)" stroke-width="0.5"/>
+        </g>
+      </svg>
+
+      <nav class="navbar glass" aria-label="Primary">
+        <span class="brandmark" aria-hidden="true"><i class="ti ti-plane-tilt"></i></span>
+        <span class="wordmark">Skytrace</span>
+        <div class="searchfield" role="search">
+          <i class="ti ti-search" aria-hidden="true" style="font-size:0.9375rem"></i>
+          <span>Search flights, airports, routes</span>
+        </div>
+        <button class="iconbtn" type="button" aria-label="Notifications"><i class="ti ti-bell" aria-hidden="true"></i></button>
+        <button class="iconbtn avatar" type="button" aria-label="Your account">AW</button>
+      </nav>
+
+      <section class="flightcard glass" aria-label="Flight UA 482 status">
+        <div class="row">
+          <span class="flightno">UA 482</span>
+          <span class="status"><i class="ti ti-circle-check" aria-hidden="true" style="font-size:0.875rem"></i>On time</span>
+        </div>
+        <div class="route">San Francisco → Tokyo</div>
+        <div class="aircraft">United · Boeing 777-300ER</div>
+        <div class="live"><span class="livedot" aria-hidden="true"></span>Live · updated 12s ago</div>
+      </section>
+
+      <div class="mapctl glass" role="group" aria-label="Map controls">
+        <button type="button" aria-label="Zoom in"><i class="ti ti-plus" aria-hidden="true"></i></button>
+        <span class="div" aria-hidden="true"></span>
+        <button type="button" class="locate" aria-label="Center on aircraft"><i class="ti ti-current-location" aria-hidden="true"></i></button>
+        <span class="div" aria-hidden="true"></span>
+        <button type="button" aria-label="Zoom out"><i class="ti ti-minus" aria-hidden="true"></i></button>
+      </div>
+
+      <section class="strip glass" aria-label="Flight progress and live metrics">
+        <div class="track-row">
+          <span class="endpt">SFO</span>
+          <div class="track" role="progressbar" aria-label="Flight progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60" aria-valuetext="60 percent complete, 5 hours 12 minutes to Tokyo">
+            <div class="done"></div>
+            <span class="plane" aria-hidden="true"></span>
+          </div>
+          <span class="endpt">HND</span>
+        </div>
+        <div class="eta">5h 12m to Tokyo · 60% complete</div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k"><i class="ti ti-arrow-up" aria-hidden="true" style="font-size:0.875rem"></i>Altitude</div>
+            <div class="v">38,000 ft</div>
+          </div>
+          <div class="metric">
+            <div class="k"><i class="ti ti-gauge" aria-hidden="true" style="font-size:0.875rem"></i>Ground speed</div>
+            <div class="v">521 mph</div>
+          </div>
+          <div class="metric">
+            <div class="k"><i class="ti ti-clock" aria-hidden="true" style="font-size:0.875rem"></i>Time left</div>
+            <div class="v">5h 12m</div>
+          </div>
+          <div class="metric">
+            <div class="k"><i class="ti ti-plane-arrival" aria-hidden="true" style="font-size:0.875rem"></i>Arrives</div>
+            <div class="v">3:25 PM <small>JST</small></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

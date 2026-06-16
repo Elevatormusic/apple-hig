@@ -6,9 +6,9 @@ A Claude Code plugin that makes Claude design and review user interfaces accordi
 Interface Guidelines (HIG), automatically choosing the correct platform scope — iOS, iPadOS, macOS,
 watchOS, tvOS, or visionOS — for whatever is being built.
 
-![Before and after apple-hig, shown as an app window on a macOS desktop inside a MacBook Pro. A slider wipes between the two: the "before" is the original EARS Bridge window — dense, dim low-contrast labels, a cramped layout, no device selected, empty unreadable meters. The "after", redesigned to Apple's macOS HIG, has semantic colors at 4.5:1+ contrast, a clear grouped hierarchy, a calm plain-language status line, readable labeled level meters, and an accent capsule action.](docs/before-after.gif?v=3)
+![One flight tracker, three ways. Top left, vanilla Claude Code: an abstract grid stands in for the map, two identical outline buttons give no clear primary action, and status pills are flat gray. Top right, the same app after the apple-hig plugin reviews it: a real labeled map, one prominent capsule action, semantic color-coded status pills, and a clear title and hierarchy. Bottom, Skytrace, a tracker designed to Apple's HIG from scratch with the plugin: Liquid Glass chrome floating over a dark map content layer with labeled live metrics.](docs/flight-compare.png)
 
-**Website:** <https://elevatormusic.github.io/apple-hig/>  ·  **Try the "after" live:** [interactive redesign](https://elevatormusic.github.io/apple-hig/prototype.html)  ·  *(both designed with the plugin)*
+**Website:** <https://elevatormusic.github.io/apple-hig/>  ·  **Try the build live:** [Skytrace](https://elevatormusic.github.io/apple-hig/mockups/ft-scratch.html)  ·  *(all three above were made with Claude Code — only the right/bottom used the plugin)*
 
 ## About
 
@@ -185,7 +185,7 @@ works for any app or website you want to feel Apple-clean. Some prompts that tri
 - "Why does this screen feel off vs. a native iOS app? Fix it."
 
 **Redesign / improve**
-- "**Redesign** this screen to Apple's macOS HIG." (paste your UI — like the EARS Bridge example above)
+- "**Redesign** this screen to Apple's macOS HIG." (paste your UI — like the flight tracker above)
 - "Tidy the hierarchy and error states on this window."
 
 **Tokens**
