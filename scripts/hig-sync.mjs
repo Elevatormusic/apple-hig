@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
 
-export const SCHEMA = 1;
+export const SCHEMA = 2;
 
 export function cacheDir(env = process.env) {
   return join(env.XDG_CACHE_HOME || join(homedir(), '.cache'), 'apple-hig');

@@ -1,0 +1,40 @@
+name: SDK bridge (macOS)
+
+# Compiles and runs the Mac Catalyst probe on a real macOS runner — the one thing
+# that can't be validated on the (Windows) maintainer machine.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/sdk-bridge.yml'
+  pull_request:
+    paths:
+      - 'scripts/**'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Toolchain
+        run: |
+          xcode-select -p
+          swift --version
+          sw_vers
+
+      - name: Run tests (includes the macOS probe compile + run)
+        run: node --test
+
+      - name: End-to-end sync / status / check
+        run: |
+          node scripts/hig-sync.mjs
+          node scripts/hig-sync.mjs --status
+          node scripts/hig-sync.mjs --check checkmark definitelynotasymbol123

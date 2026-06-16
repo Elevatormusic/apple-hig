@@ -51,11 +51,19 @@ var sys: [String: [String: String]] = [:]
 for (k, v) in systemColors { sys[k] = pair(v) }
 var sem: [String: [String: String]] = [:]
 for (k, v) in semanticColors { sem[k] = pair(v) }
+func weightName(_ font: UIFont) -> String {
+    let traits = font.fontDescriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any]
+    let w = (traits?[.weight] as? CGFloat) ?? 0
+    let scale: [(String, CGFloat)] = [
+        ("Ultralight", -0.8), ("Thin", -0.6), ("Light", -0.4), ("Regular", 0.0),
+        ("Medium", 0.23), ("Semibold", 0.3), ("Bold", 0.4), ("Heavy", 0.56), ("Black", 0.62)
+    ]
+    return scale.min(by: { abs($0.1 - w) < abs($1.1 - w) })!.0
+}
 var ramp: [String: [String: Any]] = [:]
 for (name, style) in textStyles {
     let f = UIFont.preferredFont(forTextStyle: style)
-    ramp[name] = ["size": f.pointSize, "leading": f.lineHeight.rounded(),
-                  "face": (f.fontDescriptor.object(forKey: .face) as? String) ?? "Regular"]
+    ramp[name] = ["size": f.pointSize, "leading": f.lineHeight.rounded(), "weight": weightName(f)]
 }
 printJSON(["colors": ["system": sys, "semantic": sem], "typeRamp": ramp])
 #else

@@ -68,6 +68,6 @@ Emit valid, copy-pasteable output for the requested format only.
 ## Live values (macOS)
 
 Before emitting colors or the type ramp, check for `~/.cache/apple-hig/live-tokens.json`. If it exists
-with `schema: 1`, emit its `colors`/`typeRamp` and note "(live, from your SDK — Xcode <build>)".
+with `schema: 2`, emit its `colors`/`typeRamp` and note "(live, from your SDK — Xcode <build>)".
 Otherwise emit the bundled `references/design-tokens.md` values. On macOS + Xcode with no cache, and
 unless `HIG_SDK_SYNC=never`, offer to run `/hig-sync` first (run it automatically if `HIG_SDK_SYNC=always`).
