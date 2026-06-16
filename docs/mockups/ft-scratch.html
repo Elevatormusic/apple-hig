@@ -225,6 +225,21 @@
   .mapctl .locate { color: var(--blue-d); }
   .mapctl .div { height: 0.5px; width: 24px; background: var(--glass-stroke); }
 
+  /* search panel (opens from the floating search field) */
+  .searchpanel { position: absolute; top: 78px; left: 14px; right: 14px; z-index: 30; border-radius: var(--radius-chrome); padding: 8px; opacity: 0; transform: translateY(-8px); pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
+  .searchpanel.open { opacity: 1; transform: none; pointer-events: auto; }
+  .searchpanel-field { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px 0 12px; border-radius: var(--radius-field); background: var(--glass-fill); }
+  .searchpanel-field > i { color: var(--on-glass-secondary); font-size: 1rem; }
+  .searchpanel-field input { flex: 1; min-width: 0; border: none; background: none; color: var(--on-glass); font: inherit; font-size: var(--subhead); outline: none; }
+  .searchpanel-field input::placeholder { color: var(--on-glass-secondary); }
+  .searchpanel-close { border: none; background: none; color: var(--blue-d); font: inherit; font-size: var(--subhead); font-weight: 600; cursor: pointer; padding: 6px 8px; min-height: 36px; }
+  .searchpanel-list { list-style: none; margin: 6px 0 2px; padding: 0; max-height: 232px; overflow: auto; }
+  .searchpanel-list button { display: flex; align-items: center; gap: 10px; width: 100%; border: none; background: none; color: var(--on-glass); font: inherit; font-size: var(--subhead); text-align: left; padding: 10px 12px; border-radius: var(--radius-field); cursor: pointer; }
+  .searchpanel-list button:hover { background: var(--glass-fill); }
+  .searchpanel-list .si-code { font-weight: 600; min-width: 56px; }
+  .searchpanel-list button:focus-visible, .searchpanel-close:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--map), 0 0 0 4px var(--blue-d); }
+  @media (prefers-reduced-motion: reduce) { .searchpanel { transition: none; } }
+
   /* bottom progress + metrics strip */
   .strip {
     position: absolute; left: 14px; right: 14px; bottom: 14px;
@@ -279,47 +294,46 @@
     </div>
 
     <div class="viewport">
-      <svg class="map" viewBox="0 0 1000 506" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <svg class="map" viewBox="0 0 1000 506" preserveAspectRatio="xMidYMid slice" aria-hidden="true" data-flight-map data-progress="0.6" data-loop="16000">
         <rect x="0" y="0" width="1000" height="506" fill="var(--map)"/>
-        <g stroke="var(--map-grid)" stroke-width="1">
-          <line x1="0" y1="126" x2="1000" y2="126"/><line x1="0" y1="253" x2="1000" y2="253"/><line x1="0" y1="380" x2="1000" y2="380"/>
-          <line x1="200" y1="0" x2="200" y2="506"/><line x1="400" y1="0" x2="400" y2="506"/><line x1="600" y1="0" x2="600" y2="506"/><line x1="800" y1="0" x2="800" y2="506"/>
-        </g>
-        <!-- North America: Pacific coast, SFO sits on the California shore -->
-        <path d="M-30 -30 L40 -30 C95 -10 128 20 132 70 C150 120 145 165 134 198 C158 215 168 228 150 300 C172 342 188 366 208 390 C230 412 246 436 250 466 C252 492 250 520 240 540 L-30 540 Z" fill="var(--map-land)"/>
-        <!-- Mainland Asia: Kamchatka / Korea / China coast on the far side of the Pacific -->
-        <path d="M1030 -30 L955 -30 C930 10 915 60 920 105 C895 130 905 150 948 170 C925 200 918 230 922 262 C928 300 955 345 985 400 C1002 435 1014 490 1016 540 L1030 540 Z" fill="var(--map-land)"/>
-        <!-- Japan: Honshu (HND on its Pacific coast), Hokkaido, Kyushu -->
-        <path d="M880 180 Q852 216 835 250 Q815 282 793 314 Q801 320 810 314 Q830 284 848 250 Q868 214 894 182 Q888 176 880 180 Z" fill="var(--map-land-2)"/>
-        <path d="M884 140 Q903 132 918 144 Q923 160 908 168 Q888 166 884 152 Z" fill="var(--map-land-2)"/>
-        <path d="M768 322 Q786 320 793 334 Q788 350 772 346 Q760 336 768 322 Z" fill="var(--map-land-2)"/>
-        <!-- Aleutian arc tracing the great-circle route across the North Pacific -->
-        <g fill="var(--map-land-2)" opacity="0.85">
-          <ellipse cx="318" cy="92" rx="9" ry="3.4"/><ellipse cx="392" cy="74" rx="8" ry="3.2"/><ellipse cx="470" cy="64" rx="7" ry="3"/><ellipse cx="556" cy="62" rx="6.5" ry="3"/><ellipse cx="640" cy="70" rx="7" ry="3.2"/><ellipse cx="716" cy="86" rx="8" ry="3.4"/>
-        </g>
-        <path d="M150,300 C360,72 650,72 835,248" fill="none" stroke="var(--map-route-pending)" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 9"/>
-        <path d="M150,300 C360,72 650,72 835,248" fill="none" stroke="var(--blue-d)" stroke-width="3.5" stroke-linecap="round" pathLength="100" stroke-dasharray="55 100"/>
-        <circle cx="150" cy="300" r="6.5" fill="var(--map)" stroke="var(--blue-d)" stroke-width="3"/>
-        <circle cx="835" cy="248" r="6.5" fill="var(--map)" stroke="var(--orange-d)" stroke-width="3"/>
-        <text x="150" y="330" text-anchor="middle" fill="rgba(235,235,245,0.85)" font-size="15" font-weight="600">SFO</text>
-        <text x="835" y="232" text-anchor="middle" fill="rgba(235,235,245,0.85)" font-size="15" font-weight="600">HND</text>
-        <circle class="ping" cx="538" cy="121" r="20" fill="none" stroke="var(--blue-d)" stroke-width="2"/>
-        <circle cx="538" cy="121" r="19" fill="var(--locator-ring-fill)"/>
-        <g transform="translate(538,121) rotate(90) scale(1.7)">
-          <path d="M0,-9 L1.8,-2 L9,1 L9,2.6 L1.8,1.8 L1.4,6 L4,7.4 L4,9 L0,8 L-4,9 L-4,7.4 L-1.4,6 L-1.8,1.8 L-9,2.6 L-9,1 L-1.8,-2 Z" fill="var(--on-accent)" stroke="rgba(0,0,0,0.25)" stroke-width="0.5"/>
+        <path d="M17,455L17,455L17,455ZM22,475L22,475L22,475ZM33,458L33,458L33,458ZM38,448L38,459L31,448ZM3,441L3,441L3,441ZM526,54L526,54L526,54ZM567,79L567,79L567,79ZM587,121L587,121L587,121ZM669,99L669,99L669,99ZM673,95L673,95L673,95ZM838,117L838,117L838,117ZM818,111L818,111L818,111ZM820,106L820,106L820,106ZM807,103L807,103L807,103ZM809,97L809,97L809,97ZM801,96L801,96L801,96ZM857,137L857,137L857,137ZM825,128L825,128L825,128ZM832,135L832,135L832,135ZM44,473L48,489L42,488L38,502L30,497L26,483ZM0,420L1,420L6,401L6,401L15,403L17,413L8,427L11,436L23,437L28,445L11,438L2,439L0,431L0,420ZM173,126L176,143L187,169L176,166L171,177L177,186L166,187L169,175L166,134ZM181,205L194,212L177,221L151,216L162,212L167,194ZM161,226L167,238L159,252L158,270L143,278L128,277L120,286L111,277L82,283L97,271L118,271L126,262L147,251L155,227ZM108,281L95,292L96,283ZM84,286L89,289L85,303L76,304L78,290ZM0,363L6,352L12,352L5,371L5,371L0,368L0,363ZM867,155L880,157L895,172L883,169L858,154ZM301,0L305,7L359,9L380,15L391,13L387,4L427,6L459,13L460,13L460,13L496,23L503,28L523,29L535,35L520,40L514,49L473,40L467,33L460,43L459,44L446,49L457,62L439,62L411,69L388,79L355,79L332,84L322,94L331,99L332,111L322,113L322,123L312,124L306,135L295,137L281,152L272,118L281,100L292,98L321,79L334,75L338,65L312,77L308,69L286,69L261,86L246,88L226,84L210,88L176,87L167,90L134,112L115,121L141,130L149,127L162,135L153,171L134,192L114,209L99,216L88,212L73,223L72,230L56,238L69,258L69,274L48,280L48,254L34,251L39,240L31,237L10,245L15,232L7,230L0,235L0,0ZM0,255L3,253L18,256L5,263L0,268L0,255ZM0,281L12,301L6,311L14,315L0,339L0,281ZM449,145L449,145L449,145ZM920,283L920,283L920,283ZM927,289L927,289L927,289ZM196,400L196,400L196,400ZM196,419L196,419L196,419ZM192,436L192,436L192,436ZM50,280L50,280L50,280ZM901,181L901,181L901,181ZM266,165L266,165L266,165ZM6,498L6,498L6,498ZM108,279L108,279L108,279ZM110,488L110,488L110,488ZM196,406L196,406L196,406ZM196,428L196,428L196,428ZM188,443L188,443L188,443ZM195,430L195,430L195,430ZM137,472L137,472L137,472ZM329,504L329,504L329,504ZM293,492L293,492L293,492ZM18,464L18,464L18,464ZM23,472L23,472L23,472ZM26,458L26,458L26,458ZM33,470L33,470L33,470ZM35,474L35,474L35,474ZM26,474L26,474L26,474ZM14,495L14,495L14,495ZM44,470L44,470L44,470ZM41,469L41,469L41,469ZM12,441L12,441L12,441ZM14,450L14,450L14,450ZM15,448L15,448L15,448ZM18,450L18,450L18,450ZM23,446L23,446L23,446ZM27,449L27,449L27,449ZM26,450L26,450L26,450ZM31,440L31,440L31,440ZM14,437L14,437L14,437ZM13,429L13,429L13,429ZM12,399L12,399L12,399ZM7,398L7,398L7,398ZM9,396L9,396L9,396ZM13,388L13,388L13,388ZM12,385L12,385L12,385ZM377,9L377,9L377,9ZM334,93L334,93L334,93ZM368,124L368,124L368,124ZM357,122L357,122L357,122ZM278,154L278,154L278,154ZM274,157L274,157L274,157ZM260,169L260,169L260,169ZM272,153L272,153L272,153ZM253,177L253,177L253,177ZM244,183L244,183L244,183ZM226,193L226,193L226,193ZM218,196L218,196L218,196ZM233,90L233,90L233,90ZM136,120L136,120L136,120ZM130,120L130,120L130,120ZM203,208L203,208L203,208ZM200,202L200,202L200,202ZM31,356L31,356L31,356ZM27,358L27,358L27,358ZM39,354L39,354L39,354ZM61,339L61,339L61,339ZM67,331L67,331L67,331ZM70,328L70,328L70,328ZM69,328L69,328L69,328ZM79,312L79,312L79,312ZM82,311L82,311L82,311ZM64,292L64,292L64,292ZM75,297L75,297L75,297ZM78,295L78,295L78,295ZM101,266L101,266L101,266ZM139,253L139,253L139,253ZM148,221L148,221L148,221ZM160,195L160,195L160,195ZM162,197L162,197L162,197ZM150,290L150,290L150,290ZM148,277L148,277L148,277ZM113,281L113,281L113,281ZM67,292L67,292L67,292ZM71,289L71,289L71,289ZM73,285L73,285L73,285ZM69,282L69,282L69,282ZM70,280L70,280L70,280ZM94,282L94,282L94,282ZM92,283L92,283L92,283ZM65,277L65,277L65,277ZM60,277L60,277L60,277ZM58,278L58,278L58,278ZM46,289L46,289L46,289ZM46,280L46,280L46,280ZM48,254L48,254L48,254ZM12,302L12,302L12,302ZM15,314L15,314L15,314ZM14,316L14,316L14,316ZM16,315L16,315L16,315ZM648,398L648,398L648,398ZM636,381L636,381L636,381ZM641,384L641,384L641,384ZM613,377L613,377L613,377ZM631,380L631,380L631,380ZM619,376L619,376L619,376ZM639,385L639,385L639,385ZM456,149L456,149L456,149ZM458,145L458,145L458,145ZM440,145L440,145L440,145ZM412,141L412,141L412,141ZM405,136L405,136L405,136ZM516,79L516,79L516,79ZM536,104L536,104L536,104ZM612,118L612,118L612,118ZM609,119L609,119L609,119ZM597,122L597,122L597,122ZM595,126L595,126L595,126ZM619,121L619,121L619,121ZM615,120L615,120L615,120ZM618,120L618,120L618,120ZM540,138L540,138L540,138ZM532,140L532,140L532,140ZM569,128L569,128L569,128ZM571,128L571,128L571,128ZM553,134L553,134L553,134ZM563,129L563,129L563,129ZM566,131L566,131L566,131ZM518,142L518,142L518,142ZM510,143L510,143L510,143ZM501,144L501,144L501,144ZM491,146L491,146L491,146ZM489,146L489,146L489,146ZM486,145L486,145L486,145ZM491,144L491,144L491,144ZM482,146L482,146L482,146ZM476,147L476,147L476,147ZM876,164L876,164L876,164ZM904,180L904,180L904,180ZM903,178L903,178L903,178ZM901,170L901,170L901,170ZM901,172L901,172L901,172ZM899,171L899,171L899,171ZM903,174L903,174L903,174ZM891,163L891,163L891,163ZM897,168L897,168L897,168ZM896,169L896,169L896,169ZM884,159L884,159L884,159ZM871,163L871,163L871,163ZM883,159L883,159L883,159ZM935,292L935,292L935,292ZM936,322L936,322L936,322ZM922,283L922,283L922,283ZM924,282L924,282L924,282ZM935,288L935,288L935,288ZM607,93L607,93L607,93ZM668,105L668,105L668,105ZM676,80L676,80L676,80ZM672,94L672,94L672,94ZM666,99L666,99L666,99ZM648,115L648,115L648,115ZM655,110L655,110L655,110ZM659,109L659,109L659,109ZM719,79L719,79L719,79ZM729,80L729,80L729,80ZM733,84L733,84L733,84ZM709,84L709,84L709,84ZM707,82L707,82L707,82ZM709,79L709,79L709,79ZM707,76L707,76L707,76ZM823,122L823,122L823,122ZM815,107L815,107L815,107ZM820,117L820,117L820,117ZM835,120L835,120L835,120ZM824,109L824,109L824,109ZM829,112L829,112L829,112ZM824,111L824,111L824,111ZM812,96L812,96L812,96ZM854,140L854,140L854,140ZM838,125L838,125L838,125ZM838,144L838,144L838,144ZM844,129L844,129L844,129ZM847,135L847,135L847,135ZM862,148L862,148L862,148ZM858,141L858,141L858,141ZM851,136L851,136L851,136ZM852,135L852,135L852,135ZM776,9L776,9L776,9ZM993,400L993,400L993,400ZM995,352L995,352L995,352ZM975,321L975,321L975,321ZM964,301L964,301L964,301ZM960,329L960,329L960,329ZM987,357L987,357L987,357ZM991,344L991,344L991,344ZM983,321L983,321L983,321ZM984,356L984,356L984,356ZM31,463L31,463L31,463ZM38,468L38,468L38,468ZM20,488L20,488L20,488ZM42,491L42,491L42,491ZM44,471L44,471L44,471ZM33,456L33,456L33,456ZM35,456L35,456L35,456ZM317,14L317,14L317,14ZM72,301L72,301L72,301ZM47,264L47,264L47,264ZM35,240L35,240L35,240ZM7,328L7,328L7,328ZM1000,337L983,321L976,305L962,299L965,314L988,339L995,354L1000,360L1000,362L1000,362L984,353L981,343L961,330L968,324L956,316L942,288L919,279L908,260L894,245L889,233L888,215L892,189L886,172L905,175L897,164L884,156L863,151L852,131L843,131L837,113L831,112L803,89L807,95L795,96L767,85L736,82L718,74L702,76L705,81L678,89L679,75L659,89L659,97L626,110L628,112L592,119L632,101L636,91L624,94L611,90L604,93L594,82L584,84L567,70L583,57L608,53L605,44L593,49L567,47L566,42L552,39L586,31L600,36L602,29L562,18L581,14L599,4L616,0L671,0L671,0L682,2L697,1L728,5L744,4L794,14L842,4L838,10L863,3L881,10L899,7L937,13L956,13L971,23L999,21L1000,21L1000,337ZM1000,15L976,17L971,12L949,10L945,5L987,3L971,0L1000,0ZM970,0L941,0L941,0L970,0ZM45,277L45,277L45,277ZM380,500L380,500L380,500ZM374,489L374,489L374,489ZM395,491L395,491L395,491ZM391,490L391,490L391,490ZM539,108L539,108L539,108ZM169,340L169,340L169,340ZM82,256L82,256L82,256ZM197,210L197,210L197,210ZM201,209L201,209L201,209ZM198,210L198,210L198,210ZM241,488L241,488L241,488ZM243,488L243,488L243,488ZM359,459L359,459L359,459ZM567,34L567,34L567,34ZM34,252L34,252L34,252Z" fill="var(--map-land)" stroke="var(--map-land-2)" stroke-width="0.75" stroke-linejoin="round"/>
+        <path class="route-base" d="M904,255L897.9,251.9L891.7,248.8L885.5,245.7L879.2,242.7L872.8,239.8L866.4,236.9L859.9,234L853.3,231.2L846.6,228.4L839.9,225.7L833.1,223.1L826.2,220.4L819.3,217.9L812.3,215.4L805.2,212.9L798,210.5L790.7,208.2L783.4,205.9L776.1,203.7L768.6,201.6L761.1,199.5L753.5,197.5L745.8,195.5L738.1,193.7L730.3,191.8L722.4,190.1L714.5,188.4L706.5,186.8L698.4,185.3L690.3,183.8L682.2,182.4L674,181.1L665.7,179.9L657.4,178.7L649,177.7L640.6,176.7L632.2,175.7L623.7,174.9L615.2,174.1L606.6,173.5L598,172.9L589.4,172.4L580.8,172L572.2,171.6L563.5,171.4L554.9,171.2L546.2,171.1L537.6,171.1L528.9,171.2L520.2,171.3L511.6,171.6L502.9,171.9L494.3,172.3L485.7,172.8L477.1,173.4L468.6,174.1L460.1,174.8L451.6,175.7L443.1,176.6L434.7,177.6L426.4,178.6L418,179.8L409.8,181L401.5,182.3L393.4,183.7L385.3,185.1L377.2,186.7L369.2,188.3L361.3,189.9L353.4,191.7L345.6,193.5L337.9,195.4L330.2,197.3L322.6,199.3L315.1,201.4L307.6,203.5L300.2,205.7L292.9,208L285.7,210.3L278.5,212.7L271.4,215.2L264.3,217.7L257.4,220.2L250.5,222.8L243.7,225.5L237,228.2L230.3,230.9L223.7,233.8L217.2,236.6L210.7,239.5L204.4,242.5L198.1,245.5L191.8,248.5L185.6,251.6L179.5,254.7L173.5,257.9L167.5,261.1L161.6,264.3L155.8,267.6L150,270.9" fill="none" stroke="var(--map-route-pending)" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 9"/>
+        <path class="route-flown" d="M904,255L897.9,251.9L891.7,248.8L885.5,245.7L879.2,242.7L872.8,239.8L866.4,236.9L859.9,234L853.3,231.2L846.6,228.4L839.9,225.7L833.1,223.1L826.2,220.4L819.3,217.9L812.3,215.4L805.2,212.9L798,210.5L790.7,208.2L783.4,205.9L776.1,203.7L768.6,201.6L761.1,199.5L753.5,197.5L745.8,195.5L738.1,193.7L730.3,191.8L722.4,190.1L714.5,188.4L706.5,186.8L698.4,185.3L690.3,183.8L682.2,182.4L674,181.1L665.7,179.9L657.4,178.7L649,177.7L640.6,176.7L632.2,175.7L623.7,174.9L615.2,174.1L606.6,173.5L598,172.9L589.4,172.4L580.8,172L572.2,171.6L563.5,171.4L554.9,171.2L546.2,171.1L537.6,171.1L528.9,171.2L520.2,171.3L511.6,171.6L502.9,171.9L494.3,172.3L485.7,172.8L477.1,173.4L468.6,174.1L460.1,174.8L451.6,175.7L443.1,176.6L434.7,177.6L426.4,178.6L418,179.8L409.8,181L401.5,182.3L393.4,183.7L385.3,185.1L377.2,186.7L369.2,188.3L361.3,189.9L353.4,191.7L345.6,193.5L337.9,195.4L330.2,197.3L322.6,199.3L315.1,201.4L307.6,203.5L300.2,205.7L292.9,208L285.7,210.3L278.5,212.7L271.4,215.2L264.3,217.7L257.4,220.2L250.5,222.8L243.7,225.5L237,228.2L230.3,230.9L223.7,233.8L217.2,236.6L210.7,239.5L204.4,242.5L198.1,245.5L191.8,248.5L185.6,251.6L179.5,254.7L173.5,257.9L167.5,261.1L161.6,264.3L155.8,267.6L150,270.9" fill="none" stroke="var(--blue-d)" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="150" cy="270.9" r="6.5" fill="var(--map)" stroke="var(--orange-d)" stroke-width="3"/>
+        <circle cx="904" cy="255" r="6.5" fill="var(--map)" stroke="var(--blue-d)" stroke-width="3"/>
+        <text x="150" y="298.9" text-anchor="middle" fill="rgba(235,235,245,0.9)" font-size="15" font-weight="600">HND</text>
+        <text x="904" y="283" text-anchor="middle" fill="rgba(235,235,245,0.9)" font-size="15" font-weight="600">SFO</text>
+        <g class="plane" data-plane-offset="0">
+          <circle class="ping" cx="0" cy="0" r="20" fill="none" stroke="var(--blue-d)" stroke-width="2"/>
+          <circle cx="0" cy="0" r="18" fill="var(--locator-ring-fill)"/>
+          <g transform="scale(0.92) translate(-11.5 -12)"><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" fill="var(--on-accent)" stroke="rgba(0,0,0,0.25)" stroke-width="0.5"/></g>
         </g>
       </svg>
 
       <nav class="navbar glass" aria-label="Primary">
         <span class="brandmark" aria-hidden="true"><i class="ti ti-plane-tilt"></i></span>
         <span class="wordmark">Skytrace</span>
-        <button class="searchfield" type="button" aria-label="Search flights, airports, and routes">
+        <button class="searchfield" type="button" data-search-open="#sky-search" aria-label="Search flights, airports, and routes">
           <i class="ti ti-search" aria-hidden="true" style="font-size:0.9375rem"></i>
           <span>Search flights, airports, routes</span>
         </button>
-        <button class="iconbtn" type="button" aria-label="Notifications"><i class="ti ti-bell" aria-hidden="true"></i></button>
-        <button class="iconbtn avatar" type="button" aria-label="Your account">AW</button>
+        <button class="iconbtn" type="button" data-toast="No new alerts right now" aria-label="Notifications"><i class="ti ti-bell" aria-hidden="true"></i></button>
+        <button class="iconbtn avatar" type="button" data-toast="Signed in as Alex W." aria-label="Your account">AW</button>
       </nav>
+
+      <div class="searchpanel glass" id="sky-search" data-search-panel hidden role="dialog" aria-label="Search flights">
+        <div class="searchpanel-field">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <input type="search" data-search-input placeholder="Search flights, airports, routes" aria-label="Search flights, airports, routes">
+          <button type="button" class="searchpanel-close" data-search-close aria-label="Close search">Cancel</button>
+        </div>
+        <ul class="searchpanel-list">
+          <li data-search-item><button type="button" data-toast="Tracking UA 482 · San Francisco → Tokyo"><span class="si-code">UA 482</span> San Francisco → Tokyo</button></li>
+          <li data-search-item><button type="button" data-toast="Tracking NH 7 · Tokyo → San Francisco"><span class="si-code">NH 7</span> Tokyo → San Francisco</button></li>
+          <li data-search-item><button type="button" data-toast="Showing SFO · San Francisco International"><span class="si-code">SFO</span> San Francisco International</button></li>
+          <li data-search-item><button type="button" data-toast="Showing HND · Tokyo Haneda"><span class="si-code">HND</span> Tokyo Haneda</button></li>
+        </ul>
+      </div>
 
       <section class="flightcard glass" aria-label="Flight UA 482 status">
         <div class="row">
@@ -332,11 +346,11 @@
       </section>
 
       <div class="mapctl glass" role="group" aria-label="Map controls">
-        <button type="button" aria-label="Zoom in"><i class="ti ti-plus" aria-hidden="true"></i></button>
+        <button type="button" data-toast="Zoomed in" aria-label="Zoom in"><i class="ti ti-plus" aria-hidden="true"></i></button>
         <span class="div" aria-hidden="true"></span>
-        <button type="button" class="locate" aria-label="Center on aircraft"><i class="ti ti-current-location" aria-hidden="true"></i></button>
+        <button type="button" class="locate" data-toast="Centered on UA 482" aria-label="Center on aircraft"><i class="ti ti-current-location" aria-hidden="true"></i></button>
         <span class="div" aria-hidden="true"></span>
-        <button type="button" aria-label="Zoom out"><i class="ti ti-minus" aria-hidden="true"></i></button>
+        <button type="button" data-toast="Zoomed out" aria-label="Zoom out"><i class="ti ti-minus" aria-hidden="true"></i></button>
       </div>
 
       <section class="strip glass" aria-label="Flight progress and live metrics">
@@ -353,11 +367,11 @@
         <div class="metrics">
           <div class="metric">
             <div class="k"><i class="ti ti-arrow-up" aria-hidden="true" style="font-size:0.875rem"></i>Altitude</div>
-            <div class="v">38,000 ft</div>
+            <div class="v" data-count="38000" data-comma data-suffix=" ft">38,000 ft</div>
           </div>
           <div class="metric">
             <div class="k"><i class="ti ti-gauge" aria-hidden="true" style="font-size:0.875rem"></i>Ground speed</div>
-            <div class="v">521 mph</div>
+            <div class="v" data-count="521" data-suffix=" mph">521 mph</div>
           </div>
           <div class="metric">
             <div class="k"><i class="ti ti-clock" aria-hidden="true" style="font-size:0.875rem"></i>Time left</div>
@@ -371,5 +385,6 @@
       </section>
     </div>
   </main>
+  <script src="tracker.js"></script>
 </body>
 </html>

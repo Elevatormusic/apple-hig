@@ -74,6 +74,19 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(29,158,117,0.5);}70%{box-shadow:0 0 0 6px rgba(29,158,117,0);}100%{box-shadow:0 0 0 0 rgba(29,158,117,0);}}
   #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--color-text-primary);color:var(--color-background-primary);padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:90%;text-align:center;z-index:10;}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .van-searchbar{flex:1;display:flex;align-items:center;gap:8px;background:var(--color-background-secondary);border:none;border-radius:var(--border-radius-md);padding:8px 12px;font:inherit;font-size:14px;color:var(--color-text-tertiary);text-align:left;cursor:pointer;width:100%;}
+  .van-search{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);box-shadow:0 12px 30px rgba(0,0,0,0.18);padding:8px;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s;}
+  .van-search.open{opacity:1;transform:none;pointer-events:auto;}
+  .van-search-field{display:flex;align-items:center;gap:8px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;}
+  .van-search-field i{color:var(--color-text-tertiary);font-size:16px;}
+  .van-search-field input{flex:1;min-width:0;border:none;background:none;color:var(--color-text-primary);font:inherit;font-size:14px;outline:none;}
+  .van-search-field input::placeholder{color:var(--color-text-tertiary);}
+  .van-search-close{border:none;background:none;color:var(--color-text-info);font:inherit;font-size:14px;font-weight:500;cursor:pointer;padding:4px 8px;}
+  .van-search-list{list-style:none;margin:6px 0 0;padding:0;max-height:220px;overflow:auto;}
+  .van-search-list button{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;color:var(--color-text-primary);font:inherit;font-size:14px;text-align:left;padding:9px 10px;border-radius:var(--border-radius-md);cursor:pointer;}
+  .van-search-list button:hover{background:var(--color-background-secondary);}
+  .van-search-list .si-code{font-weight:600;min-width:54px;}
+  @media (prefers-reduced-motion:reduce){.van-search{transition:none;}}
 </style>
 </head>
 <body>
@@ -82,12 +95,25 @@
 
 <div class="ft-wrap">
 
-  <div style="display:flex;align-items:center;gap:10px;">
-    <div style="flex:1;display:flex;align-items:center;gap:8px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;">
+  <div style="display:flex;align-items:center;gap:10px;position:relative;">
+    <button type="button" class="van-searchbar" data-search-open="#van-search" aria-label="Search flights, routes, or airports">
       <i class="ti ti-search" style="font-size:18px;color:var(--color-text-tertiary);" aria-hidden="true"></i>
-      <span style="font-size:14px;color:var(--color-text-tertiary);">Search flight, route, or airport</span>
-    </div>
+      <span>Search flight, route, or airport</span>
+    </button>
     <span class="ft-pill" style="background:var(--color-background-success);color:var(--color-text-success);"><span class="lp"></span>Live</span>
+    <div class="van-search" id="van-search" data-search-panel hidden role="dialog" aria-label="Search flights">
+      <div class="van-search-field">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input type="search" data-search-input placeholder="Search flight, route, or airport" aria-label="Search flight, route, or airport">
+        <button type="button" class="van-search-close" data-search-close aria-label="Close search">Cancel</button>
+      </div>
+      <ul class="van-search-list">
+        <li data-search-item><button type="button" data-toast="Opening UA 2402 · San Francisco to New York"><span class="si-code">UA 2402</span> San Francisco → New York</button></li>
+        <li data-search-item><button type="button" data-toast="Opening DL 415 · Atlanta to Los Angeles"><span class="si-code">DL 415</span> Atlanta → Los Angeles</button></li>
+        <li data-search-item><button type="button" data-toast="Showing SFO · San Francisco International"><span class="si-code">SFO</span> San Francisco International</button></li>
+        <li data-search-item><button type="button" data-toast="Showing JFK · New York Kennedy"><span class="si-code">JFK</span> New York Kennedy</button></li>
+      </ul>
+    </div>
   </div>
 
   <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;display:flex;flex-direction:column;gap:1rem;">
@@ -105,37 +131,21 @@
     </div>
 
     <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:6px;">
-      <svg viewBox="0 0 680 300" width="100%" height="auto" style="display:block;" role="img" aria-label="Map of the contiguous United States with the flight path from San Francisco to New York; the aircraft is 62 percent of the way along the route.">
-        <path d="M98 120 L104 150 L112 182 L100 205 L95 222 L86 230 L96 238 L128 256 L150 262 L195 260 L235 258 L250 262 L262 276 L286 266 L306 274 L322 262 L345 257 L376 258 L382 266 L394 257 L432 253 L472 252 L508 254 L512 257 L518 285 L527 283 L521 256 L538 238 L550 216 L562 194 L570 178 L588 152 L596 138 L604 140 L612 120 L590 112 L562 108 L538 110 L520 122 L506 110 L482 126 L468 108 L440 104 L380 102 L310 103 L240 106 L170 112 L120 118 Z" fill="rgba(125,122,112,0.15)" stroke="rgba(125,122,112,0.34)" stroke-width="1" stroke-linejoin="round"/>
-        <g style="stroke:var(--color-border-tertiary);" stroke-width="1" stroke-dasharray="2 7" opacity="0.7">
-          <line x1="150" y1="20" x2="150" y2="280"/>
-          <line x1="280" y1="20" x2="280" y2="280"/>
-          <line x1="410" y1="20" x2="410" y2="280"/>
-          <line x1="540" y1="20" x2="540" y2="280"/>
-          <line x1="40" y1="100" x2="640" y2="100"/>
-          <line x1="40" y1="190" x2="640" y2="190"/>
-        </g>
-
-        <path d="M90 230 Q 495 115.8 590 150" fill="none" style="stroke:var(--color-border-secondary);" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round"/>
-        <path d="M90 230 Q 245 124.6 400 119.14" fill="none" stroke="#378ADD" stroke-width="2.5" stroke-linecap="round"/>
-
-        <text x="340" y="104" text-anchor="middle" style="fill:var(--color-text-secondary);font-family:var(--font-sans);font-size:12px;">5h 28m · 982 mi to go</text>
-
-        <circle cx="90" cy="230" r="6" style="fill:var(--color-background-primary);stroke:#185FA5;" stroke-width="2"/>
-        <circle cx="90" cy="230" r="2.5" fill="#185FA5"/>
-        <text x="74" y="254" text-anchor="start" style="fill:var(--color-text-primary);font-family:var(--font-sans);font-size:15px;font-weight:500;">SFO</text>
-        <text x="74" y="270" text-anchor="start" style="fill:var(--color-text-secondary);font-family:var(--font-sans);font-size:11px;">San Francisco</text>
-
-        <circle cx="590" cy="150" r="6" style="fill:var(--color-background-primary);stroke:#185FA5;" stroke-width="2"/>
-        <circle cx="590" cy="150" r="2.5" fill="#185FA5"/>
-        <text x="606" y="155" text-anchor="end" style="fill:var(--color-text-primary);font-family:var(--font-sans);font-size:15px;font-weight:500;">JFK</text>
-        <text x="606" y="171" text-anchor="end" style="fill:var(--color-text-secondary);font-family:var(--font-sans);font-size:11px;">New York</text>
-
-        <g transform="translate(400,119)">
-          <circle r="16" style="fill:var(--color-background-primary);stroke:#378ADD;" stroke-width="1"/>
-          <g transform="rotate(-5) translate(-12 -12) scale(1.05)">
-            <path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" fill="#185FA5"/>
-          </g>
+      <svg viewBox="0 0 680 300" width="100%" style="display:block;height:auto;" role="img" aria-label="Map of the contiguous United States with the flight path from San Francisco to New York; the aircraft is 62 percent of the way along the route." data-flight-map data-progress="0.62" data-loop="15000">
+        <path d="M487,72L507,66L513,56L516,40L526,41L530,53L535,57L536,61L521,74L517,90L526,94L507,103L499,112L502,114L499,128L493,124L498,133L495,139L488,128L491,150L494,149L498,159L496,164L479,184L477,189L464,204L462,214L466,224L481,253L480,265L474,268L455,244L456,234L443,224L433,230L423,224L403,225L399,231L388,239L378,232L375,235L361,233L355,236L346,245L336,250L332,257L335,270L318,265L315,254L306,240L298,232L293,231L284,239L274,232L271,222L260,210L246,208L246,213L223,209L195,193L196,191L177,189L176,181L170,172L156,164L156,158L150,144L152,139L144,117L144,101L148,93L149,79L154,72L163,49L164,28L175,34L174,42L178,36L177,26L264,36L350,50L364,53L373,58L388,57L393,54L417,65L420,69L434,78L439,94L435,110L440,113L447,106L462,97L463,90L475,87L484,73ZM510,105L510,105L510,105ZM531,67L531,67L531,67ZM500,113L500,113L500,113ZM523,98L523,98L523,98ZM518,99L518,99L518,99ZM527,98L527,98L527,98ZM499,159L499,159L499,159ZM501,164L501,164L501,164ZM499,165L499,165L499,165ZM495,172L495,172L495,172ZM464,257L464,257L464,257ZM464,256L464,256L464,256ZM480,267L480,267L480,267ZM379,236L379,236L379,236ZM336,252L336,252L336,252ZM338,249L338,249L338,249ZM333,257L333,257L333,257ZM353,240L353,240L353,240ZM334,268L334,268L334,268ZM156,169L156,169L156,169ZM161,178L161,178L161,178ZM168,184L168,184L168,184ZM158,170L158,170L158,170ZM159,169L159,169L159,169ZM169,179L169,179L169,179ZM176,29L176,29L176,29ZM174,30L174,30L174,30ZM176,34L176,34L176,34ZM517,99L517,99L517,99ZM502,120L502,120L502,120ZM497,139L497,139L497,139ZM495,172L495,172L495,172ZM473,272L473,272L473,272ZM477,270L477,270L477,270ZM478,269L478,269L478,269ZM475,271L475,271L475,271ZM463,213L463,213L463,213ZM471,273L471,273L471,273ZM479,246L479,246L479,246ZM469,274L469,274L469,274ZM403,232L403,232L403,232ZM406,227L406,227L406,227ZM410,226L410,226L410,226ZM400,229L400,229L400,229ZM404,231L404,231L404,231ZM436,230L436,230L436,230ZM172,42L172,42L172,42ZM175,41L175,41L175,41ZM175,39L175,39L175,39ZM175,31L175,31L175,31ZM528,69L528,69L528,69Z" fill="rgba(125,122,112,0.16)" stroke="rgba(125,122,112,0.34)" stroke-width="1" stroke-linejoin="round"/>
+        <path class="route-base" d="M149.5,131.3L155,130.8L160.5,130.4L166,129.9L171.5,129.5L177,129L182.5,128.6L188,128.1L193.5,127.7L199,127.3L204.5,126.8L210,126.4L215.5,126L221,125.6L226.5,125.2L232.1,124.8L237.6,124.3L243.1,123.9L248.6,123.5L254.1,123.1L259.6,122.8L265.1,122.4L270.6,122L276.1,121.6L281.6,121.2L287.2,120.9L292.7,120.5L298.2,120.2L303.7,119.8L309.2,119.5L314.7,119.1L320.2,118.8L325.8,118.5L331.3,118.1L336.8,117.8L342.3,117.5L347.8,117.2L353.3,116.9L358.9,116.6L364.4,116.3L369.9,116L375.4,115.7L380.9,115.5L386.5,115.2L392,114.9L397.5,114.7L403,114.4L408.5,114.2L414.1,114L419.6,113.7L425.1,113.5L430.6,113.3L436.2,113.1L441.7,112.8L447.2,112.6L452.7,112.4L458.2,112.2L463.8,112.1L469.3,111.9L474.8,111.7L480.3,111.5L485.8,111.3L491.4,111.2L496.9,111L502.4,110.9" fill="none" style="stroke:var(--color-border-secondary);" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round"/>
+        <path class="route-flown" d="M149.5,131.3L155,130.8L160.5,130.4L166,129.9L171.5,129.5L177,129L182.5,128.6L188,128.1L193.5,127.7L199,127.3L204.5,126.8L210,126.4L215.5,126L221,125.6L226.5,125.2L232.1,124.8L237.6,124.3L243.1,123.9L248.6,123.5L254.1,123.1L259.6,122.8L265.1,122.4L270.6,122L276.1,121.6L281.6,121.2L287.2,120.9L292.7,120.5L298.2,120.2L303.7,119.8L309.2,119.5L314.7,119.1L320.2,118.8L325.8,118.5L331.3,118.1L336.8,117.8L342.3,117.5L347.8,117.2L353.3,116.9L358.9,116.6L364.4,116.3L369.9,116L375.4,115.7L380.9,115.5L386.5,115.2L392,114.9L397.5,114.7L403,114.4L408.5,114.2L414.1,114L419.6,113.7L425.1,113.5L430.6,113.3L436.2,113.1L441.7,112.8L447.2,112.6L452.7,112.4L458.2,112.2L463.8,112.1L469.3,111.9L474.8,111.7L480.3,111.5L485.8,111.3L491.4,111.2L496.9,111L502.4,110.9" fill="none" stroke="#378ADD" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="149.5" cy="131.3" r="6" style="fill:var(--color-background-primary);stroke:#185FA5;" stroke-width="2"/>
+        <circle cx="149.5" cy="131.3" r="2.5" fill="#185FA5"/>
+        <text x="149.5" y="153.3" text-anchor="middle" style="fill:var(--color-text-primary);font-family:var(--font-sans);font-size:15px;font-weight:500;">SFO</text>
+        <text x="149.5" y="169.3" text-anchor="middle" style="fill:var(--color-text-secondary);font-family:var(--font-sans);font-size:11px;">San Francisco</text>
+        <circle cx="502.4" cy="110.9" r="6" style="fill:var(--color-background-primary);stroke:#185FA5;" stroke-width="2"/>
+        <circle cx="502.4" cy="110.9" r="2.5" fill="#185FA5"/>
+        <text x="502.4" y="98.9" text-anchor="middle" style="fill:var(--color-text-primary);font-family:var(--font-sans);font-size:15px;font-weight:500;">JFK</text>
+        <text x="502.4" y="130.9" text-anchor="middle" style="fill:var(--color-text-secondary);font-family:var(--font-sans);font-size:11px;">New York</text>
+        <g class="plane" data-plane-offset="0">
+          <circle cx="0" cy="0" r="13" style="fill:var(--color-background-primary);stroke:#378ADD;" stroke-width="1"/>
+          <g transform="scale(0.95) translate(-11.5 -12)"><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" fill="#185FA5"/></g>
         </g>
       </svg>
     </div>
@@ -159,9 +169,9 @@
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
-      <div class="ft-metric"><p class="lbl">Altitude</p><p class="val">38,000 ft</p></div>
-      <div class="ft-metric"><p class="lbl">Ground speed</p><p class="val">521 mph</p></div>
-      <div class="ft-metric"><p class="lbl">Distance left</p><p class="val">982 mi</p></div>
+      <div class="ft-metric"><p class="lbl">Altitude</p><p class="val" data-count="38000" data-comma data-suffix=" ft">38,000 ft</p></div>
+      <div class="ft-metric"><p class="lbl">Ground speed</p><p class="val" data-count="521" data-suffix=" mph">521 mph</p></div>
+      <div class="ft-metric"><p class="lbl">Distance left</p><p class="val" data-count="982" data-suffix=" mi">982 mi</p></div>
       <div class="ft-metric"><p class="lbl">Est. arrival</p><p class="val">16:38</p></div>
     </div>
 
@@ -234,5 +244,6 @@
     toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2600);
   }
 </script>
+<script src="tracker.js"></script>
 </body>
 </html>
