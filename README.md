@@ -109,6 +109,10 @@ spaces, and ornaments, with eyes-and-hands input.
 - **Commit gate (hook)** — a PreToolUse hook blocks a Claude-run `git commit` that stages UI files
   until a HIG review passes; see [Mandatory review gate](#mandatory-review-gate). Turn it off with
   `HIG_GATE=off` or by deleting `hooks/hooks.json`.
+- **Update notifier (hook)** — a SessionStart hook quietly checks GitHub at most once a day and, if a
+  newer release exists, prints a one-line notice with the update command. It never blocks, never
+  fetches more than the version string, and fails silently offline. Turn it off with
+  `HIG_UPDATE_CHECK=off`; see [Update notifier](#update-notifier).
 
 ## Coverage
 
@@ -142,7 +146,7 @@ Verify and manage it:
 ```text
 claude plugin list                       # confirm apple-hig is installed and enabled
 claude plugin details apple-hig          # show the skill, commands, agent, and token cost
-claude plugin update apple-hig           # pull a newer version after the repo is updated
+claude plugin update apple-hig           # pull a newer version (the notifier tells you when one exists)
 claude plugin uninstall apple-hig        # remove it
 claude plugin marketplace remove apple-hig
 ```
@@ -152,11 +156,11 @@ claude plugin marketplace remove apple-hig
 `claude plugin details apple-hig` reports the component inventory and its projected token cost:
 
 ```text
-Apple HIG (apple-hig) 1.4.2
+Apple HIG (apple-hig) 1.5.0
 Component inventory
   Skills (5)  apple-hig, hig-review, hig-scaffold, hig-sync, hig-tokens
   Agents (1)  design-reviewer
-  Hooks  (2)  SessionStart, PreToolUse (commit gate)  (harness-only — no model context cost)
+  Hooks  (2)  SessionStart (ready + update check), PreToolUse (commit gate)  (harness-only — no model context cost)
   MCP servers (0) · LSP servers (0)
 
 Projected token cost
@@ -236,6 +240,30 @@ invalidates the marker, so you can't review once and then change the code.
 - `HIG_GATE=off` — disable the gate entirely.
 - `HIG_GATE_BYPASS=1` — allow a single blocked commit (appended to a bypass log).
 - `HIG_GATE_EXT=".tsx,.css,…"` — override the UI file extensions that trigger the gate.
+
+## Update notifier
+
+A SessionStart hook (`hooks/version-check.mjs`) tells you when a newer apple-hig release is out, so the
+plugin doesn't quietly fall behind. It compares the installed `plugin.json` version against the one on
+`main`, and if you're behind it prints a single line:
+
+```text
+apple-hig 1.6.0 is available (installed 1.5.0). Update: claude plugin update apple-hig@apple-hig
+```
+
+It is deliberately unobtrusive:
+
+- **Notify only** — it never updates anything for you; you run the update command when you choose.
+- **Throttled** — it checks GitHub at most once every 24 h and caches the result in your temp dir, so
+  it isn't a network call on every session.
+- **Minimal & private** — it fetches only the version string from
+  `raw.githubusercontent.com/Elevatormusic/apple-hig/main/.claude-plugin/plugin.json`, with a 2 s
+  timeout, and **fails silently** when offline or rate-limited (no errors, no noise).
+- **Versions compared numerically** — `1.10.0` is correctly newer than `1.9.0`.
+
+**Switch**
+
+- `HIG_UPDATE_CHECK=off` (also `0`/`false`/`no`) — disable the check entirely.
 
 ## Live values from your SDK (macOS)
 
@@ -319,7 +347,7 @@ apple-hig/
 │   └── references/design-tokens.md
 ├── agents/design-reviewer.md
 ├── commands/                  # hig-review, hig-scaffold, hig-sync, hig-tokens
-├── hooks/                     # hooks.json + hig-gate.mjs (the commit gate)
+├── hooks/                     # hooks.json + hig-gate.mjs (commit gate) + version-check.mjs (update notifier)
 ├── scripts/                   # install-rules.mjs, hig-sync.mjs, sdk-probe/ (Mac Catalyst)
 ├── integrations/apple-hig.md  # canonical ruleset for other AI coding tools
 ├── docs/                      # GitHub Pages site (the comparison + live demo)
