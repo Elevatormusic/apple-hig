@@ -92,11 +92,14 @@
   .ftgal{max-width:980px;margin:22px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .ftgal figure{margin:0;display:flex;flex-direction:column}
   .ftgal .wide{grid-column:1 / -1}
-  .ftcap{display:flex;align-items:center;gap:9px;margin:0 2px 10px;flex-wrap:wrap}
-  .ftchip{font-size:12px;font-weight:700;letter-spacing:.2px;padding:4px 11px;border-radius:999px;white-space:nowrap}
-  .ftchip.v{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
-  .ftchip.f,.ftchip.s{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent)}
-  .ftcap .note{font-size:13px;color:var(--text2)}
+  .ftcap{display:flex;align-items:baseline;gap:8px;margin:0 2px 12px;flex-wrap:wrap}
+  .ftcap .dot{width:8px;height:8px;border-radius:50%;align-self:center;flex:0 0 auto}
+  .ftcap .dot.v{background:var(--text2)}
+  .ftcap .dot.f{background:var(--accent)}
+  .ftcap .name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.1px}
+  .ftcap .name.f{color:var(--accent)}
+  .ftcap .note{font-size:13px;color:var(--text2);background:none;border:0;border-radius:0;padding:0;margin:0;display:inline}
+  .ftcap .note::before{content:"·";margin-right:6px}
   .liveframe{position:relative;width:100%;aspect-ratio:720/1140;overflow:hidden;border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);background:#0c0c0d}
   .liveframe iframe{position:absolute;top:0;left:0;width:720px;height:1140px;border:0;transform-origin:top left;background:#0c0c0d}
   @media(max-width:680px){ .ftgal{grid-template-columns:1fr} }
@@ -169,14 +172,14 @@
     </div>
   </section>
 
-  <p class="ftlead">The same flight tracker, built two ways — <strong>live, not screenshots</strong>. Left, vanilla Claude Code; right, the same app after apple-hig reviews it. (A from-scratch build runs lower down.)</p>
+  <p class="ftlead">The same flight tracker, built two ways — <strong>live, not screenshots</strong>. Tap the buttons in either to feel the difference: vanilla Claude Code on the left, the same app after apple-hig reviews it on the right. (A from-scratch build runs lower down.)</p>
   <div class="ftgal">
     <figure>
-      <figcaption class="ftcap"><span class="ftchip v">Vanilla Claude Code</span><span class="note">no plugin</span></figcaption>
+      <figcaption class="ftcap"><span class="dot v"></span><span class="name">Vanilla Claude Code</span><span class="note">no plugin</span></figcaption>
       <div class="liveframe"><iframe src="mockups/ft-vanilla.html" loading="lazy" title="A flight tracker built with vanilla Claude Code — no plugin: an abstract grid map, two identical outline buttons, flat gray status pills."></iframe></div>
     </figure>
     <figure>
-      <figcaption class="ftcap"><span class="ftchip f">+ apple-hig</span><span class="note">same app, reviewed</span></figcaption>
+      <figcaption class="ftcap"><span class="dot f"></span><span class="name f">Reviewed by apple-hig</span><span class="note">same app</span></figcaption>
       <div class="liveframe"><iframe src="mockups/ft-fixed.html" loading="lazy" title="The same flight tracker after the apple-hig plugin reviewed it — a real labeled map, one prominent capsule action, semantic color-coded statuses, and a clear hierarchy."></iframe></div>
     </figure>
   </div>
