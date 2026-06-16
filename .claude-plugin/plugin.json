@@ -1,7 +1,7 @@
 {
   "name": "apple-hig",
   "displayName": "Apple HIG",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Automatically design and review UIs to Apple's Human Interface Guidelines across iOS, iPadOS, macOS, watchOS, tvOS, and visionOS. Ships a complete on-disk guideline reference so it never fetches Apple at runtime; the router skill loads only the files relevant to the current task.",
   "author": {
     "name": "Shayan B",

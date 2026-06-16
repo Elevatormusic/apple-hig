@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apple Maps (MapKit JS), to HIG — apple-hig scaffold</title>
+<!--
+  Scaffolded by the apple-hig plugin: a real Apple Maps view via MapKit JS 6,
+  built to the Human Interface Guidelines. No key lives in this file — it reads
+  a domain-bound token you supply (?token=… or window.MAPKIT_TOKEN), so the
+  public page degrades gracefully and never ships a secret.
+  Reference: skills/apple-hig/guidelines/technologies/maps.md
+  Verify the API + token flow on Apple: https://developer.apple.com/maps/web/
+-->
+<style>
+  :root { color-scheme: light dark; --bg:#f2f2f7; --card:#fff; --label:#1c1c1e; --label2:#5c5c61; --blue:#0066d6; --border:rgba(0,0,0,.12); }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#000; --card:#1c1c1e; --label:#fff; --label2:#aeaeb2; --blue:#0a84ff; --border:rgba(255,255,255,.16); } }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--label);
+    font: 17px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  /* the map is the Apple surface — let it fill, and never cover MapKit's attribution / Legal link */
+  #map { position: fixed; inset: 0; }
+  .notice { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; }
+  .notice .card { max-width: 460px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 28px 26px; box-shadow: 0 24px 60px rgba(0,0,0,.18); }
+  .notice h1 { font-size: 22px; font-weight: 600; margin: 0 0 6px; letter-spacing: -.2px; }
+  .notice p { margin: 0 0 14px; color: var(--label2); font-size: 15px; }
+  .notice ol { margin: 0 0 4px; padding-left: 20px; color: var(--label2); font-size: 15px; }
+  .notice li { margin: 6px 0; }
+  .notice code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px;
+    background: color-mix(in srgb, var(--label) 8%, transparent); padding: 2px 6px; border-radius: 6px; color: var(--label); }
+  .notice a { color: var(--blue); }
+</style>
+</head>
+<body>
+  <!-- accessible name on the map container; MapKit makes the controls keyboard-reachable -->
+  <div id="map" role="application" aria-label="Apple Maps — flight route from San Francisco to New York"></div>
+
+  <div id="notice" class="notice" hidden>
+    <div class="card">
+      <h1>Add your MapKit JS token</h1>
+      <p>This is the apple-hig <strong>scaffold output</strong> — a HIG-correct Apple Maps view. It renders
+        real Apple Maps once you supply a domain-bound MapKit JS token (no token is committed to the repo).</p>
+      <ol>
+        <li>In your Apple Developer account, create a <strong>Maps Token</strong> (MapKit JS 6) restricted to your domain.</li>
+        <li>Run this with the token: append <code>?token=YOUR_TOKEN</code> to the URL, or set <code>window.MAPKIT_TOKEN</code> before this script (inject it from <code>MAPKIT_TOKEN</code> at build/deploy — never hardcode it).</li>
+      </ol>
+      <p style="margin-top:14px"><a href="https://developer.apple.com/maps/web/">developer.apple.com/maps/web</a></p>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var token = new URLSearchParams(location.search).get('token') || window.MAPKIT_TOKEN;
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var darkQ = matchMedia('(prefers-color-scheme: dark)');
+
+    // No token → show the scaffold notice instead of a broken map. Real Apple Maps needs a key.
+    if (!token) { document.getElementById('notice').hidden = false; return; }
+
+    // MapKit JS 6: a static, domain-bound token on the loader — no private key, no JWT endpoint.
+    var s = document.createElement('script');
+    s.src = 'https://cdn.apple-mapkit.com/mk/6/mapkit.core.js';
+    s.crossOrigin = 'anonymous';
+    s.async = true;
+    s.dataset.libraries = 'map,annotations';
+    s.dataset.token = token;
+    s.dataset.callback = 'initMapKit';
+
+    window.initMapKit = function () {
+      function scheme() { return darkQ.matches ? mapkit.Map.ColorSchemes.Dark : mapkit.Map.ColorSchemes.Light; }
+
+      var map = new mapkit.Map('map', {
+        colorScheme: scheme(),                                  // match the system appearance (light/dark)
+        showsUserLocationControl: true,                         // standard controls, not custom chrome
+        showsCompass: mapkit.FeatureVisibility.Adaptive,
+        showsScale: mapkit.FeatureVisibility.Adaptive,
+        showsZoomControl: true
+        // Apple's logo + "Legal" link are drawn by MapKit and left fully visible (required).
+      });
+
+      var sfo = new mapkit.Coordinate(37.615, -122.389);
+      var jfk = new mapkit.Coordinate(40.641, -73.779);
+
+      // markers: title + an accessible label; meaning never lives in color alone
+      map.showItems([
+        new mapkit.MarkerAnnotation(sfo, { title: 'SFO', glyphText: '✈', color: '#0a84ff', accessibilityLabel: 'San Francisco International' }),
+        new mapkit.MarkerAnnotation(jfk, { title: 'JFK', glyphText: '⚑', color: '#0a84ff', accessibilityLabel: 'New York Kennedy' })
+      ]);
+      map.addOverlay(new mapkit.PolylineOverlay([sfo, jfk], { style: new mapkit.Style({ lineWidth: 3, strokeColor: '#0a84ff' }) }));
+
+      // frame both endpoints; honor Reduce Motion (no animated camera fly-in)
+      var region = new mapkit.BoundingRegion(49, -66, 24, -125).toCoordinateRegion();
+      map.setRegionAnimated(region, !reduce);
+
+      // keep the map's appearance in sync if the user switches light/dark
+      darkQ.addEventListener('change', function () { map.colorScheme = scheme(); });
+    };
+
+    document.head.appendChild(s);
+  })();
+  </script>
+</body>
+</html>

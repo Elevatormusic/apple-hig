@@ -32,3 +32,12 @@ Steps:
 3. **Annotate** the generated code with brief comments noting which HIG rule each choice satisfies.
 4. **Summarize** what you built and list any decisions to confirm (tint color, number of tabs, etc.).
    Offer to run `/hig-review` on the result.
+
+**Apple Maps requests** (a map view/screen) route to `technologies/maps.md`. Emit a real Apple Maps
+integration, not a stand-in:
+- **Web** → **MapKit JS** (the MapKit JS 6 `@apple/mapkit-loader` or `mapkit.core.js` loader). Read the
+  domain-bound token from an env var (`MAPKIT_TOKEN`) — **never hardcode or commit a token**. Sync
+  `colorScheme` to `prefers-color-scheme`, keep Apple's attribution + Legal link visible, honor Reduce
+  Motion, and use the standard map controls.
+- **Apple platforms** → SwiftUI `Map` (or `MKMapView`), with `MapUserLocationButton`/`MapCompass`,
+  semantic styling, in-context Core Location, and ≥44 pt annotation targets.
