@@ -20,11 +20,21 @@
       var offset = parseFloat(plane.getAttribute('data-plane-offset')) || 0;
       flown.style.strokeDasharray = L + ' ' + L;
 
+      // Sample the path ONCE up front. getPointAtLength forces a synchronous layout
+      // flush; calling it every animation frame turns the loop into a per-frame reflow
+      // (which re-shapes page text — very slow on some font paths). Interpolate instead.
+      var SAMPLES = 240, pts = [];
+      for (var sIdx = 0; sIdx <= SAMPLES; sIdx++) pts.push(flown.getPointAtLength(L * sIdx / SAMPLES));
+      function pointAt(frac) {
+        var x = Math.max(0, Math.min(1, frac)) * SAMPLES, i = Math.floor(x), t = x - i;
+        var a = pts[i], b = pts[Math.min(SAMPLES, i + 1)];
+        return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+      }
+
       function place(p) {
         p = Math.max(0, Math.min(1, p));
         flown.style.strokeDashoffset = (L * (1 - p)).toString();
-        var a = flown.getPointAtLength(L * p);
-        var b = flown.getPointAtLength(L * Math.min(1, p + 0.012));
+        var a = pointAt(p), b = pointAt(Math.min(1, p + 0.012));
         var ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
         plane.setAttribute('transform', 'translate(' + a.x.toFixed(1) + ',' + a.y.toFixed(1) + ') rotate(' + (ang + offset).toFixed(1) + ')');
       }

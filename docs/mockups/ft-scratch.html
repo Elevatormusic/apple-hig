@@ -67,6 +67,9 @@
     color: var(--label);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Inter", "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+    /* UI text doesn't need ligatures — skipping them avoids a pathologically slow
+       font-shaping path (DirectWrite ligature-coverage lookup) that froze the page on scroll */
+    font-variant-ligatures: none;
     display: grid;
     place-items: center;
     padding: clamp(16px, 4vw, 48px);
