@@ -53,7 +53,10 @@ classic **Clarity, Deference, Depth** triad (both still underlie the system).
     Transparency, Increase Contrast, Bold Text, Differentiate Without Color, VoiceOver labels
     on **every** interactive element (including icon-only buttons). See [[accessibility]].
 11. **Use motion purposefully** — to show hierarchy and spatial relationships, not decoration;
-    always provide a Reduce Motion alternative. See [[motion]].
+    always provide a Reduce Motion alternative. **Animate cheaply:** prefer `transform`/`opacity`
+    (compositor-only); don't loop-animate layout/paint properties (`width`, `box-shadow`, `clip`) or
+    force layout every frame; avoid animating expensive `filter`/`backdrop-filter` blur; and **pause
+    continuous animation when it's off-screen or the tab/app is backgrounded**. See [[motion]].
 12. **Protect privacy.** Request data only when needed, in context, with clear purpose
     strings; minimize collection. See [[privacy]].
 13. **Write in Apple's voice** — concise, specific, title- or sentence-style capitalization;

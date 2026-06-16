@@ -45,6 +45,8 @@ Plus `.bar` / system chrome materials for bars. UIKit equivalent: `UIBlurEffect`
 - ✅ To imply **depth and layering** (Depth principle).
 - ❌ Don't stack materials (glass on glass) — it muddies legibility and costs performance.
 - ❌ Don't put body content on a material if it threatens contrast.
+- ❌ Don't **animate** a material's blur, and don't run **live motion behind** a material — the blur
+  recomputes every frame; pause/drop it when off-screen or backgrounded. See [[motion]], [[liquid-glass]].
 
 ## Liquid Glass relationship
 

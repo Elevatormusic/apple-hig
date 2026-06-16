@@ -64,6 +64,21 @@ should **never be mixed** in the same context:
   layer) behind clear when the background is bright; skip the dimming when the background is
   already dark enough, or for AVKit media controls.
 
+## Performance
+
+Glass blur (`backdrop-filter` on the web; system materials natively) is **GPU-expensive** — and
+historically slower in some web engines (notably Firefox). Large or stacked blurs can hitch, especially
+on re-entry/refocus, and **continuous motion under glass forces the blur to recompute every frame**.
+
+- Keep glass on **chrome, not content**, and use **one** glass layer per region — don't stack blurs.
+- Keep the **blur radius modest**; a smaller radius composites much faster.
+- **Don't run live animation behind glass** — content moving under a `backdrop-filter` forces the blur
+  to recompute every frame (see [[motion]]).
+- For **off-screen or backgrounded** glass on the web, drop the blur to an **opaque fallback** (reuse
+  the Reduce Transparency surface) so there are no live blur layers to rebuild; restore it when visible.
+- Always ship the **Reduce Transparency / Increase Contrast** opaque fallback (below) — it's also the
+  cheap path.
+
 ## APIs (for engineers)
 
 - **SwiftUI:** `.glassEffect()`, `GlassEffectContainer`, `glassEffectID` for morphing

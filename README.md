@@ -96,7 +96,8 @@ spaces, and ornaments, with eyes-and-hands input.
 - **`design-reviewer` subagent** — audits UI code (SwiftUI/UIKit/AppKit, React/React Native, Flutter,
   HTML/CSS) and reports violations with the rule, the Apple `source_url`, the location, and a concrete
   fix. Catches sub-44 pt targets, hardcoded/non-semantic colors, missing dark-mode variants, off-grid
-  spacing, low contrast, non-standard radii, motion that ignores Reduce Motion, and more.
+  spacing, low contrast, non-standard radii, motion that ignores Reduce Motion, janky/always-on
+  animations (looping a non-compositable property, or never pausing off-screen), and more.
 - **Commands**
   - `/hig-review [path]` — run the design-reviewer on the current file/selection or a path.
   - `/hig-scaffold <platform> <component/screen> [stack]` — generate a HIG-compliant component or
@@ -151,7 +152,7 @@ claude plugin marketplace remove apple-hig
 `claude plugin details apple-hig` reports the component inventory and its projected token cost:
 
 ```text
-Apple HIG (apple-hig) 1.3.0
+Apple HIG (apple-hig) 1.4.0
 Component inventory
   Skills (5)  apple-hig, hig-review, hig-scaffold, hig-sync, hig-tokens
   Agents (1)  design-reviewer

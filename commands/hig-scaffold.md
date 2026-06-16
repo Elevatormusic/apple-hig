@@ -25,6 +25,10 @@ Steps:
      radii; safe areas; leading/trailing (RTL-safe).
    - Provide **light + dark** appearances; **VoiceOver labels** on icon-only controls; a **Reduce
      Motion** alternative for any animation.
+   - **Animate cheaply:** only `transform`/`opacity`; don't loop-animate layout/paint props
+     (`box-shadow`, `width`, `clip`) or read layout (`getBoundingClientRect`, `getPointAtLength`) inside
+     the loop; avoid animating expensive `filter`/`backdrop-filter` blur; pause continuous animation
+     when off-screen or the tab/app is backgrounded.
    - Use the platform's current design language (Liquid Glass chrome on the 26/27 generation; do not
      put glass on the content layer).
    - For **web/Android** targets: keep Apple principles + tokens but use the host platform's

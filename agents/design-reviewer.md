@@ -78,6 +78,17 @@ actually be rendered**:
 10. **Non-standard chrome / wrong component** — custom nav/tab bars instead of system components;
     Liquid Glass applied to the content layer; tab bar with >5 iPhone tabs; alert used for
     non-critical info. Source: the relevant component file + liquid-glass.md.
+11. **Janky / always-on animation (motion performance)** — **(web/CSS)** a loop (`infinite`) animating a
+    non-compositable layout/paint property (`width`, `height`, `top`/`left`, `margin`, `box-shadow`,
+    `clip`/`clip-path`, `background-position`) instead of `transform`/`opacity` → reflow/repaint every
+    frame; a loop that **reads layout every frame** (`getBoundingClientRect`, `offsetWidth`,
+    `getComputedStyle`, SVG `getPointAtLength`/`getBBox`) → forced synchronous reflow ("layout
+    thrashing"); animating, or stacking/large, `filter`/`backdrop-filter` blur. **Any platform:** a
+    *persistent/decorative* continuous animation with **no pause when off-screen or backgrounded** (no
+    `IntersectionObserver` / Page Visibility / `content-visibility`; no view-disappear/background stop)
+    — but **don't** flag brief loaders or elements that can't scroll off-screen. Give the
+    `transform`/`opacity` (+ read-once / off-screen-pause) equivalent. Keep these perf findings at
+    🟠/🟡, not 🔴, unless they cause a real hang. Source: motion.md / liquid-glass.md.
 
 Also note, where relevant: safe-area violations, RTL hardcoding (left/right vs leading/trailing),
 permission requests without context, and SF Symbols used in app icons/logos (license violation).

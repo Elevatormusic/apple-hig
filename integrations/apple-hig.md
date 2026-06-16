@@ -17,6 +17,11 @@ project, consult it for exact, sourced values and load only the files relevant t
   **color alone**.
 - **VoiceOver label** on every control, including icon-only ones. Provide a **Reduce Motion**
   alternative for any animation.
+- **Animate cheaply:** only `transform`/`opacity` (compositor-only); don't loop-animate layout/paint
+  properties (`box-shadow`, `width`, `clip`) or read layout (`getBoundingClientRect`, `getPointAtLength`)
+  in the loop; avoid animating expensive `filter`/`backdrop-filter` blur; pause continuous animation
+  when it's off-screen or the tab/app is backgrounded. Disable ligatures on UI text that doesn't need
+  them (`font-variant-ligatures: none`) and prefer SVG icons over icon webfonts.
 - **On-grid spacing** (4/8 pt rhythm); respect **safe areas**; use **leading/trailing** (RTL-safe),
   not left/right.
 - **Licensing:** do not bundle or redistribute Apple's SF fonts, SF Symbols, or templates — link to
@@ -46,5 +51,8 @@ version-dependent.
 
 Flag and fix: touch targets < 44 pt (60 pt visionOS); hardcoded/non-semantic colors; missing
 dark-mode variants; off-grid spacing; contrast < 4.5:1 body / < 3:1 large; non-standard corner radii;
-motion with no Reduce Motion path; icon-only controls without a VoiceOver label; hardcoded type sizes
-/ no Dynamic Type. Prefer system components and semantic values in every fix.
+motion with no Reduce Motion path; **animations that loop a non-compositable property (`box-shadow`,
+`width`, `clip`) instead of `transform`/`opacity`, force a layout read every frame, or never pause
+off-screen/when backgrounded**; icon-only controls without a VoiceOver label; hardcoded type sizes /
+no Dynamic Type.
+Prefer system components and semantic values in every fix.
