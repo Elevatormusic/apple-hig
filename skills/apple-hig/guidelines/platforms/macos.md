@@ -62,3 +62,18 @@ When bringing an iPad app to Mac, adopt Mac idioms: real menu bar, pointer hover
 chrome, keyboard shortcuts — don't ship touch-only chrome.
 
 See also: [[ipados]], [[menus]], [[toolbars]], [[split-views]], [[liquid-glass]], [[layout]].
+
+## Design rubric -- judge by macOS, not iOS
+
+When reviewing a macOS screen, check these (not the iPhone defaults):
+- **Density is correct, not clutter.** Inspectors, source lists, multi-column tables, and packed toolbars are idiomatic; apply "one primary task / minimal controls" to the per-window task only, never to overall control count. (apple_published -- Designing for macOS.)
+- **Control size = macOS, not 44pt.** Judge against macOS control sizes (~28/24/20pt regular/small/mini -- platform_api_observed, a soft reference, not a hard gate); a 44pt-tall control in a dense desktop layout wastes space. Capsule shapes only for large/x-large prominent actions; mini/small/medium are rounded rectangles.
+- **Complete menu bar.** Every command in a logically grouped top menu; standard menus present; inapplicable items disabled/grayed, not hidden. (apple_published -- The menu bar.)
+- **No toolbar-only actions.** The toolbar is user-removable, so every toolbar command must also exist in the menu bar (and a shortcut where frequent). (apple_published -- Toolbars.)
+- **Full Keyboard Access + standard shortcuts** (Cmd-C/V/Z/S/...), a visible focus ring, and no reassigning of system shortcuts. (apple_published -- Keyboards.)
+- **Pointer affordances:** hover states that don't change selection; secondary-click (right/Control-click) context menus where relevant. Flag a macOS UI with no hover and no contextual menus. (apple_published.)
+- **Sidebar -> content -> detail navigation** (+ optional trailing inspector), NOT an iOS bottom tab bar; auxiliary/attribute UI goes in an inspector or non-modal panel, not a modal sheet. (apple_published -- Sidebars / Panels.)
+- **Windowing:** resizable, sensible min + default size, restored across launches (a fixed-size single-window app is a defect); first-class single AND multi-selection (Shift/Cmd) that respects the accent color, not color alone. (apple_published -- Windows / Selection.)
+- **No Dynamic Type** (macOS doesn't support it) -- judge fixed ~13pt body / ~10pt-min legibility; the user adjusts via display zoom. (apple_published -- Typography.)
+
+**iOS defaults WRONG here:** demanding one prominent CTA / minimal controls; 44pt-everywhere; a bottom tab bar as primary nav; "no dense layouts"; requiring Dynamic Type.

@@ -22,7 +22,7 @@ Prioritize comfort — minimize fatigue and motion discomfort.
 - **Eyes + hands (indirect, preferred):** look to target, **pinch** to select; reduces arm
   fatigue. **Direct touch** for near objects. **Hover/look highlight** as feedback.
 - **Minimum hit target 60 pt** (eye-tracking imprecision) — larger than the 44 pt touch floor;
-  keep ≥ ~4 pt spacing/padding between targets. Place primary controls within comfortable gaze
+  keep a **≥16 pt margin** around each target **or ≥60 pt center-to-center** spacing. Place primary controls within comfortable gaze
   range. See [[accessibility]].
 
 ## Spatial containers
@@ -56,3 +56,15 @@ Prioritize comfort — minimize fatigue and motion discomfort.
 - Don't crowd the field of view; leave breathing room. Respect passthrough and the user's room.
 
 See also: [[materials]], [[liquid-glass]], [[motion]], [[accessibility]], [[layout]].
+
+## Design rubric -- eyes + hands, spatial
+
+- **Gaze target 60pt default**, with a **>=16pt margin around each target OR >=60pt center-to-center** spacing (eye-tracking imprecision; a 44pt iOS button is too small/tight). (apple_published -- Accessibility table / Eyes.)
+- **Rounded interactive shapes** (eyes drift to corners; rounder is easier to hold gaze) that show the system look-highlight on gaze. (apple_published -- Eyes.)
+- **Eyes + hands:** look to target, pinch to select, arms resting; reserve direct touch for nearby content; don't require reaching or precise drags. (apple_published -- Designing for visionOS.)
+- **Right spatial container:** Windows (2D) for primary UI, Volumes for bounded 3D, Full Space only when needed; default to the Shared Space so the app coexists with others. (apple_published.)
+- **Controls in ornaments** (floating just off the window edge, in a parallel z-plane), not in-window chrome or arbitrary floating panels. (apple_published -- Ornaments.)
+- **Glass material over passthrough** plus a legibility check against an unpredictable real backdrop; let depth/scale convey hierarchy. (apple_published -- Materials.)
+- **Motion comfort (critical):** keep a stationary frame of reference, animate objects not the viewpoint/world, avoid large/fast/peripheral/oncoming motion; in Full Space support the Digital Crown to adjust immersion / reveal passthrough and never trap the user. (apple_published -- Immersive experiences.)
+
+**iOS defaults WRONG here:** 44pt targets / tight spacing; square interactive shapes; assuming a held multi-touch rectangle; treating the app as a full-screen 2D scene that owns the display; docking toolbars/tab bars in-window; opaque backgrounds; ignoring physical motion comfort.

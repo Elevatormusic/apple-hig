@@ -19,8 +19,9 @@ for actions (use a [[toolbars|toolbar]]) and not for sequential steps. See [[tab
 
 ## iOS / iPadOS specifics (exact)
 
-- **2–5 tabs** on iPhone, each an **SF Symbol + short label**; the selected tab uses the **filled**
-  symbol variant + tint color. See [[sf-symbols]].
+- **2–5 tabs** on iPhone (a common convention — the current HIG says only "avoid adding too many tabs";
+  more than 5 collapses into a system **More** tab), each an **SF Symbol + short label**; the selected tab
+  uses the **filled** symbol variant + tint color. See [[sf-symbols]].
 - **iOS 26:** the tab bar is a **floating, inset, pill/capsule shape** rendered in **Liquid Glass**
   (chrome-only; variants regular/clear) — it floats over content and is translucent, not glued to
   the bottom edge. The **scroll edge effect** keeps it legible. See [[liquid-glass]].

@@ -13,8 +13,11 @@ last_verified: 2026-06-14
 
 ## Contrast (exact)
 
-- **4.5:1** minimum for body text and meaningful glyphs.
-- **3:1** for **large text** (≥18 pt regular / ≥14 pt bold).
+- **4.5:1** minimum for **normal body text** (WCAG 1.4.3).
+- **3:1** for **large text** (≥18 pt regular / ≥14 pt bold) and for **meaningful non-text** — essential
+  glyphs/icons (e.g. icon-only-button symbols) and the boundaries/states of interactive UI components
+  (WCAG 1.4.11; mirrors [color.md](color.md)). **Decorative**, **disabled/inactive**, and **logotype**
+  elements are **exempt** — don't flag them.
 - **Placeholder text** must also meet **4.5:1**.
 - **Never rely on color alone** — pair color with text, shape, or SF Symbol (Differentiate
   Without Color).
@@ -70,7 +73,7 @@ Custom controls must replicate all of it — a strong reason to use stock compon
 ## Quick audit checklist
 
 - [ ] Every target ≥44 pt (60 pt visionOS)
-- [ ] Body contrast ≥4.5:1, large ≥3:1, placeholder ≥4.5:1
+- [ ] Body & placeholder ≥4.5:1; large text & meaningful non-text/UI ≥3:1 (decorative, disabled, logotype exempt)
 - [ ] Semantic colors; dark mode pairs present
 - [ ] No info by color alone
 - [ ] Dynamic Type works at xSmall and AX5
