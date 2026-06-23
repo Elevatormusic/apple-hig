@@ -1,0 +1,19 @@
+{
+  "note": "Seed fixtures for the SP-D design benchmark. SP-A only checks structure; SP-D runs the reviewer.",
+  "fixtures": [
+    {
+      "file": "perfect-tokens-wrong-hierarchy.html",
+      "summary": "Correct tokens, broken hierarchy: two co-equal primaries, metadata louder than title, buried critical failure.",
+      "expectedVerdict": "fail",
+      "expectedCategories": ["hierarchy", "visual"],
+      "mustNotFlag": ["off-grid-spacing", "hardcoded-color"]
+    },
+    {
+      "file": "monitoring-no-cta.html",
+      "summary": "Informational monitoring board; correct with no primary CTA.",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": [],
+      "mustNotFlag": ["missing-primary-action"]
+    }
+  ]
+}
