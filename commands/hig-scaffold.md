@@ -65,8 +65,8 @@ genuinely **non-obvious** decisions in the code itself.
 
 ## Step 5 — Validate, don't just assert
 
-Generated code is a draft, **not "compliant by construction."** When tools are available, offer to
-**compile / typecheck / render** it, and report what was and wasn't verified. Then **summarize** the plan
+Generated code is a **draft to validate, not a guarantee of correctness.** When tools are available, offer
+to **compile / typecheck / render** it, and report what was and wasn't verified. Then **summarize** the plan
 + what you built, list the assumptions to confirm (deployment target, tint, tab count, map provider), and
 offer to run `/hig-review` on the result.
 
