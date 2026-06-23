@@ -38,4 +38,11 @@ test('emits the evolved machine-readable verdict line', () => {
 test('retains the existing mechanical checks (nothing lost)', () => {
   assert.match(A, /44/); assert.match(A, /semantic/i); assert.match(A, /Reduce Motion/i);
   assert.match(A, /Dynamic Type/i);
+  // all original 11 checks must survive the rewrite — guard the ones a shallow test would miss
+  assert.match(A, /dark.?mode/i);
+  assert.match(A, /corner radi/i);
+  assert.match(A, /off-grid|4\/8/);
+  assert.match(A, /backdrop-filter|non-?compositable/i);
+  assert.match(A, /[Ll]iquid [Gg]lass/);          // Liquid Glass on the content layer
+  assert.match(A, /alert[^\n]*non-critical|non-critical[^\n]*alert/i);  // wrong-component: alert misuse
 });

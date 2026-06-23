@@ -61,7 +61,9 @@ literals with paired light+dark are fine, not a violation); **missing dark-mode 
 standard corner radii** (the concentric/continuous principle is `apple_published`; specific radius
 numbers are `community_convention`); **off-grid spacing** (the 4/8 grid is `community_convention`, ≤ low
 severity, never blocks — the `apple_published` spacing facts are 16pt compact / 20pt regular margins +
-tvOS 60/80 overscan; flag *inconsistent relationships*, not a number for being off-grid).
+tvOS 60/80 overscan; flag *inconsistent relationships*, not a number for being off-grid); and **Liquid
+Glass on the content layer** (Liquid Glass belongs to chrome / navigation / controls, never the content
+layer — `apple_published`, liquid-glass.md).
 
 **Stage 5 — Interaction + states.** The **state matrix** (default, hover/pointer, pressed, focused,
 selected, disabled, loading, empty, error, offline, permission-denied — `community_convention`); the
@@ -101,9 +103,12 @@ Also: **target size** — 44pt is Apple's *default* (28 floor; 60 visionOS); fla
 UIAccessibility; cross-cite WCAG 4.1.2 Name/Role/Value + 1.1.1, both Level A, to justify high/critical).
 **Dynamic Type** reflow (Apple text styles `apple_published`; web maps to WCAG 1.4.4/1.4.10).
 
-**Stage 7 — Platform fit.** Components (cite the specific component page, e.g. `tab-bars.md`, not a
-generic claim; tab-bar "2-5" is `community_convention`, the >5→More overflow is `platform_api_observed`;
-sidebar/split-view adaptation is `apple_published`); navigation; window model; **deployment-target /
+**Stage 7 — Platform fit.** Components — **prefer system components over custom rebuilds**
+(`apple_published`); cite the specific component page (e.g. `tab-bars.md`); flag a **custom nav/tab bar
+where a system one fits** and an **alert used for non-critical info** (alerts are for critical,
+interruptive moments — using one for routine info is the wrong component, `apple_published`); tab-bar
+"2-5" is `community_convention`, the >5→More overflow is `platform_api_observed`; sidebar/split-view
+adaptation is `apple_published`; navigation; window model; **deployment-target /
 version availability**; responsive/adaptive behavior. On **web/Android**, keep Apple principles + tokens
 but defer to host conventions — do not impose iOS chrome.
 
