@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { AUTHORITIES } from '../scripts/validate-review-report.mjs';
 const root = new URL('../', import.meta.url);
 const g = (p) => readFileSync(new URL('skills/apple-hig/guidelines/' + p, root), 'utf8');
 
@@ -50,4 +51,16 @@ test('platform rubrics use the SP-A authority vocabulary, not Apple-everywhere',
   assert.match(g('platforms/tvos.md'), /community_convention/);
   assert.match(g('universal.md'), /wcag_external|community_convention/);
   assert.match(g('platforms/macos.md'), /platform_api_observed/);
+});
+
+test('rubric authority tags use ONLY the canonical six-value vocabulary', () => {
+  const files = ['platforms/macos.md', 'platforms/ipados.md', 'platforms/tvos.md',
+    'platforms/visionos.md', 'universal.md'];
+  for (const p of files) {
+    const txt = g(p);
+    assert.doesNotMatch(txt, /\bweb standard\b/i, `${p}: "web standard" is not a valid authority`);
+    // any snake_case token immediately after "(" must be a real authority value
+    const tags = (txt.match(/\(([a-z][a-z_]*[a-z])\b/g) || []).map((s) => s.slice(1)).filter((t) => t.includes('_'));
+    for (const t of tags) assert.ok(AUTHORITIES.includes(t), `${p}: invalid authority tag "(${t}"`);
+  }
 });

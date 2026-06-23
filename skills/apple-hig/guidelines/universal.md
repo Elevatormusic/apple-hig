@@ -124,10 +124,10 @@ Apple's HIG is scoped to Apple platforms; it does NOT govern the web. Reuse Appl
 
 - **Don't flag a web app for lacking iOS chrome** (bottom tab bars, nav bars, sheets, SF Symbols) -- those are not a web compliance gate. (apple_published -- the HIG is Apple-platform-scoped.)
 - **Desktop-web conventions at pointer widths** (persistent / sidebar nav, hover, right-click menus, denser layouts); reserve mobile chrome for narrow/touch viewports via responsive breakpoints. The web pointer-target floor is **WCAG 2.5.8's 24x24 CSS px** (wcag_external), NOT Apple's 44pt.
-- **URL / History / Back native** -- every primary view has a shareable URL; Back/Forward and history work; don't hijack history with app-modal nav. (web standard.)
+- **URL / History / Back native** -- every primary view has a shareable URL; Back/Forward and history work; don't hijack history with app-modal nav. (community_convention -- WHATWG History API.)
 - **Visible, managed focus** -- keyboard-reachable in a logical order with a `:focus-visible` indicator (don't blanket-remove outlines); move/trap/restore focus on route and dialog changes. (wcag_external -- WCAG 2.1.1 / 2.4.7 / 2.4.11.)
-- **Semantic HTML + native form controls before ARIA** (labels, `type`/`inputmode`/`autocomplete`); build ARIA widgets only when no native element fits, then follow the ARIA APG. (web standard.)
-- **Responsive via CSS media/container queries + `prefers-*`** (reduced-motion, color-scheme, contrast) -- not size classes; support fine AND coarse pointers on one page. (web standard.)
+- **Semantic HTML + native form controls before ARIA** (labels, `type`/`inputmode`/`autocomplete`); build ARIA widgets only when no native element fits, then follow the ARIA APG. (wcag_external -- WCAG 1.3.1 / 4.1.2; ARIA APG.)
+- **Responsive via CSS media/container queries + `prefers-*`** (reduced-motion, color-scheme, contrast) -- not size classes; support fine AND coarse pointers on one page. (community_convention -- W3C CSS / WHATWG.)
 - **No SF Pro / SF Compact / SF Symbols off Apple platforms** (license) -- use the `system-ui` stack or Inter + inline SVG icons. (apple_published -- SF font / SF Symbols license.)
 - **Apple's VISUAL language on the web is conditional** on a genuine Apple-ecosystem surface (an Apple product's own marketing/docs, or a companion web view paired with an app) PLUS web-licit substitutes; borrowing iOS chrome on a generic SaaS purely to look "Apple" is cosplay -- flag it. (inference.)
 - The three OFFICIAL Apple web components -- **Apple Pay on the Web, Sign in with Apple JS, MapKit JS** -- ARE Apple-governed: render the official button/map, don't restyle beyond permitted parameters, and keep MapKit's Apple logo + "Legal" link visible. (apple_published.)
