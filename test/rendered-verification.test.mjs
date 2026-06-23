@@ -24,3 +24,17 @@ test('benchmark workflow has a capability-gated rendered path (file:// + sequent
   assert.match(wf, /file:\/\//);
   assert.match(wf, /browser_navigate|browser_take_screenshot|browser_resize/);
 });
+
+test('the computer-control render tier is backed by a real tool grant (not advertised-but-impossible)', () => {
+  const a = read('agents/design-reviewer.md');
+  // if the reviewer advertises a computer-control render path, the agent MUST grant a computer-use tool
+  if (/computer.control/i.test(a))
+    assert.match(a, /mcp__computer-use__screenshot/,
+      'reviewer advertises computer-control but the tools: frontmatter grants no computer-use tool');
+});
+
+test('benchmark rendered path guards repoAbs and normalises Windows paths', () => {
+  const wf = read('scripts/design-benchmark.workflow.js');
+  assert.match(wf, /rendered:true requires repoAbs/i, 'missing the empty-repoAbs guard');
+  assert.match(wf, /replace\(\/\\\\\/g/, 'missing the backslash->slash file:// normalisation');
+});

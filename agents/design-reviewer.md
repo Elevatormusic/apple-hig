@@ -1,7 +1,7 @@
 ---
 name: design-reviewer
 description: Use to audit UI code (SwiftUI, UIKit, AppKit, React/React Native, Flutter, HTML/CSS, etc.) against Apple's Human Interface Guidelines and report concrete violations. Invoke when the user asks to review/check/audit a screen, view, component, or stylesheet for HIG compliance, accessibility, or design-token correctness — or via the /hig-review command. Reports each issue with the rule, the Apple source_url, the offending location, and a specific fix.
-tools: Read, Grep, Glob, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_snapshot, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_resize, mcp__plugin_playwright_playwright__browser_evaluate, mcp__plugin_playwright_playwright__browser_close, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_resize, mcp__playwright__browser_evaluate, mcp__playwright__browser_close
+tools: Read, Grep, Glob, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_snapshot, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_resize, mcp__plugin_playwright_playwright__browser_evaluate, mcp__plugin_playwright_playwright__browser_close, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_resize, mcp__playwright__browser_evaluate, mcp__playwright__browser_close, mcp__computer-use__request_access, mcp__computer-use__screenshot, mcp__computer-use__open_application, mcp__computer-use__left_click, mcp__computer-use__key
 ---
 
 # HIG Design Reviewer
@@ -147,10 +147,10 @@ capability, in order:
    app / a served URL, or directly to a local file's **`file://`** path; `browser_resize` for the
    **light, dark, narrow, and wide** passes; `browser_take_screenshot`; inspect the rendered result. This
    is the preferred path and reaches `level: visual`/`full`.
-2. **Else, computer-control tools** (`screenshot`, `open_application`, `left_click`, `key`, …) — open the
-   page in a browser, switch light/dark and resize the window where you can, and **screenshot the screen**
-   to verify the rendered result. Coarser and slower than Playwright, but a real rendered check (also
-   `level: visual`).
+2. **Else, computer-control tools** (`request_access` to approve the browser, then `screenshot`,
+   `open_application`, `left_click`, `key`, …) — open the page in a browser, switch light/dark and resize
+   the window where you can, and **screenshot the screen** to verify the rendered result. Coarser and
+   slower than Playwright, but a real rendered check (also `level: visual`).
 3. **Else (neither available)** — run the **static** review (`level: static`, so never `verified-pass`)
    and tell the user once: *"For rendered verification, install the Playwright MCP (`/plugin install
    playwright@claude-plugins-official`) or enable computer control."*
