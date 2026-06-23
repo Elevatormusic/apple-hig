@@ -65,3 +65,15 @@ Respect the camera, Home indicator, and (when keyboard attached) the software ke
 Design for any window size, not just full screen.
 
 See also: [[ios]], [[macos]], [[split-views]], [[multitasking]], [[layout]], [[liquid-glass]].
+
+## Design rubric -- iPad is not a big iPhone
+
+- **Reject "stretched iPhone."** On regular width the screen must RESTRUCTURE (sidebar+content+detail, or a content grid), not just pad the margins of one centered column. (apple_published -- Designing for iPadOS.)
+- **Size-class driven.** Check BOTH the regular-width multi-column layout AND the compact collapse (Slide Over / narrow Split View / small Stage Manager window) and the transition between them. Never a fixed iPad point size. (apple_published -- Layout / Split Views.)
+- **Any window size + continuous resize.** Never assume full screen; verify the narrowest and widest sizes; preserve the user's place/selection across a resize. (apple_published -- Multitasking.)
+- **Sidebar + split view** for multi-section content over a lone bottom tab bar (a simple app may legitimately stay tab-bar-based via `.sidebarAdaptable`); persist sidebar state + selection. (apple_published -- Sidebars.)
+- **Co-equal touch + pointer + keyboard.** Any touch action is also pointer- and keyboard-reachable; pointer effects on controls; Cmd-based keyboard shortcuts. (apple_published -- Pointing devices / Keyboards.)
+- **Popovers** for anchored regular-width contextual UI (adapt to a sheet in compact); **inter-app + multi-item drag-and-drop** where it aids -- but never the ONLY path; **multiple windows** for parallel contexts. (apple_published -- Popovers / Drag and drop / Multitasking.)
+- **Use the canvas for more content/hierarchy, not inflated controls in whitespace.** Primary touch targets stay >=44pt; secondary pointer controls may be denser. 20pt regular / 16pt compact content margins, by size class. (apple_published -- Layout.) ~320pt sidebar width is a soft reference, not a gate.
+
+**iOS defaults WRONG here:** a single padded column with empty side margins; a lone bottom tab bar for multi-section content; assuming full-screen / fixed size; treating pointer + keyboard as optional; designing one size class only; orientation lock without content reason.

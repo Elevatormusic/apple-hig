@@ -46,3 +46,15 @@ focus-driven. Minimize text entry. Let content (posters, video) dominate.
 - Honor Reduce Motion (parallax). See [[motion]], [[accessibility]].
 
 See also: [[ios]], [[tab-views]], [[layout]], [[motion]], [[icons]].
+
+## Design rubric -- focus, not touch
+
+- **Everything actionable must be FOCUSABLE** with an obviously distinct focused state -- tvOS has no cursor or touch; the user moves a focus ring with the Siri Remote, so a non-focusable control is unreachable. (apple_published -- Designing for tvOS.)
+- **Use the system focus effect** (parallax / lift / illumination via system views and `.focusable`/`focusEffect`), not a hand-rolled highlight; never convey focus by color alone. (apple_published.)
+- **Target floor 66pt default / 56pt minimum** (larger than iOS 44pt), with generous spacing so focus moves cleanly and items don't merge at distance. (apple_published -- Accessibility control-size table.)
+- **Overscan:** keep titles/actions/key UI within **80pt of the sides and 60pt top/bottom**. (apple_published -- Layout.)
+- **Design for ~8+ feet:** large legible type, high contrast, edge-to-edge cinematic artwork as the hero; flag dense small type, low-contrast text over imagery, and phone-ported layouts. (apple_published.)
+- **Minimize text entry** (remote typing is slow) -- prefer selection, sign-in via a nearby iPhone/QR, or dictation over on-screen keyboards. (community_convention -- follows from the remote/focus model.)
+- **Top Shelf** dynamic content for top-row apps; a **layered parallax app icon** (not a flat square); honor Reduce Motion (damp the focus parallax). (apple_published -- Top Shelf / App icons / Accessibility.)
+
+**iOS defaults WRONG here:** 44pt targets (tvOS floor is 56/66pt); an app-drawn pressed/selected tint as sufficient (use the system focus effect); assuming touch or a pointer; bezel-sized safe areas (tvOS adds 80/60pt overscan); dense small phone layouts.
