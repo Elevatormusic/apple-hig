@@ -32,6 +32,7 @@ const ACTUAL_SCHEMA = {
     verdict: { type: 'string', enum: ['verified-pass', 'advisory-pass', 'fail', 'incomplete'] },
     categories: { type: 'array', items: { type: 'string' } },
     flags: { type: 'array', items: { type: 'string' }, description: 'short tags for each rule raised, e.g. "off-grid-spacing 13px", "competing-primary"' },
+    level: { type: 'string', enum: ['static', 'visual', 'full'] },
     notes: { type: 'string' },
   },
   required: ['verdict', 'categories', 'flags'],
@@ -41,13 +42,30 @@ const JUDGE_SCHEMA = {
   properties: { agree: { type: 'boolean' }, reason: { type: 'string' } }, required: ['agree', 'reason'],
 }
 
+// Capability-gated: pass {rendered:true, repoAbs:"<abs path to the apple-hig repo>"} to render each
+// fixture via the Playwright `browser_*` tools (needs the Playwright MCP). Default = static (code-only).
+const rendered = !!(args && args.rendered)
+const repoAbs = (args && args.repoAbs) || ''
+const GUARDS = `Apply the method honestly — establish the task, judge the visual/task hierarchy, states, and accessibility; respect the false-positive guards (don't flag decorative/disabled/logotype contrast, off-grid numbers alone, brand colors with paired light+dark, or a missing CTA on a monitoring screen). Return ONLY: the \`verdict\`, the finding \`categories\` you raised (hierarchy|task-fit|ia|state|error-recovery|accessibility|visual|interaction|platform-fit|content), \`flags\` (a short tag per rule), and \`level\`. Do NOT read expected.json or any answer key.`
+const staticPrompt = (fx) =>
+  `Act as the apple-hig design-reviewer. First Read \`${REPO}/agents/design-reviewer.md\` (the staged method + contrast-role table + verdict rules). Then Read the fixture \`${REPO}/test/fixtures/design/${fx.file}\` and review at scope=screen, level=static (no renderer available). ${GUARDS}`
+const renderedPrompt = (fx) =>
+  `Act as the apple-hig design-reviewer with RENDERED verification. Read \`${REPO}/agents/design-reviewer.md\` for the method, then RENDER the fixture with the Playwright \`browser_*\` tools (load them via tool search if needed): \`browser_navigate\` to \`file://${repoAbs}/test/fixtures/design/${fx.file}\`; \`browser_resize\` for a LIGHT and a DARK pass and a narrow (~390) and wide (~1280) pass; \`browser_take_screenshot\` each. Verify against the ACTUAL rendered pixels — real contrast on the rendered background, target geometry after layout, and the hierarchy (squint/blur: which element dominates the screen?). Review at scope=screen, level=visual. ${GUARDS}`
+
 phase('Review')
-const reviews = await parallel(FIXTURES.map((fx) => () =>
-  agent(
-    `Act as the apple-hig design-reviewer. First Read \`${REPO}/agents/design-reviewer.md\` to load the staged method, the contrast-role table, and the verdict rules. Then Read the fixture \`${REPO}/test/fixtures/design/${fx.file}\` (an HTML screen) and review it at scope=screen, level=static (you cannot render it here). Apply the method honestly — establish the task, judge the visual/task hierarchy, states, and accessibility; respect the false-positive guards (don't flag decorative/disabled/logotype contrast, off-grid numbers alone, brand colors with paired light+dark, or a missing CTA on a monitoring screen). Return ONLY: the \`verdict\`, the list of finding \`categories\` you raised (from hierarchy|task-fit|ia|state|error-recovery|accessibility|visual|interaction|platform-fit|content), and \`flags\` (a short tag per rule you raised). Do NOT read expected.json or any answer key.`,
-    { label: `review:${fx.file}`, phase: 'Review', schema: ACTUAL_SCHEMA },
-  ).then((actual) => ({ fx, actual, score: actual ? scoreFixture(actual, fx) : null }))
-))
+let reviews
+if (rendered) {
+  // sequential — one browser at a time, to avoid Playwright-profile contention across agents
+  reviews = []
+  for (const fx of FIXTURES) {
+    const actual = await agent(renderedPrompt(fx), { label: `render:${fx.file}`, phase: 'Review', schema: ACTUAL_SCHEMA })
+    reviews.push({ fx, actual, score: actual ? scoreFixture(actual, fx) : null })
+  }
+} else {
+  reviews = await parallel(FIXTURES.map((fx) => () =>
+    agent(staticPrompt(fx), { label: `review:${fx.file}`, phase: 'Review', schema: ACTUAL_SCHEMA })
+      .then((actual) => ({ fx, actual, score: actual ? scoreFixture(actual, fx) : null }))))
+}
 
 const scored = reviews.filter((r) => r && r.score)
 const agg = scored.reduce((a, r) => {

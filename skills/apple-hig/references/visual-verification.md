@@ -48,6 +48,17 @@ preview); record `stagesRun` / `stagesSkipped` honestly.
 - **Overlay / z-order conflicts** — keyboard, modal, safe-area, and floating chrome must not obscure
   primary content or the focused control.
 
+## How to render (capability tiers)
+
+Get a renderable page, then run the modes above:
+- **Playwright MCP** (preferred): `browser_navigate` to the running app / a served URL, or directly to a
+  local file's `file://` path; `browser_resize` for light / dark / narrow / wide; `browser_take_screenshot`.
+- **Computer-control** (fallback): open the page in a browser, toggle appearance + resize the window, and
+  `screenshot` the screen.
+- **No renderer:** the review stays `level: static` and cannot be `verified-pass`.
+
+Reaching `level: full` requires running the screen-type's required modes through one of these.
+
 ## Level rules
 
 - **static** — nothing rendered (code only); a static review can **never** be `verified-pass`.

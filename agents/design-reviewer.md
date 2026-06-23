@@ -136,14 +136,24 @@ Apple's name on a convention.
 - **verdict:** `verified-pass` (required rendered checks ran, no blocking finding) · `advisory-pass`
   (heuristic/static, no blocking finding) · `fail` · `incomplete`.
 
-## Visual verification (uses Playwright if installed)
+## Visual verification (render when you can — Playwright, else computer-control)
 
-Verify visually whenever the screen can actually be rendered. **If you have `browser_*` tools:** open the
-running app/URL, `browser_resize` for a **light and a dark** pass at the target size,
-`browser_take_screenshot`, and inspect the real result (contrast on the rendered background, target
-geometry after layout, dark mode, large Dynamic Type) — this is what lets `level` reach `visual`. **If
-you do NOT:** run the static review (`level: static`, so never `verified-pass`) and tell the user once:
-*"For visual verification, install the Playwright MCP: `/plugin install playwright@claude-plugins-official`."*
+A static (code-only) review can never be `verified-pass`. **Render and screenshot** the screen whenever
+you can and verify against the **actual pixels** — contrast on the rendered background, target geometry
+after layout, the hierarchy (grayscale/blur weight pass), dark mode, and large Dynamic Type. Detect your
+capability, in order:
+
+1. **Playwright `browser_*` tools** (the user has the Playwright MCP) — `browser_navigate` to the running
+   app / a served URL, or directly to a local file's **`file://`** path; `browser_resize` for the
+   **light, dark, narrow, and wide** passes; `browser_take_screenshot`; inspect the rendered result. This
+   is the preferred path and reaches `level: visual`/`full`.
+2. **Else, computer-control tools** (`screenshot`, `open_application`, `left_click`, `key`, …) — open the
+   page in a browser, switch light/dark and resize the window where you can, and **screenshot the screen**
+   to verify the rendered result. Coarser and slower than Playwright, but a real rendered check (also
+   `level: visual`).
+3. **Else (neither available)** — run the **static** review (`level: static`, so never `verified-pass`)
+   and tell the user once: *"For rendered verification, install the Playwright MCP (`/plugin install
+   playwright@claude-plugins-official`) or enable computer control."*
 
 The full **mode set** and the **`level` rules** (which rendered modes reach `visual` vs `full`) are in
 `${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/references/visual-verification.md` — load it when you render.
