@@ -43,7 +43,7 @@ preview); record `checksRun` / `checksSkipped` honestly.
 
 ## Level rules
 
-- **static** — nothing rendered (code only). → **cannot** be `verified-pass`.
+- **static** — nothing rendered (code only); a static review can **never** be `verified-pass`.
 - **visual** — the **Basic** modes ran (light/dark + narrow/wide + keyboard focus).
 - **full** — every mode the screen type requires ran: Basic **plus** the applicable Accessibility,
   Hierarchy, and UX-state modes.
