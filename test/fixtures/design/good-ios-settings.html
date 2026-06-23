@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Settings</title>
+<style>
+  :root{color-scheme:light dark;--bg:#f2f2f7;--group:#fff;--label:#1c1c1e;--label2:#3c3c4399;
+        --sep:#3c3c4329;--tint:#0a84ff;--danger:#ff3b30}
+  @media(prefers-color-scheme:dark){:root{--bg:#000;--group:#1c1c1e;--label:#fff;--label2:#ebebf599;--sep:#54545899}}
+  body{margin:0;background:var(--bg);color:var(--label);font:17px/1.3 -apple-system,system-ui,sans-serif}
+  .wrap{max-width:520px;margin:0 auto;padding:16px}
+  h1{font-size:34px;font-weight:700;letter-spacing:-.4px;margin:8px 4px 16px}  /* clear large title */
+  .group{background:var(--group);border-radius:10px;overflow:hidden;margin:0 0 28px}
+  .row{display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:11px 16px;
+       border-bottom:.5px solid var(--sep)}
+  .row:last-child{border-bottom:0}
+  .row .v{color:var(--label2)}
+  .ghdr{font-size:13px;color:var(--label2);text-transform:uppercase;letter-spacing:.4px;margin:0 16px 6px}
+</style></head><body><div class="wrap">
+  <h1>Settings</h1>
+  <p class="ghdr">General</p>
+  <div class="group" role="group" aria-label="General">
+    <div class="row"><span>Wi-Fi</span><span class="v">Home</span></div>
+    <div class="row"><span>Bluetooth</span><span class="v">On</span></div>
+    <div class="row"><span>Notifications</span><span class="v">3 apps</span></div>
+  </div>
+  <p class="ghdr">Display</p>
+  <div class="group" role="group" aria-label="Display">
+    <div class="row"><span>Appearance</span><span class="v">Automatic</span></div>
+    <div class="row"><span>Text Size</span><span class="v">Default</span></div>
+  </div>
+</div></body></html>
