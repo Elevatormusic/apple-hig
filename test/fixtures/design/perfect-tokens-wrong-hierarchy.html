@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Order</title>
+<style>
+  :root{color-scheme:light dark;--bg:#fff;--label:#1c1c1e;--label2:#8a8a8e;--tint:#0a84ff;--danger:#ff3b30}
+  @media(prefers-color-scheme:dark){:root{--bg:#000;--label:#fff;--label2:#8a8a8e}}
+  body{margin:0;background:var(--bg);color:var(--label);font:17px/1.4 -apple-system,system-ui,sans-serif}
+  .wrap{max-width:420px;margin:0 auto;padding:20px}
+  .meta{font-size:28px;font-weight:800;color:var(--label)}      /* metadata louder than the title */
+  .title{font-size:15px;font-weight:400;color:var(--label2)}    /* the actual title, demoted */
+  .status{font-size:12px;color:var(--label2)}                   /* critical failure, buried */
+  .btn{display:block;width:100%;min-height:44px;margin:8px 0;border-radius:12px;border:0;
+       font:600 17px -apple-system;background:var(--tint);color:#fff}  /* two equal primaries */
+</style></head><body><div class="wrap">
+  <div class="meta">#48213-A</div>
+  <h1 class="title">Your order</h1>
+  <p class="status">Payment failed — card declined.</p>
+  <button class="btn">Pay now</button>
+  <button class="btn">Place order</button>
+</div></body></html>
