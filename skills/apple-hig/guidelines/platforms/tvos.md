@@ -32,8 +32,8 @@ focus-driven. Minimize text entry. Let content (posters, video) dominate.
 
 - Design on a **1920 × 1080 pt** canvas. Renders **@1x** on HD and **@2x** (3840 × 2160 px) on 4K.
   Supply **@1x and @2x** assets.
-- **Overscan safe margins:** keep title/action-safe content within ~**90 px horizontal / 60 px
-  vertical** of the edges (don't place UI at the extreme edge).
+- **Overscan safe margins:** keep title/action-safe content within **80 pt** of the left/right edges and
+  **60 pt** of the top/bottom edges (don't place UI at the extreme edge).
 - App icon: **800 × 480 px** landscape, **Parallax**, **2–5 layers** (background + foreground layers). See [[icons]].
 
 ## Conventions

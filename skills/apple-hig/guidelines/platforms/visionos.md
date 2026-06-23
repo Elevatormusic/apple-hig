@@ -22,7 +22,7 @@ Prioritize comfort — minimize fatigue and motion discomfort.
 - **Eyes + hands (indirect, preferred):** look to target, **pinch** to select; reduces arm
   fatigue. **Direct touch** for near objects. **Hover/look highlight** as feedback.
 - **Minimum hit target 60 pt** (eye-tracking imprecision) — larger than the 44 pt touch floor;
-  keep ≥ ~4 pt spacing/padding between targets. Place primary controls within comfortable gaze
+  keep a **≥16 pt margin** around each target **or ≥60 pt center-to-center** spacing. Place primary controls within comfortable gaze
   range. See [[accessibility]].
 
 ## Spatial containers
