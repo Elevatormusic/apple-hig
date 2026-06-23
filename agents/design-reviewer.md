@@ -147,7 +147,7 @@ you do NOT:** run the static review (`level: static`, so never `verified-pass`) 
 
 The full **mode set** and the **`level` rules** (which rendered modes reach `visual` vs `full`) are in
 `${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/references/visual-verification.md` — load it when you render.
-Record the modes you ran in `checksRun` and the ones you skipped in `checksSkipped`; a `verified-pass`
+Record the modes you ran in `stagesRun` and the ones you skipped in `stagesSkipped`; a `verified-pass`
 requires at least `level: visual`, and a hierarchy finding at `confidence: high` requires the
 **grayscale/blur** weight pass.
 

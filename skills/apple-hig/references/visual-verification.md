@@ -11,7 +11,7 @@ note: Defines the rendered modes a design review runs and the `level` (static|vi
 A design review's `level` reflects what was actually **rendered**. A static (code-only) review can never
 be `verified-pass` — methodology precedent: **WCAG-EM** requires automated/static findings to be confirmed
 by rendered/manual evaluation before conformance is claimed. Render with the Playwright MCP (or any live
-preview); record `checksRun` / `checksSkipped` honestly.
+preview); record `stagesRun` / `stagesSkipped` honestly.
 
 ## The modes
 
@@ -41,6 +41,13 @@ preview); record `checksRun` / `checksSkipped` honestly.
   **Destructive-confirmation**. (Loading/errors must not rely on color or motion alone; errors show a
   recovery path.)
 
+**Layout robustness** (render where the screen type warrants — not a blanket mandate):
+- **Long-localization / pseudolocalization** — long German/French strings, CJK, bidi; layout must not
+  depend on short English.
+- **Content clipping & overflow** — fixed-height containers, truncated titles, scroll-edge cut-off.
+- **Overlay / z-order conflicts** — keyboard, modal, safe-area, and floating chrome must not obscure
+  primary content or the focused control.
+
 ## Level rules
 
 - **static** — nothing rendered (code only); a static review can **never** be `verified-pass`.
@@ -50,5 +57,5 @@ preview); record `checksRun` / `checksSkipped` honestly.
 
 A **verified-pass** requires at least `level: visual`. A **hierarchy** finding at `confidence: high`
 requires the **grayscale/blur** pass (otherwise cap its confidence at medium). Always list the modes you
-ran in `checksRun` and the ones you skipped (and why) in `checksSkipped` — a skipped mode lowers `level`,
+ran in `stagesRun` and the ones you skipped (and why) in `stagesSkipped` — a skipped mode lowers `level`,
 it does not silently pass.

@@ -25,3 +25,11 @@ test('the reviewer loads the visual-verification reference (placeholder gone)', 
   assert.match(a, /visual-verification(\.md)?/i);
   assert.doesNotMatch(a, /SP-C expands/);
 });
+
+test('render-tracking fields match the report schema (stagesRun, never checksRun)', () => {
+  for (const p of ['skills/apple-hig/references/visual-verification.md', 'agents/design-reviewer.md']) {
+    const t = read(p);
+    assert.doesNotMatch(t, /checksRun|checksSkipped/, `${p} uses checksRun/checksSkipped; the schema field is stagesRun/stagesSkipped`);
+    assert.match(t, /stagesRun|stagesSkipped/, `${p} should reference stagesRun/stagesSkipped`);
+  }
+});
