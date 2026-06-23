@@ -1,5 +1,5 @@
 {
-  "note": "Seed fixtures for the SP-D design benchmark. SP-A only checks structure; SP-D runs the reviewer.",
+  "note": "Seeded ground truth for the SP-D design benchmark. Structure is checked by test/fixtures-manifest.test.mjs; the reviewer is run against it by .claude/workflows/design-benchmark.js and scored by scripts/benchmark-score.mjs.",
   "fixtures": [
     {
       "file": "perfect-tokens-wrong-hierarchy.html",
@@ -14,6 +14,20 @@
       "expectedVerdict": "advisory-pass",
       "expectedCategories": [],
       "mustNotFlag": ["missing-primary-action"]
+    },
+    {
+      "file": "good-ios-settings.html",
+      "summary": "Clean, correct iOS grouped-settings screen: semantic colors, dark mode, clear title, 44pt rows, no over-cards. A true negative.",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": [],
+      "mustNotFlag": ["off-grid-spacing", "hardcoded-color", "contrast", "missing-label", "missing-primary-action"]
+    },
+    {
+      "file": "hidden-critical-warning.html",
+      "summary": "Delete-account screen: the irreversible consequence is tiny/faint and the destructive action is styled as a calm prominent primary.",
+      "expectedVerdict": "fail",
+      "expectedCategories": ["error-recovery", "hierarchy"],
+      "mustNotFlag": []
     }
   ]
 }
