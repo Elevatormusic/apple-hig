@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "design-review-report",
+  "type": "object",
+  "required": ["schema", "scope", "level", "findings", "verdict"],
+  "properties": {
+    "schema": { "const": 1 },
+    "scope": { "enum": ["element", "component", "screen", "flow"] },
+    "level": { "enum": ["static", "visual", "full"] },
+    "platforms": { "type": "array", "items": { "type": "string" } },
+    "stack": { "type": "string" },
+    "deploymentTarget": { "type": ["string", "null"] },
+    "stagesRun": { "type": "array", "items": { "type": "string" } },
+    "stagesSkipped": { "type": "array", "items": { "type": "string" } },
+    "verdict": { "enum": ["verified-pass", "advisory-pass", "fail", "incomplete"] },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "ruleId", "category", "authority", "severity", "confidence",
+          "evidence", "location", "problem", "userImpact", "fix", "howToVerify"],
+        "properties": {
+          "id": { "type": "string" },
+          "ruleId": { "type": "string" },
+          "category": { "enum": ["hierarchy", "task-fit", "ia", "state", "error-recovery",
+            "accessibility", "visual", "interaction", "platform-fit", "content"] },
+          "authority": { "enum": ["apple_published", "platform_api_observed", "wcag_external",
+            "project_recommendation", "community_convention", "inference"] },
+          "severity": { "enum": ["critical", "high", "medium", "low", "advisory"] },
+          "confidence": { "enum": ["high", "medium", "low"] },
+          "evidence": { "enum": ["static-code", "computed", "screenshot", "a11y-tree", "inferred"] },
+          "location": { "type": "object" },
+          "problem": { "type": "string" },
+          "userImpact": { "type": "string" },
+          "fix": { "type": "string" },
+          "source": { "type": ["string", "null"] },
+          "howToVerify": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$comment": "Cross-field invariants (verified-pass not at level=static; the blocking rule) are enforced by scripts/validate-review-report.mjs, not expressible in draft-07 alone."
+}
