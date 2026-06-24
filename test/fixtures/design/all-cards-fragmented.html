@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Profile</title>
+<!-- Card overload: every single field is wrapped in its own bordered, shadowed card, fragmenting
+     one simple profile into 8 equal-weight boxes. The reviewer should flag visual (card overload). -->
+<style>
+  :root{color-scheme:light dark;--bg:#f2f2f7;--card:#fff;--label:#1c1c1e;--label2:#8a8a8e}
+  @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--label:#fff;--label2:#98989d}}
+  body{margin:0;background:var(--bg);color:var(--label);font:17px/1.4 -apple-system,system-ui,sans-serif}
+  .wrap{max-width:440px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+  /* the anti-pattern: a card per atom */
+  .card{background:var(--card);border:.5px solid #8883;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:16px}
+  .k{font-size:13px;color:var(--label2);margin:0 0 4px}.v{font-size:17px;margin:0}
+</style></head><body><div class="wrap">
+  <div class="card"><p class="k">Name</p><p class="v">Alex Rivera</p></div>
+  <div class="card"><p class="k">Email</p><p class="v">alex@example.com</p></div>
+  <div class="card"><p class="k">Phone</p><p class="v">(555) 010-2837</p></div>
+  <div class="card"><p class="k">Member since</p><p class="v">March 2021</p></div>
+  <div class="card"><p class="k">Plan</p><p class="v">Pro</p></div>
+  <div class="card"><p class="k">Renewal</p><p class="v">Aug 14, 2026</p></div>
+  <div class="card"><p class="k">Seats</p><p class="v">5</p></div>
+  <div class="card"><p class="k">Region</p><p class="v">US-West</p></div>
+</div></body></html>
