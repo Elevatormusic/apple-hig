@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   boxesOverlap, intersectionArea, overlapDepth,
   isHorizClipped, isVertClipped, hasHorizontalScroll,
-  TEXT_SPACING_OVERRIDE, DYNAMIC_TYPE_AX5_SCALE, REFLOW_WIDTH_CSS_PX, REFLOW_HEIGHT_CSS_PX, RESIZE_TEXT_PERCENT,
+  TEXT_SPACING_OVERRIDE, DYNAMIC_TYPE_AX5_SCALE, REFLOW_WIDTH_CSS_PX, REFLOW_HEIGHT_CSS_PX, RESIZE_TEXT_PERCENT, OVERLAP_NOISE_PX,
 } from './layout-robustness.mjs';
 
 const box = (left, top, right, bottom) => ({ left, top, right, bottom });
@@ -49,4 +49,5 @@ test('grounded WCAG / Dynamic-Type constants (from R1 research)', () => {
   assert.equal(REFLOW_HEIGHT_CSS_PX, 256);
   assert.equal(RESIZE_TEXT_PERCENT, 200);
   assert.ok(Math.abs(DYNAMIC_TYPE_AX5_SCALE - 3.12) < 0.001);
+  assert.equal(OVERLAP_NOISE_PX, 2);
 });

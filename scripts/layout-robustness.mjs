@@ -14,6 +14,9 @@ export const TEXT_SPACING_OVERRIDE = { lineHeight: 1.5, paragraphSpacing: 2, let
 // Largest iOS Dynamic Type (AX5): Body ~53pt (platform_api_observed, OS-version-dependent) / 17pt default ≈ 3.12.
 // NON-LINEAR per text style — a flat scale OVER-scales titles; iOS/iPadOS only (macOS has no Dynamic Type).
 export const DYNAMIC_TYPE_AX5_SCALE = 3.12;
+// Report threshold for overlap DEPTH — the stress probe only reports a collision when boxes overlap by more
+// than this, to suppress sub-pixel / anti-alias noise. Distinct from EPS (the 1px existence floor).
+export const OVERLAP_NOISE_PX = 2;
 
 // --- geometry (collision / obscured content, WCAG F69) ---
 export function boxesOverlap(a, b) {

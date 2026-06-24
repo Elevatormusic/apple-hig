@@ -218,7 +218,11 @@ capability, in order:
    is window-resize-to-`NSWindow.minSize` + "Use Preferred Reading Size" + Increase/Reduce-Contrast — NOT an
    iOS Dynamic Type ramp** (the ~3.12× scale and 320px reflow are `wcag_external` *analogues*, informs-not-
    governs); iOS/iPadOS → the AX5 3.12× scale is the real target. Fixed chrome that legitimately doesn't
-   scale (with a Large Content Viewer) is a non-scaling **exception**, not a defect.
+   scale (with a Large Content Viewer) is a non-scaling **exception**, not a defect. **Corroborate the
+   probe's `clipped`/`overlapping`/`notMirrored` lists against the screenshot before flagging** — an
+   intentional line-clamp with a visible "show more", a designed overlay/badge, or a centred element is not
+   breakage; and apply the reflow whitelist (maps/video/data-table-grid) to the `clipped`/`overlapping` nodes
+   too, not only to `pageHorizontalScroll`.
 2. **Else, computer-control tools** (`request_access` to approve the browser, then `screenshot`,
    `open_application`, `left_click`, `key`, …) — open the page in a browser, switch light/dark and resize
    the window where you can, and **screenshot the screen** to verify the rendered result. Coarser and

@@ -25,6 +25,9 @@ test('the stress probe uses the same constants as the unit-tested layout-robustn
     assert.ok(P.includes(tok), `probe missing ${tok}`);
     assert.ok(LR.includes(tok), `layout-robustness.mjs missing ${tok}`);
   }
+  // the overlap-noise gate is a named, shared constant (not a bare literal) so "mirrors the module" is true
+  assert.ok(P.includes('OVERLAP_NOISE_PX'), 'probe references the named overlap gate');
+  assert.ok(LR.includes('OVERLAP_NOISE_PX'), 'module exports the overlap gate');
 });
 
 test('the reviewer wires the stress pass, platform-calibrated', () => {
