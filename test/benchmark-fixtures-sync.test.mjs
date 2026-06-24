@@ -14,6 +14,23 @@ test('the benchmark workflow fixtures stay in sync with expected.json', () => {
   }
 });
 
+test('manifest and inlined workflow FIXTURES match per-fixture, per-field (no silent ground-truth drift)', () => {
+  const expected = JSON.parse(read('test/fixtures/design/expected.json')).fixtures;
+  const wf = read('scripts/design-benchmark.workflow.js');
+  const m = wf.match(/const FIXTURES = (\[[\s\S]*?\n\])/);
+  assert.ok(m, 'could not locate the inlined FIXTURES array');
+  const inlined = (0, eval)(m[1]); // our own committed source; a JS array literal
+  assert.equal(inlined.length, expected.length, 'fixture count differs between manifest and workflow');
+  const byFile = Object.fromEntries(inlined.map((f) => [f.file, f]));
+  for (const e of expected) {
+    const i = byFile[e.file];
+    assert.ok(i, `workflow missing fixture ${e.file}`);
+    assert.equal(i.expectedVerdict, e.expectedVerdict, `${e.file}: expectedVerdict drift`);
+    assert.deepEqual(i.expectedCategories, e.expectedCategories, `${e.file}: expectedCategories drift`);
+    assert.deepEqual(i.mustNotFlag, e.mustNotFlag, `${e.file}: mustNotFlag drift`);
+  }
+});
+
 test('the workflow inlines the same scoring contract as scripts/benchmark-score.mjs', () => {
   const wf = read('scripts/design-benchmark.workflow.js');
   // the inlined scorer must compute the same fields the node module + its test assert

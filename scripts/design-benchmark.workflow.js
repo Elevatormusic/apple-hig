@@ -122,7 +122,9 @@ const judged = await parallel(scored.map((r) => () =>
 
 const judgeAgreement = judged.length ? judged.filter((j) => j.expertAgree).length / judged.length : 1
 const runsOf = (r) => (r.runs && r.runs.length) ? r.runs : (r.actual ? [r.actual] : []);
-const consistencyReport = repeats > 1
+const consistencyReport = rendered
+  ? { repeats: 1, note: 'consistency not measured in rendered mode (fixtures run once, sequentially)' }
+  : repeats > 1
   ? { repeats, agreement: reviews.length ? reviews.reduce((s, r) => s + consistency(runsOf(r)), 0) / reviews.length : 1,
       perFixture: reviews.map((r) => ({ file: r.fx.file, verdicts: runsOf(r).map((x) => x.verdict) })) }
   : { repeats: 1, note: 'pass {repeats:N} (e.g. 3) to measure run-to-run consistency / over-flagging variance' };
