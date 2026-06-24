@@ -9,6 +9,19 @@ Review UI code for Apple Human Interface Guidelines compliance.
 **Target:** $ARGUMENTS
 If no target is given, review the file/selection currently in focus.
 
+**Native JUCE descriptor?** If the target is a `native-render` descriptor JSON produced by the JUCE design
+probe (a top-level `meta` + `elements`; see `references/native-juce-review.md`), do **not** dispatch the
+subagent — it has no Bash and no browser for native. Instead run, with your Bash tool:
+
+```
+node "${CLAUDE_PLUGIN_ROOT}/scripts/native-review.mjs" <path-to-descriptor.json>
+```
+
+and present its output: the measured findings (`evidence: extracted`), the **coverage ratio** (custom-painted
+nodes aren't contrast-scored), and the snapshot PNG to confirm the duplicate/clip/overlap class by eye. A
+native review is **advisory-pass at most — never `verified-pass`** (deterministic, not a pixel render). For
+all other (source) targets:
+
 Dispatch the **`design-reviewer`** subagent via the Task tool (`subagent_type: "design-reviewer"`) and
 pass it the target path(s). That agent knows how to load the bundled guidelines and pull each rule's
 Apple `source_url`. Ask it to detect the platform(s) and stack, then audit for at least: touch targets

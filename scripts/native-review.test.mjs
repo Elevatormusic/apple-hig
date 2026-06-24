@@ -1,8 +1,26 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { contrastFindings, geometryFindings, coverage, reviewNativeDescriptor } from './native-review.mjs';
 const fx = JSON.parse(readFileSync(new URL('../test/fixtures/native/ears-like.json', import.meta.url)));
+const repo = fileURLToPath(new URL('../', import.meta.url));
+
+test('the CLI reviews a descriptor file and prints findings + coverage + verdict', () => {
+  const out = execFileSync('node', ['scripts/native-review.mjs', 'test/fixtures/native/ears-like.json'], { cwd: repo, encoding: 'utf8' });
+  assert.match(out, /verdict:/);
+  assert.match(out, /Coverage: 6\/7/);
+  assert.match(out, /contrast|clip|duplicate/);
+  assert.match(out, /never verified-pass/);
+});
+
+test('the CLI rejects a non-descriptor JSON with a clear error', () => {
+  let threw = false;
+  try { execFileSync('node', ['scripts/native-review.mjs', 'package.json'], { cwd: repo, encoding: 'utf8' }); }
+  catch (e) { threw = true; assert.match(String(e.stderr), /not a valid native-render descriptor/); }
+  assert.ok(threw, 'exits non-zero on an invalid descriptor');
+});
 
 test('contrast is scored only on measurable nodes and flags the near-invisible label', () => {
   const f = contrastFindings(fx.elements);

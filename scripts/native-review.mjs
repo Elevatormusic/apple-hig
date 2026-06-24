@@ -4,9 +4,12 @@
 // live component tree, but NOT a pixel render). Contrast is scored ONLY on introspectable (`measurable`)
 // nodes; a coverage ratio is reported so a heavily custom-painted UI is never mistaken for "fully reviewed".
 
+import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { contrastRatio } from './wcag-contrast.mjs';
 import { boxesOverlap, overlapDepth } from './layout-robustness.mjs';
 import { visualWeight } from './visual-weight.mjs';
+import { validateDescriptor } from './native-descriptor.mjs';
 
 const isLarge = (el) => el.fontPt >= 18 || (el.bold && el.fontPt >= 14);
 const rect = (b) => ({ left: b.x, top: b.y, right: b.x + b.w, bottom: b.y + b.h });
@@ -66,4 +69,27 @@ export function reviewNativeDescriptor(descriptor) {
   const blocking = findings.some((f) => f.severity === 'high' || f.severity === 'critical');
   // a native (introspection) review is deterministic but not a pixel render — never `verified-pass`.
   return { findings, coverage: cov, verdict: blocking ? 'fail' : 'advisory-pass' };
+}
+
+// --- CLI: `node scripts/native-review.mjs <descriptor.json> [--json]` ---
+// The design-reviewer subagent has no Bash and no browser for native, so the `/hig-review` command (which
+// has Bash) runs THIS on a JUCE design-probe descriptor to get the measured findings.
+if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
+  const path = process.argv[2];
+  if (!path) { console.error('usage: node native-review.mjs <descriptor.json> [--json]'); process.exit(2); }
+  let desc;
+  try { desc = JSON.parse(readFileSync(path, 'utf8')); } catch (e) { console.error(`cannot read ${path}: ${e.message}`); process.exit(2); }
+  const errs = validateDescriptor(desc);
+  if (errs.length) { console.error(`not a valid native-render descriptor:\n  ${errs.join('\n  ')}`); process.exit(2); }
+  const r = reviewNativeDescriptor(desc);
+  if (process.argv.includes('--json')) { console.log(JSON.stringify(r, null, 2)); process.exit(0); }
+  const pct = (r.coverage.ratio * 100).toFixed(0);
+  console.log(`Native JUCE review (evidence: extracted) — verdict: ${r.verdict}  ·  never verified-pass (not a pixel render)`);
+  console.log(`Coverage: ${r.coverage.measurable}/${r.coverage.total} nodes introspectable (${pct}%); custom-painted nodes are NOT contrast-scored.`);
+  const order = { critical: 0, high: 1, medium: 2, low: 3, advisory: 4 };
+  const sorted = [...r.findings].sort((a, b) => (order[a.severity] ?? 9) - (order[b.severity] ?? 9));
+  if (!sorted.length) console.log('  (no measured issues on the introspectable subset)');
+  for (const f of sorted) console.log(`  [${f.severity}] ${f.category} — ${f.element}: ${f.message}`);
+  console.log('Confirm the duplicate/clip/overlap class against the snapshot PNG.');
+  process.exit(0);
 }
