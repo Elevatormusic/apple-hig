@@ -65,7 +65,14 @@ disclosure are `community_convention` (NN/g) — keep them ≤ medium severity; 
 
 **Stage 4 — Visual + task hierarchy.** Expected vs observed attention order, dominant element (NN/g: ≤2
 dominant), typography hierarchy, visual weight, container/**card overload**, color emphasis, **spacing
-relationships**, content-vs-chrome layering, **competing primary emphasis**, critical-status prominence.
+relationships**, content-vs-chrome layering, **competing primary emphasis**, critical-status prominence. **When rendered,
+use the probe's `visualWeightTop` (the objective squint test):** the highest-weight elements are the
+rendered focal points. If a metadata/decorative element or a secondary control **outweighs** the intended
+primary content/action — or the title/critical status sits far down the list — that is an evidence-backed
+**hierarchy inversion** (`category: hierarchy`, `evidence: computed`). Visual weight is a heuristic
+*estimate* (rendered area × ink × contrast), not pixel saliency, and it skips filled container surfaces so
+they cannot outshout their own contents — so cap a weight-only inversion at `confidence: medium` unless the
+rendered screenshot corroborates it by eye.
 Folds in: **hardcoded/non-semantic colors** (`apple_published` — use semantic colors; brand/data/media
 literals with paired light+dark are fine, not a violation); **missing dark-mode variants**; **non-
 standard corner radii** (the concentric/continuous principle is `apple_published`; specific radius
@@ -170,9 +177,12 @@ capability, in order:
    is the preferred path and reaches `level: visual`/`full`. **Then run the DOM probe**
    (`${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/references/dom-probe.js`) via `browser_evaluate` to **measure**
    real WCAG contrast (against the rendered background), interactive-target geometry after layout, and
-   dark-mode support; tag findings it backs `evidence: computed` (a **measured fact** — high confidence,
-   not `inferred`), and apply the contrast-role exemptions (decorative/disabled/logotype) to its output
-   before flagging. A `verified-pass` rests on the probe's computed evidence, not heuristics alone.
+   dark-mode support, and rank elements by **visual weight** (`visualWeightTop`); tag findings it backs
+   `evidence: computed`, not `inferred`. Calibrate confidence to what was actually measured: contrast,
+   geometry, and dark-mode are **exact measurements** (high confidence); the visual-weight ranking is a
+   **heuristic estimate**, so cap a weight-only finding at `confidence: medium` (see Stage 4). Apply the
+   contrast-role exemptions (decorative/disabled/logotype) to its output before flagging. A `verified-pass`
+   rests on the probe's exact measurements, not the heuristic estimates or unaided judgement alone.
 2. **Else, computer-control tools** (`request_access` to approve the browser, then `screenshot`,
    `open_application`, `left_click`, `key`, …) — open the page in a browser, switch light/dark and resize
    the window where you can, and **screenshot the screen** to verify the rendered result. Coarser and
