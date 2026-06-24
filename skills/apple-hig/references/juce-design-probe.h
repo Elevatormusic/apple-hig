@@ -91,14 +91,15 @@ namespace hig
         if (usableW <= 1.0f || usableH <= 1.0f) return false;
         const auto  font    = l->getFont();
         const float oneLine = font.getHeight();
-        if (font.getStringWidthFloat (text) > usableW + 1.0f && usableH < oneLine * 1.8f) return true; // single-line clip
         juce::AttributedString as; as.append (text, font);
+        juce::TextLayout wide; wide.createLayout (as, 1.0e6f);   // no wrap -> natural single-line width (JUCE-8 safe)
+        if (wide.getWidth() > usableW + 1.0f && usableH < oneLine * 1.8f) return true;                  // single-line clip
         juce::TextLayout layout; layout.createLayout (as, usableW);
-        return usableH >= oneLine * 1.8f && layout.getHeight() > usableH + 1.0f;                        // multi-line clip
+        return usableH >= oneLine * 1.8f && layout.getHeight() > usableH + 1.0f;                         // multi-line clip
     }
 
     // Effective background: the widget's own bg colour id, else walk up to the nearest opaque ancestor.
-    inline void resolveColours (juce::Component& c, const juce::String& type,
+    inline void resolveColours (juce::Component& c,
                                 juce::String& fg, juce::String& bg, bool& fgOk, bool& bgOk)
     {
         fg = bg = "not introspectable"; fgOk = bgOk = false;
@@ -139,8 +140,11 @@ namespace hig
         o->setProperty ("id",   c.getComponentID().isNotEmpty() ? c.getComponentID() : ("c" + juce::String (index)));
         o->setProperty ("type", type);
 
-        // geometry in the probed-root LOGICAL coordinate space (transform/scale aware)
-        const auto r = root.getLocalArea (c.getParentComponent(), c.getBounds());
+        // geometry in the probed-root LOGICAL coordinate space (transform/scale aware). The root itself is
+        // (0,0,w,h) in its own space — using getLocalArea against its desktop parent would offset it by the
+        // window/title-bar, so it wouldn't "contain" its children and every child would read as an overlap.
+        const auto r = (&c == &root) ? root.getLocalBounds()
+                                     : root.getLocalArea (c.getParentComponent(), c.getBounds());
         auto* b = new juce::DynamicObject();
         b->setProperty ("x", r.getX()); b->setProperty ("y", r.getY());
         b->setProperty ("w", r.getWidth()); b->setProperty ("h", r.getHeight());
@@ -148,7 +152,7 @@ namespace hig
 
         const bool isCustom = (type == "custom/unknown");
         juce::String fg, bg; bool fgOk = false, bgOk = false;
-        if (! isCustom) resolveColours (c, type, fg, bg, fgOk, bgOk);
+        if (! isCustom) resolveColours (c, fg, bg, fgOk, bgOk);
         else { fg = bg = "not introspectable"; }
 
         o->setProperty ("label", labelOf (c));
@@ -183,7 +187,10 @@ namespace hig
         // GPU/Web subtrees render blank in createComponentSnapshot — flag, don't pixel-score. OpenGL is
         // detected by an attached OpenGLContext on the component or an ancestor (NOT OpenGLAppComponent,
         // which is a standalone-app base class never used inside a plugin editor).
-        bool gpu = (dynamic_cast<juce::WebBrowserComponent*> (&c) != nullptr);
+        bool gpu = false;
+       #if JUCE_WEB_BROWSER   // juce::WebBrowserComponent only exists when this is 1; many apps build with 0
+        gpu = (dynamic_cast<juce::WebBrowserComponent*> (&c) != nullptr);
+       #endif
        #if defined (JUCE_MODULE_AVAILABLE_juce_opengl) && JUCE_MODULE_AVAILABLE_juce_opengl
         for (auto* p = &c; p != nullptr && ! gpu; p = p->getParentComponent())
             if (juce::OpenGLContext::getContextAttachedTo (*p) != nullptr) gpu = true;

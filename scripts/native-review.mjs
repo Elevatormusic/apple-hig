@@ -14,7 +14,8 @@ import { validateDescriptor } from './native-descriptor.mjs';
 const isLarge = (el) => el.fontPt >= 18 || (el.bold && el.fontPt >= 14);
 const rect = (b) => ({ left: b.x, top: b.y, right: b.x + b.w, bottom: b.y + b.h });
 // full containment = parent/child nesting (the probe emits a flat tree with absolute bounds), NOT a collision.
-const contains = (p, q) => p.left <= q.left && p.top <= q.top && p.right >= q.right && p.bottom >= q.bottom;
+// A small tolerance absorbs residual window/border offsets so an edge-touching child still reads as nested.
+const contains = (p, q, t = 2) => p.left <= q.left + t && p.top <= q.top + t && p.right >= q.right - t && p.bottom >= q.bottom - t;
 const interactive = (el) => /button|toggle|slider|combo/i.test(el.type) || /button|link|slider|checkbox/i.test(el.role);
 
 export function coverage(elements) {

@@ -3,6 +3,23 @@
 All notable changes to the apple-hig plugin. This project follows [Keep a Changelog](https://keepachangelog.com/)
 and [semantic versioning](https://semver.org/).
 
+## [1.7.1] — 2026-06-23
+
+Patch — the JUCE design probe now **compiles on the common `JUCE_WEB_BROWSER=0`** configuration. Validated on
+a real **JUCE 8.0.4** build, where v1.7.0's native review otherwise worked end-to-end (valid descriptor, 90%
+accessibility coverage, honest 73% introspectable-coverage reporting) and caught a real clipped label a manual
+pass had missed.
+
+### Fixed
+- **Compile blocker:** `juce::WebBrowserComponent` only exists when `JUCE_WEB_BROWSER=1`; that reference is now
+  guarded with `#if JUCE_WEB_BROWSER`, so apps built with it `=0` (very common) compile cleanly.
+- **JUCE-8 deprecation:** replaced `Font::getStringWidthFloat` (deprecated; fails a `-Werror` build) with a
+  `TextLayout` width.
+- **Warning:** dropped the unused `type` parameter in `resolveColours`.
+- **False positives:** the root node is now emitted as `(0,0,w,h)`, so it correctly contains its children and
+  no longer reads as overlapping every one of them; the containment check also gained a small tolerance for
+  residual window/border offsets.
+
 ## [1.7.0] — 2026-06-23
 
 Native **JUCE / C++** design review — the "measure, don't guess" capability extended beyond the browser to

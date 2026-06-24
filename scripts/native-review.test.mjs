@@ -53,6 +53,14 @@ test('parent/child nesting is NOT flagged as an overlap (flat tree, absolute bou
   assert.ok(!geometryFindings(nested.elements).some((x) => x.category === 'overlap'), 'a child inside its parent is not an overlap');
 });
 
+test('the root node containing full-width children is NOT flagged as overlap (root-bounds + tolerance)', () => {
+  const d = { meta: {}, elements: [
+    { id: 'root', type: 'Component', role: '', label: '', value: '', bounds: { x: 0, y: 0, w: 900, h: 780 }, fgIntrospectable: false, bgIntrospectable: false, fontPt: 0, bold: false, visible: true, showing: true, enabled: true, checkable: false, checked: false, measurable: false, snapshotMayBeBlank: false, textOverflows: false },
+    { id: 'bar', type: 'Component', role: '', label: '', value: '', bounds: { x: 0, y: 28, w: 901, h: 40 }, fgIntrospectable: false, bgIntrospectable: false, fontPt: 0, bold: false, visible: true, showing: true, enabled: true, checkable: false, checked: false, measurable: false, snapshotMayBeBlank: false, textOverflows: false },
+  ] };
+  assert.ok(!geometryFindings(d.elements).some((x) => x.category === 'overlap'), 'a full-width child of the root is not an overlap (1px over-edge absorbed by tolerance)');
+});
+
 test('the assembled native review tags extracted, reports coverage, and never verified-passes', () => {
   const r = reviewNativeDescriptor(fx);
   assert.ok(r.findings.length >= 3);
