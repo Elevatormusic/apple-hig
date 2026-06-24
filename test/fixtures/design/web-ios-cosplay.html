@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Acme</title>
+<!-- A DESKTOP web app cosplaying as iOS: a fixed bottom TAB BAR + large iOS title on a wide pointer
+     layout, instead of web-native top/sidebar nav. The reviewer should RAISE platform-fit (iOS chrome
+     imposed on desktop web) — but NOT fail (medium). -->
+<style>
+  :root{color-scheme:light dark;--bg:#f2f2f7;--card:#fff;--label:#1c1c1e;--label2:#8a8a8e;--tint:#0a84ff;--sep:#3c3c4329}
+  @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--label:#fff;--label2:#98989d}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--label);font:17px/1.4 -apple-system,system-ui,sans-serif;min-height:100vh}
+  .page{max-width:1200px;margin:0 auto;padding:24px 32px 96px}     /* wide desktop canvas... */
+  h1{font-size:34px;font-weight:700;margin:8px 0 20px}             /* ...with an iOS large title */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+  .card .n{font-size:26px;font-weight:700}.card .l{color:var(--label2);font-size:13px}
+  /* the tell: a fixed bottom tab bar on a desktop web app */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;height:64px;background:var(--card);border-top:.5px solid var(--sep);
+          display:flex;justify-content:center;gap:48px;align-items:center}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--label2);font-size:11px}
+  .tab.on{color:var(--tint)}.dot{width:24px;height:24px;border-radius:7px;background:currentColor;opacity:.85}
+</style></head><body>
+<div class="page">
+  <h1>Dashboard</h1>
+  <div class="grid">
+    <div class="card"><div class="n">12,418</div><div class="l">Users</div></div>
+    <div class="card"><div class="n">$84.2k</div><div class="l">MRR</div></div>
+    <div class="card"><div class="n">3.1%</div><div class="l">Churn</div></div>
+    <div class="card"><div class="n">1,204</div><div class="l">Trials</div></div>
+  </div>
+</div>
+<nav class="tabbar" aria-label="Main">
+  <span class="tab on"><span class="dot"></span>Home</span>
+  <span class="tab"><span class="dot"></span>Reports</span>
+  <span class="tab"><span class="dot"></span>Team</span>
+  <span class="tab"><span class="dot"></span>Settings</span>
+</nav></body></html>

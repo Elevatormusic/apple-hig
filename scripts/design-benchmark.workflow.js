@@ -19,6 +19,8 @@ const FIXTURES = [
   { file: 'good-web-dashboard.html', summary: 'Correct desktop-web dashboard (web-native nav, no iOS chrome); must NOT be flagged for lacking iOS chrome/tab-bar/SF-Symbols.', expectedVerdict: 'advisory-pass', expectedCategories: [], mustNotFlag: ['missing-ios-chrome', 'no-tab-bar', 'no-sf-symbols', 'missing-primary-action'] },
   { file: 'all-cards-fragmented.html', summary: 'Card overload — every field in its own shadowed card; must RAISE visual (medium, verdict stays advisory-pass).', expectedVerdict: 'advisory-pass', expectedCategories: ['visual'], mustNotFlag: [] },
   { file: 'error-without-recovery.html', summary: 'Payment error with no cause/retry and wiped fields; must fail on error-recovery.', expectedVerdict: 'fail', expectedCategories: ['error-recovery'], mustNotFlag: [] },
+  { file: 'web-ios-cosplay.html', summary: 'Desktop web app cosplaying as iOS (fixed bottom tab bar on a wide layout); must RAISE platform-fit (iOS chrome on desktop web), not fail.', expectedVerdict: 'advisory-pass', expectedCategories: ['platform-fit'], mustNotFlag: [] },
+  { file: 'ipad-splitview-good.html', summary: 'Correct iPad regular-width sidebar->list->detail (restructured, no dead margins); must NOT flag platform-fit/stretched-iPhone.', expectedVerdict: 'advisory-pass', expectedCategories: [], mustNotFlag: ['stretched-iphone', 'platform-fit', 'empty-margins'] },
 ]
 
 // Inlined twin of scripts/benchmark-score.mjs (the Workflow sandbox can't import it).

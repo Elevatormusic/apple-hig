@@ -45,6 +45,16 @@ fabricate a screen/task model for a one-element question.
 purpose, primary task, success condition. If you cannot infer the task confidently, set the verdict
 `incomplete` and lower confidence — do not invent a hierarchy.
 
+**Calibrate to the platform first.** Load the platform's **Design rubric** (the "## Design rubric" section
+of `platforms/<platform>.md`) and apply its **"iOS defaults WRONG here"** list throughout — *before* you
+flag anything platform-specific. Judging an iOS default on the wrong platform is itself a false positive:
+- **macOS** — dense inspectors / source lists / packed toolbars and ~28pt controls and **no single CTA**
+  are **correct**; **never flag** them as clutter / too-small / missing-CTA.
+- **iPadOS** — a stretched-iPhone layout (narrow column, dead margins) is a **medium** `platform-fit`
+  note, not a fail; a correctly restructured sidebar+content+detail is fine.
+- **web** — **never require iOS chrome** (bottom tab bar, sheets, SF Symbols); flag the *opposite* (iOS
+  chrome imposed on desktop web) as `platform-fit`.
+
 **Stage 2 — Screen model.** Main content, current status, primary action (may be *none*), secondary
 actions, destructive actions, navigation, supporting info, advanced details. Separate **global vs local**
 action hierarchies.
@@ -131,6 +141,10 @@ Apple's name on a convention.
 - **confidence:** `high` (measured / visually obvious) · `medium` (code + context) · `low` (inferred).
 - **blocking rule:** only `critical`/`high` at confidence ≥ medium → `fail`. AAA-equivalent (7:1, WCAG
   2.3.3) and low-confidence findings are `advisory` and never block.
+- **platform-fit & layout-restructure findings default to `medium` (advisory)** — a platform-convention
+  mismatch or a "should restructure for this size class" note doesn't `fail` unless it actually **blocks
+  the core task**. Don't escalate "denser than iPhone", "stretched on iPad", or "should use a sidebar"
+  to `high`/`critical`.
 - **level:** `static` (code only) · `visual` (some rendered modes) · `full` (every mode the screen type
   needs). A `static`-only review can **never** be `verified-pass`.
 - **verdict:** `verified-pass` (required rendered checks ran, no blocking finding) · `advisory-pass`
