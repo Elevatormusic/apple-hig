@@ -82,6 +82,14 @@ test('macOS overhaul: Dynamic-Type fix, control sizes, Larger-Text not overclaim
   assert.match(mac, /iOS defaults WRONG here/);
 });
 
+test('reduced-motion honoring is community_convention, not a WCAG AA gate (2.3.3 is AAA)', () => {
+  // B1 fix: WCAG 2.3.3 Animation from Interactions is AAA; honoring prefers-reduced-motion is a convention
+  for (const f of [web, sw]) assert.doesNotMatch(f, /reduced-motion gate = `wcag_external`/);
+  assert.match(sw, /### 21 —[^\n]*Motion[^\n]*`community_convention`/);
+  assert.ok(has(web, 'AAA / advisory'), 'web notes 2.3.3 as AAA/advisory');
+  assert.ok(has(web, "honoring `prefers-reduced-motion` = `community_convention`"), 'web reduced-motion = convention');
+});
+
 test('universal.md routes web/desktop to profiles and drops the inline web rubric', () => {
   assert.match(uni, /profiles\/web\.md/);
   assert.match(uni, /profiles\/desktop-cross-platform\.md/);

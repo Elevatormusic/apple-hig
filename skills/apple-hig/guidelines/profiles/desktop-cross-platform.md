@@ -191,12 +191,13 @@ hard-coded colors that ignore the contrast theme, invisible borders/focus when f
 by color alone. Mixed: contrast-themes mechanism = `community_convention`; WCAG 1.4.1 backs the
 not-color-alone clause (`wcag_external`). — https://learn.microsoft.com/en-us/windows/apps/design/accessibility/high-contrast-themes
 
-### 21 — Motion & animation  `wcag_external`
+### 21 — Motion & animation  `community_convention`
 PASS: motion is purposeful (feedback, wayfinding, spatial continuity — Fluent "reactive, direct,
-context-appropriate"), respects the OS "reduce/disable animations" setting with a non-animated fallback
-(2.3.3), and is cheap (transform/opacity, paused off-screen/backgrounded). FAIL: gratuitous looping
-decoration, motion that ignores the OS animation-off setting, layout/paint-thrashing animation. Mixed: WCAG
-2.3.3 reduced-motion gate = `wcag_external`; "motion with purpose" = `inference`; Fluent motion =
+context-appropriate"), respects the OS "reduce/disable animations" setting with a non-animated fallback,
+and is cheap (transform/opacity, paused off-screen/backgrounded). FAIL: gratuitous looping decoration,
+motion that ignores the OS animation-off setting, layout/paint-thrashing animation. Mixed: honoring the OS
+reduce-motion setting = `community_convention` (no AA SC mandates it — WCAG 2.3.3 Animation from Interactions
+is **AAA / advisory**, not an AA gate); "motion with purpose" = `inference`; Fluent motion =
 `community_convention`. — https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html
 
 ### 22 — Platform-fit (host conventions RIGHT vs WRONG to borrow)  `community_convention`

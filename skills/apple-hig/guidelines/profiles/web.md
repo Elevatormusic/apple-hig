@@ -145,7 +145,9 @@ PASS: motion is purposeful and short (~150–300ms UI transitions) with standard
 backgrounded; a `prefers-reduced-motion` alternative exists for everything (ties to Base 11). FAIL:
 gratuitous looping decoration, long/janky transitions, animating `width`/`box-shadow`/`top`, motion with no
 reduced-motion fallback. Mixed: "motion shows hierarchy" = `inference`; implementation = `community_convention`;
-reduced-motion gate = `wcag_external` (2.3.3). — https://web.dev/articles/animations-guide
+honoring `prefers-reduced-motion` = `community_convention` (no AA SC mandates it — WCAG 2.3.3 Animation from
+Interactions is **AAA / advisory**; the `wcag_external` motion gate is 2.3.1 Three Flashes, A, in Base 11).
+— https://web.dev/articles/animations-guide
 
 ### Base 14 — Internationalization / localization  `community_convention`
 PASS: `<html lang>` set and correct (3.1.1 A); UI strings externalized (no grammar-breaking concatenation);

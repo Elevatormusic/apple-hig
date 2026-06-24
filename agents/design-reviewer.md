@@ -158,8 +158,9 @@ Apple's name on a convention.
   prevented) · `low` (nuisance, still a real defect) · `advisory` (preference/aesthetic/low-confidence —
   never blocks, separate from `low`).
 - **confidence:** `high` (measured / visually obvious) · `medium` (code + context) · `low` (inferred).
-- **blocking rule:** only `critical`/`high` at confidence ≥ medium → `fail`. AAA-equivalent (7:1, WCAG
-  2.3.3) and low-confidence findings are `advisory` and never block.
+- **blocking rule:** only `critical`/`high` at confidence ≥ medium → `fail`. AAA-equivalent findings
+  (e.g. 7:1 = WCAG 1.4.6 Contrast Enhanced; 2.4.13 Focus Appearance; 2.3.3 Animation from Interactions) and
+  low-confidence findings are `advisory` and never block.
 - **platform-fit & layout-restructure findings default to `medium` (advisory)** — a platform-convention
   mismatch or a "should restructure for this size class" note doesn't `fail` unless it actually **blocks
   the core task**. Don't escalate "denser than iPhone", "stretched on iPad", or "should use a sidebar"
