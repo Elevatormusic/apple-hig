@@ -29,6 +29,9 @@
 #if JUCE_DEBUG
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#if defined (JUCE_MODULE_AVAILABLE_juce_opengl) && JUCE_MODULE_AVAILABLE_juce_opengl
+ #include <juce_opengl/juce_opengl.h>   // only to detect OpenGL-attached (snapshot-blank) subtrees
+#endif
 
 namespace hig
 {
@@ -71,17 +74,27 @@ namespace hig
         return false;
     }
 
-    // Probe-computed text overflow: lay the text out at the component's width and compare to its height,
-    // and (for non-wrapping) compare single-line width — so a clipped/truncated label becomes a measured fact.
+    // Probe-computed text overflow — a HEURISTIC, not a pixel-exact clip. A standard JUCE Label renders
+    // SINGLE-LINE (squash-then-ellipsis), so the strongest signal is the unmodified string being wider than
+    // the usable width on a one-line-tall label; a taller label is checked by laying the text out and
+    // comparing height. Border insets are subtracted. False positives/negatives are possible — the reviewer
+    // corroborates the `clip` finding against the snapshot.
     inline bool textOverflowsOf (juce::Component& c)
     {
-        juce::String text; juce::Font font;
-        if (auto* l = dynamic_cast<juce::Label*>(&c)) { text = l->getText(); font = l->getFont(); }
-        else return false;
-        if (text.isEmpty() || c.getWidth() <= 0) return false;
+        auto* l = dynamic_cast<juce::Label*> (&c);
+        if (l == nullptr) return false;
+        const auto text = l->getText();
+        if (text.isEmpty()) return false;
+        const auto  border  = l->getBorderSize();
+        const float usableW = (float) c.getWidth()  - (float) (border.getLeft() + border.getRight());
+        const float usableH = (float) c.getHeight() - (float) (border.getTop()  + border.getBottom());
+        if (usableW <= 1.0f || usableH <= 1.0f) return false;
+        const auto  font    = l->getFont();
+        const float oneLine = font.getHeight();
+        if (font.getStringWidthFloat (text) > usableW + 1.0f && usableH < oneLine * 1.8f) return true; // single-line clip
         juce::AttributedString as; as.append (text, font);
-        juce::TextLayout layout; layout.createLayout (as, (float) c.getWidth());
-        return layout.getHeight() > (float) c.getHeight() + 1.0f;
+        juce::TextLayout layout; layout.createLayout (as, usableW);
+        return usableH >= oneLine * 1.8f && layout.getHeight() > usableH + 1.0f;                        // multi-line clip
     }
 
     // Effective background: the widget's own bg colour id, else walk up to the nearest opaque ancestor.
@@ -167,9 +180,14 @@ namespace hig
         o->setProperty ("role", role);
         o->setProperty ("checkable", checkable);  o->setProperty ("checked", checked);
         o->setProperty ("measurable", ! isCustom);
-        // GPU/Web/Video subtrees render blank in createComponentSnapshot — flag, don't pixel-score.
-        const bool gpu = (c.findParentComponentOfClass<juce::OpenGLAppComponent>() != nullptr)
-                      ||  (dynamic_cast<juce::WebBrowserComponent*> (&c) != nullptr);
+        // GPU/Web subtrees render blank in createComponentSnapshot — flag, don't pixel-score. OpenGL is
+        // detected by an attached OpenGLContext on the component or an ancestor (NOT OpenGLAppComponent,
+        // which is a standalone-app base class never used inside a plugin editor).
+        bool gpu = (dynamic_cast<juce::WebBrowserComponent*> (&c) != nullptr);
+       #if defined (JUCE_MODULE_AVAILABLE_juce_opengl) && JUCE_MODULE_AVAILABLE_juce_opengl
+        for (auto* p = &c; p != nullptr && ! gpu; p = p->getParentComponent())
+            if (juce::OpenGLContext::getContextAttachedTo (*p) != nullptr) gpu = true;
+       #endif
         o->setProperty ("snapshotMayBeBlank", gpu);
         o->setProperty ("textOverflows", textOverflowsOf (c));
         return juce::var (o);
@@ -185,7 +203,7 @@ namespace hig
     }
 
     // The descriptor JSON for `root` and all of its children. Call on the MESSAGE THREAD.
-    inline juce::String describeComponentTree (juce::Component& root)
+    inline juce::String describeComponentTree (juce::Component& root, const juce::String& snapshotName = "hig-probe.png")
     {
         juce::Array<juce::var> elements; int index = 0, axCovered = 0;
         collect (root, root, elements, index, axCovered);
@@ -197,7 +215,7 @@ namespace hig
         rb->setProperty ("x", 0); rb->setProperty ("y", 0);
         rb->setProperty ("w", root.getWidth()); rb->setProperty ("h", root.getHeight());
         meta->setProperty ("rootBounds", juce::var (rb));
-        meta->setProperty ("snapshotPath", "hig-probe.png");
+        meta->setProperty ("snapshotPath", snapshotName);
         meta->setProperty ("shown", root.isShowing());
         meta->setProperty ("axCoverageRatio", elements.size() > 0 ? (double) axCovered / (double) elements.size() : 0.0);
 
@@ -219,7 +237,7 @@ namespace hig
 
     inline void writeDesignProbe (juce::Component& root, const juce::File& jsonOut, const juce::File& pngOut)
     {
-        jsonOut.replaceWithText (describeComponentTree (root));
+        jsonOut.replaceWithText (describeComponentTree (root, pngOut.getFileName()));
         writeSnapshot (root, pngOut);
     }
 

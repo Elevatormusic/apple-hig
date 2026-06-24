@@ -10,6 +10,8 @@ import { visualWeight } from './visual-weight.mjs';
 
 const isLarge = (el) => el.fontPt >= 18 || (el.bold && el.fontPt >= 14);
 const rect = (b) => ({ left: b.x, top: b.y, right: b.x + b.w, bottom: b.y + b.h });
+// full containment = parent/child nesting (the probe emits a flat tree with absolute bounds), NOT a collision.
+const contains = (p, q) => p.left <= q.left && p.top <= q.top && p.right >= q.right && p.bottom >= q.bottom;
 const interactive = (el) => /button|toggle|slider|combo/i.test(el.type) || /button|link|slider|checkbox/i.test(el.role);
 
 export function coverage(elements) {
@@ -35,10 +37,12 @@ export function geometryFindings(elements) {
   const vis = elements.filter((e) => e.visible && e.showing);
   for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) {
     const a = vis[i], b = vis[j];
-    const overlap = boxesOverlap(rect(a.bounds), rect(b.bounds)) && overlapDepth(rect(a.bounds), rect(b.bounds)) > 2;
+    const ra = rect(a.bounds), rb = rect(b.bounds);
+    const overlap = boxesOverlap(ra, rb) && overlapDepth(ra, rb) > 2;
+    const nested = contains(ra, rb) || contains(rb, ra); // child inside its ancestor — not a collision
     const identical = a.type === b.type && a.label && a.label === b.label && a.bounds.w === b.bounds.w && a.bounds.h === b.bounds.h;
     if (identical) out.push({ category: 'duplicate', severity: overlap ? 'high' : 'medium', element: b.id, evidence: 'extracted', message: `identical "${a.label}" (${a.type}) appears twice — ${a.id} & ${b.id}${overlap ? ', overlapping (painted twice)' : ' (stacked — confirm against the snapshot)'}` });
-    else if (overlap) out.push({ category: 'overlap', severity: 'medium', element: b.id, evidence: 'extracted', message: `${b.id} overlaps ${a.id} by ${overlapDepth(rect(a.bounds), rect(b.bounds))}px` });
+    else if (overlap && !nested) out.push({ category: 'overlap', severity: 'medium', element: b.id, evidence: 'extracted', message: `${b.id} overlaps ${a.id} by ${overlapDepth(ra, rb)}px` });
   }
   for (const el of vis) if (interactive(el) && (el.bounds.w < 24 || el.bounds.h < 24)) out.push({ category: 'target-size', severity: 'medium', element: el.id, evidence: 'extracted', message: `${el.bounds.w}×${el.bounds.h}px target is below the 24px pointer floor (WCAG 2.5.8 — not Apple's 44pt)` });
   for (const el of vis) if (el.textOverflows) out.push({ category: 'clip', severity: 'medium', element: el.id, evidence: 'extracted', message: `"${(el.label || el.value || '').slice(0, 32)}" overflows its bounds and is clipped/truncated` });

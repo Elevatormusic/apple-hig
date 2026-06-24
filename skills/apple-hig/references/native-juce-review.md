@@ -51,3 +51,7 @@ The reviewer runs `reviewNativeDescriptor` and reports findings tagged `evidence
   the optional `Desktop::setGlobalScaleFactor` axis is whole-UI zoom, not text-only growth.
 - **Snapshot blanks** on `OpenGLContext`/`WebBrowserComponent`/`VideoComponent` subtrees (flagged
   `snapshotMayBeBlank`) — those aren't pixel-scored.
+- **`duplicate` findings are advisory.** Two *legitimately* repeated controls of the same type, label, and
+  size (e.g. a "Remove" button in each row of a list) are flagged as a `duplicate` "confirm against the
+  snapshot" — geometry alone can't tell a paint-bug from intentional repetition. Confirm via the PNG before
+  acting; an *overlapping* identical pair (`high`) is the strong paint-twice signal.

@@ -27,6 +27,14 @@ test('geometry flags the duplicate status row, the sub-target button, and the cl
   assert.ok(f.every((x) => x.evidence === 'extracted'));
 });
 
+test('parent/child nesting is NOT flagged as an overlap (flat tree, absolute bounds)', () => {
+  const nested = { meta: {}, elements: [
+    { id: 'panel', type: 'Component', role: '', label: '', value: '', bounds: { x: 0, y: 0, w: 400, h: 300 }, fgIntrospectable: false, bgIntrospectable: false, fontPt: 0, bold: false, visible: true, showing: true, enabled: true, checkable: false, checked: false, measurable: false, snapshotMayBeBlank: false, textOverflows: false },
+    { id: 'btn', type: 'TextButton', role: 'button', label: 'OK', value: '', bounds: { x: 20, y: 20, w: 80, h: 30 }, fg: '#ffffff', bg: '#0066cc', fgIntrospectable: true, bgIntrospectable: true, fontPt: 13, bold: false, visible: true, showing: true, enabled: true, checkable: false, checked: false, measurable: true, snapshotMayBeBlank: false, textOverflows: false },
+  ] };
+  assert.ok(!geometryFindings(nested.elements).some((x) => x.category === 'overlap'), 'a child inside its parent is not an overlap');
+});
+
 test('the assembled native review tags extracted, reports coverage, and never verified-passes', () => {
   const r = reviewNativeDescriptor(fx);
   assert.ok(r.findings.length >= 3);
