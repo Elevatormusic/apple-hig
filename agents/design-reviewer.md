@@ -105,6 +105,16 @@ deliberately — `apple_published`); **Reduce Motion** (`apple_published` on App
 in the **janky/always-on animation** performance checks (web: a loop animating a non-compositable
 property or reading layout every frame, or animating/large `filter`/`backdrop-filter`; any platform: a
 persistent decorative animation with no off-screen/background pause — keep these 🟠/🟡 unless they hang).
+**Non-default-state pass bars:** an **error** names what happened, the cause, and a concrete recovery, in
+plain text + a non-colour channel (`role=alert`/aria-live) — never a raw code or a colour-only border
+(`apple_published` WWDC17 *Writing Great Alerts* + WCAG 1.4.1); an **empty** state explains what belongs +
+offers a first action, not a dead end; a **loading** state shows something immediately (a placeholder
+mirroring the real layout beats a bare spinner), is determinate when the duration is known, and its failure
+branch renders the error state with retry *without losing the user's place*. In a **static** review with no
+running app, a component that renders only the happy path with no error/empty/loading branch necessarily
+produces a blank/frozen/dead-end screen in those conditions — flag the **absence** as an `unhandled
+non-default state` gap (severity scaled by likelihood: network calls → loading+error; lists/collections →
+empty; offline/no-permission where a capability is required).
 
 **Stage 6 — Accessibility as evidence.** Tag every finding's `evidence`
 (`static-code|computed|screenshot|a11y-tree|inferred`). **Contrast:** assign the ROLE first, then the
@@ -196,6 +206,19 @@ capability, in order:
    **heuristic estimate**, so cap a weight-only finding at `confidence: medium` (see Stage 4). Apply the
    contrast-role exemptions (decorative/disabled/logotype) to its output before flagging. A `verified-pass`
    rests on the probe's exact measurements, not the heuristic estimates or unaided judgement alone.
+   **Then run the stress pass** (`${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/references/dom-stress-probe.js`) via
+   `browser_evaluate`, once per mode, to **measure** whether the screen survives the conditions that actually
+   break layouts — tag findings `evidence: computed`, `category: layout`/`responsive`:
+   `'large-text'` (root scaled to largest Dynamic Type ~3.12×) and `'text-spacing'` (WCAG 1.4.12 overrides)
+   → clip/truncate/overlap; `'reflow'` → `browser_resize` to **320 CSS px** first, then call it (a page-level
+   horizontal scrollbar = WCAG 1.4.10 two-dimensional-scrolling fail; whitelist maps/diagrams/video/games/
+   data-table-grid before flagging); `'rtl'` → `notMirrored` elements likely use physical (`left`/`right`/
+   `margin-left`) CSS instead of logical properties, and must-not-mirror items (clocks, media transport,
+   logos, numerals) must NOT flip. **Platform-calibrate:** web/app → run all four; **macOS → the binding axis
+   is window-resize-to-`NSWindow.minSize` + "Use Preferred Reading Size" + Increase/Reduce-Contrast — NOT an
+   iOS Dynamic Type ramp** (the ~3.12× scale and 320px reflow are `wcag_external` *analogues*, informs-not-
+   governs); iOS/iPadOS → the AX5 3.12× scale is the real target. Fixed chrome that legitimately doesn't
+   scale (with a Large Content Viewer) is a non-scaling **exception**, not a defect.
 2. **Else, computer-control tools** (`request_access` to approve the browser, then `screenshot`,
    `open_application`, `left_click`, `key`, …) — open the page in a browser, switch light/dark and resize
    the window where you can, and **screenshot the screen** to verify the rendered result. Coarser and
