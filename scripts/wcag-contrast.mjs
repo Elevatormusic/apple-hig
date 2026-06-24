@@ -3,10 +3,19 @@
 // import this module; keep the two in sync. See specs/2026-06-17-design-spE-deterministic-evidence.md.
 
 function toRgb(c) {
+  if (Array.isArray(c)) return { r: c[0], g: c[1], b: c[2] };
   if (c && typeof c === 'object') return { r: c.r, g: c.g, b: c.b };
   let h = String(c).trim().replace(/^#/, '');
   if (h.length === 3) h = h.split('').map((x) => x + x).join('');
   return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+}
+
+// Composite a (possibly translucent) foreground over an opaque background — alpha matters for contrast:
+// rgba(60,60,67,0.6) over white reads ~3.45:1, not the opaque ~9:1. Returns an [r,g,b] array.
+export function blendOver(fg, bg, alpha) {
+  const f = toRgb(fg), b = toRgb(bg);
+  const mix = (x, y) => x * alpha + y * (1 - alpha);
+  return [mix(f.r, b.r), mix(f.g, b.g), mix(f.b, b.b)];
 }
 
 function channel(ch) {

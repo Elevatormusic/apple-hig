@@ -11,6 +11,8 @@
   const chan = (ch) => { const c = ch / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
   const lum = ([r, g, b]) => 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
   const parseRGB = (s) => { const m = String(s).match(/[\d.]+/g); return m ? m.slice(0, 3).map(Number) : null; };
+  const parseColor = (s) => { const m = String(s).match(/[\d.]+/g); if (!m) return null; const [r, g, b, a] = m.map(Number); return { rgb: [r, g, b], a: a === undefined ? 1 : a }; };
+  const blend = (fg, bg, a) => fg.map((v, i) => v * a + bg[i] * (1 - a)); // composite a translucent fg over bg
   const ratio = (a, b) => { const la = lum(a), lb = lum(b); const hi = Math.max(la, lb), lo = Math.min(la, lb); return (hi + 0.05) / (lo + 0.05); };
 
   const isTransparent = (s) => !s || /rgba\([^)]*,\s*0\s*\)/.test(s) || s === 'transparent';
@@ -27,10 +29,12 @@
     const hasOwnText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
     if (!hasOwnText || !visible(el)) return;
     const s = getComputedStyle(el);
-    const fg = parseRGB(s.color); if (!fg) return;
+    const fgc = parseColor(s.color); if (!fgc) return;
+    const bg = bgOf(el);
+    const fg = fgc.a < 1 ? blend(fgc.rgb, bg, fgc.a) : fgc.rgb; // alpha matters: rgba text composites over bg
     const px = parseFloat(s.fontSize); const bold = parseInt(s.fontWeight, 10) >= 700;
     const large = px >= 24 || (bold && px >= 18.66);
-    const r = ratio(fg, bgOf(el)); const floor = large ? 3 : 4.5;
+    const r = ratio(fg, bg); const floor = large ? 3 : 4.5;
     if (r < floor) textContrastFailures.push({ text: el.textContent.trim().slice(0, 40), ratio: +r.toFixed(2), needs: floor, fontPx: Math.round(px), large });
   });
 
