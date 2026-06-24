@@ -167,7 +167,12 @@ capability, in order:
 1. **Playwright `browser_*` tools** (the user has the Playwright MCP) — `browser_navigate` to the running
    app / a served URL, or directly to a local file's **`file://`** path; `browser_resize` for the
    **light, dark, narrow, and wide** passes; `browser_take_screenshot`; inspect the rendered result. This
-   is the preferred path and reaches `level: visual`/`full`.
+   is the preferred path and reaches `level: visual`/`full`. **Then run the DOM probe**
+   (`${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/references/dom-probe.js`) via `browser_evaluate` to **measure**
+   real WCAG contrast (against the rendered background), interactive-target geometry after layout, and
+   dark-mode support; tag findings it backs `evidence: computed` (a **measured fact** — high confidence,
+   not `inferred`), and apply the contrast-role exemptions (decorative/disabled/logotype) to its output
+   before flagging. A `verified-pass` rests on the probe's computed evidence, not heuristics alone.
 2. **Else, computer-control tools** (`request_access` to approve the browser, then `screenshot`,
    `open_application`, `left_click`, `key`, …) — open the page in a browser, switch light/dark and resize
    the window where you can, and **screenshot the screen** to verify the rendered result. Coarser and
