@@ -150,6 +150,13 @@ Apple's name on a convention.
 - **verdict:** `verified-pass` (required rendered checks ran, no blocking finding) · `advisory-pass`
   (heuristic/static, no blocking finding) · `fail` · `incomplete`.
 
+**Before you emit `fail`, re-check every blocking finding:** is it genuinely `critical`/`high` **and** does
+it **block the core task** — the user can't complete it, loses data, or is misled into a dangerous action —
+not merely degrade, clutter, or annoy? If the user can still finish the task, the finding is `medium` →
+`advisory-pass`. **Catching a real problem is not the same as blocking on it:** most findings are advisory;
+reserve `fail` for genuine task-blockers (a wrong-but-recoverable layout, an over-busy screen, or a
+platform-convention mismatch is `medium`, not `fail`).
+
 ## Visual verification (render when you can — Playwright, else computer-control)
 
 A static (code-only) review can never be `verified-pass`. **Render and screenshot** the screen whenever
