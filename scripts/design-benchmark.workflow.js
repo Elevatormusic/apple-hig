@@ -81,13 +81,14 @@ if (rendered) {
     reviews.push({ fx, actual, score: actual ? scoreFixture(actual, fx) : null })
   }
 } else {
-  // run each fixture `repeats` times (parallel); score the first run, keep all for the consistency metric
-  const flat = await parallel(FIXTURES.flatMap((fx) =>
+  // run each fixture `repeats` times (parallel); score the first run, keep all for the consistency metric.
+  // Group by fixture INDEX (a primitive) — object identity does not survive the Workflow parallel() boundary.
+  const flat = await parallel(FIXTURES.flatMap((fx, i) =>
     Array.from({ length: repeats }, (_, k) => () =>
       agent(staticPrompt(fx), { label: `review:${fx.file}${repeats > 1 ? '#' + (k + 1) : ''}`, phase: 'Review', schema: ACTUAL_SCHEMA })
-        .then((actual) => ({ fx, actual })))))
-  reviews = FIXTURES.map((fx) => {
-    const runs = flat.filter((r) => r && r.fx === fx && r.actual).map((r) => r.actual)
+        .then((actual) => ({ i, actual })))))
+  reviews = FIXTURES.map((fx, i) => {
+    const runs = flat.filter((r) => r && r.i === i && r.actual).map((r) => r.actual)
     return { fx, actual: runs[0] || null, score: runs[0] ? scoreFixture(runs[0], fx) : null, runs }
   })
 }
