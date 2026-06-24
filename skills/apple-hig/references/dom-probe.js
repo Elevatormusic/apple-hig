@@ -50,10 +50,36 @@
   let darkMode = false;
   try { for (const ss of document.styleSheets) for (const rule of (ss.cssRules || [])) if (rule.media && /prefers-color-scheme/.test(rule.media.mediaText)) darkMode = true; } catch (e) { /* cross-origin sheet */ }
 
+  // --- visual weight ("squint test"): which elements dominate the rendered view? (mirrors scripts/visual-weight.mjs) ---
+  const pageBg = (() => { const c = parseColor(getComputedStyle(document.body).backgroundColor); return c && c.a > 0.1 ? c.rgb : [255, 255, 255]; })();
+  const wf = (area, contrast, filled, bold) => { const cf = Math.max(0, Math.min(1, (contrast - 1) / 20)); const ink = filled ? 1 : 0.15 * (bold ? 1.5 : 1); return area * ink * cf; };
+  const inFilled = (el) => { let n = el.parentElement; while (n) { const b = parseColor(getComputedStyle(n).backgroundColor); if (b && b.a > 0.1 && ratio(b.rgb, pageBg) > 1.2) return true; n = n.parentElement; } return false; };
+  const weights = [];
+  document.querySelectorAll('h1,h2,h3,h4,button,a,[role=button],img,p,span,div,li,strong').forEach((el) => {
+    if (!visible(el)) return;
+    const r = el.getBoundingClientRect(); const area = Math.round(r.width * r.height);
+    if (area < 250) return;
+    const s = getComputedStyle(el);
+    const ownBg = parseColor(s.backgroundColor);
+    const filled = !!(ownBg && ownBg.a > 0.1 && ratio(ownBg.rgb, pageBg) > 1.2);
+    const ownText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    if (!filled && !ownText && el.tagName !== 'IMG') return;
+    if (!filled && inFilled(el)) return; // text inside a filled block — the block already counts it
+    const bold = parseInt(s.fontWeight, 10) >= 700;
+    let contrast;
+    if (filled) contrast = ratio(ownBg.rgb, pageBg);
+    else if (el.tagName === 'IMG') contrast = 8; // treat an image as a strong block
+    else { const fgc = parseColor(s.color); const bg = bgOf(el); contrast = fgc ? ratio(fgc.a < 1 ? blend(fgc.rgb, bg, fgc.a) : fgc.rgb, bg) : 1; }
+    const weight = wf(area, contrast, filled, bold);
+    if (weight > 0) weights.push({ tag: el.tagName.toLowerCase(), text: (el.textContent || el.alt || '').trim().slice(0, 30), weight: Math.round(weight), filled });
+  });
+  const visualWeightTop = weights.sort((a, b) => b.weight - a.weight).slice(0, 6);
+
   return {
     evidence: 'computed',
     textContrastFailures,
     smallTargets,
+    visualWeightTop,
     darkMode,
     note: 'Measured against the RENDERED background. Web target floor 24px = WCAG 2.5.8 AA (Apple design target is 44pt); large text = >=24px or >=18.66px bold. Decorative/disabled elements may be over-reported — apply the contrast-role exemptions before flagging.',
   };

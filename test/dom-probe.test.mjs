@@ -12,7 +12,15 @@ test('dom-probe measures contrast, target geometry, and dark-mode from the rende
   assert.match(P, /0\.2126[\s\S]*0\.7152[\s\S]*0\.0722/); // WCAG luminance coefficients
   assert.match(P, /textContrastFailures/);
   assert.match(P, /smallTargets/);
+  assert.match(P, /visualWeightTop/);
+  assert.match(P, /squint|visual weight/i);
   assert.match(P, /evidence:\s*'computed'/);
+});
+
+test('the reviewer uses the visual-weight signal for an evidence-backed hierarchy check', () => {
+  const A = readFileSync(new URL('agents/design-reviewer.md', root), 'utf8');
+  assert.match(A, /visualWeightTop|visual weight|squint/i);
+  assert.match(A, /hierarchy inversion|dominant[^\n]*element|outweigh/i);
 });
 
 test('the probe uses the same sRGB/WCAG constants as the unit-tested module (kept in sync)', () => {

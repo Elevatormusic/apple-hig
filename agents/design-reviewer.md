@@ -65,7 +65,11 @@ disclosure are `community_convention` (NN/g) — keep them ≤ medium severity; 
 
 **Stage 4 — Visual + task hierarchy.** Expected vs observed attention order, dominant element (NN/g: ≤2
 dominant), typography hierarchy, visual weight, container/**card overload**, color emphasis, **spacing
-relationships**, content-vs-chrome layering, **competing primary emphasis**, critical-status prominence.
+relationships**, content-vs-chrome layering, **competing primary emphasis**, critical-status prominence. **When rendered,
+use the probe's `visualWeightTop` (the objective squint test):** the highest-weight elements are the
+rendered focal points. If a metadata/decorative element or a secondary control **outweighs** the intended
+primary content/action — or the title/critical status sits far down the list — that is an evidence-backed
+**hierarchy inversion** (`category: hierarchy`, `evidence: computed`).
 Folds in: **hardcoded/non-semantic colors** (`apple_published` — use semantic colors; brand/data/media
 literals with paired light+dark are fine, not a violation); **missing dark-mode variants**; **non-
 standard corner radii** (the concentric/continuous principle is `apple_published`; specific radius
