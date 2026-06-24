@@ -24,6 +24,22 @@ export function scoreFixture(actual, expected) {
   return { verdictMatch, truePositives, falseNegatives, falsePositives };
 }
 
+// Run-to-run consistency: how reproducible the reviewer is. `runs` = repeated results of ONE fixture;
+// returns the modal-verdict fraction (1.0 = every run agreed). Quantifies the over-flagging variance the
+// before/after benchmark exposed.
+export function consistency(runs) {
+  if (!runs || !runs.length) return 1;
+  const counts = {};
+  for (const r of runs) counts[r.verdict] = (counts[r.verdict] || 0) + 1;
+  return Math.max(...Object.values(counts)) / runs.length;
+}
+
+export function aggregateConsistency(perFixtureRuns) {
+  if (!perFixtureRuns || !perFixtureRuns.length) return 1;
+  const cs = perFixtureRuns.map(consistency);
+  return cs.reduce((a, b) => a + b, 0) / cs.length;
+}
+
 export function aggregate(results) {
   let tp = 0, fn = 0, fp = 0, verdictHits = 0;
   for (const r of results) {
