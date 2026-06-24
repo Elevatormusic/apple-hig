@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Inspector</title>
+<!-- macOS inspector: DENSE is correct here (not iOS). The reviewer must NOT flag clutter / sub-44pt
+     controls / "no primary action" — macOS uses ~28pt controls, packed panels, and no single CTA. -->
+<style>
+  :root{color-scheme:light dark;--bg:#ececec;--panel:#f6f6f6;--label:#1d1d1f;--label2:#6e6e73;--line:#0000001a;--tint:#0a84ff}
+  @media(prefers-color-scheme:dark){:root{--bg:#3a3a3c;--panel:#2c2c2e;--label:#fff;--label2:#98989d;--line:#ffffff1a}}
+  body{margin:0;background:var(--bg);color:var(--label);font:13px/1.3 -apple-system,system-ui,sans-serif}
+  .insp{width:280px;background:var(--panel);border-left:1px solid var(--line);padding:8px 0}
+  .sec{font-size:11px;font-weight:700;color:var(--label2);text-transform:uppercase;padding:8px 12px 4px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 12px;min-height:22px}
+  .row label{color:var(--label2);flex:0 0 92px}
+  .row input[type=range]{flex:1}
+  .row input[type=number]{width:48px;height:20px}
+  select{height:21px;font:inherit}
+  .row.cb{justify-content:flex-start;gap:6px}
+</style></head><body>
+<div class="insp" role="group" aria-label="Inspector">
+  <div class="sec">Arrange</div>
+  <div class="row"><label for=x>X</label><input id=x type=number value="120"><label for=y>Y</label><input id=y type=number value="64"></div>
+  <div class="row"><label for=w>Width</label><input id=w type=number value="320"><label for=h>Height</label><input id=h type=number value="200"></div>
+  <div class="row"><label for=rot>Rotation</label><input id=rot type=range min=0 max=360 value=0></div>
+  <div class="sec">Appearance</div>
+  <div class="row"><label for=op>Opacity</label><input id=op type=range min=0 max=100 value=100></div>
+  <div class="row"><label for=bl>Blend</label><select id=bl><option>Normal</option><option>Multiply</option></select></div>
+  <div class="row cb"><input id=sh type=checkbox checked><label for=sh style="flex:none">Drop shadow</label></div>
+  <div class="row cb"><input id=cl type=checkbox><label for=cl style="flex:none">Clip to bounds</label></div>
+  <div class="sec">Text</div>
+  <div class="row"><label for=fn>Font</label><select id=fn><option>SF Pro</option><option>New York</option></select></div>
+  <div class="row"><label for=sz>Size</label><input id=sz type=number value="13"></div>
+  <div class="row"><label for=al>Align</label><select id=al><option>Left</option><option>Center</option><option>Right</option></select></div>
+</div></body></html>

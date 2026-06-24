@@ -14,6 +14,11 @@ const FIXTURES = [
   { file: 'monitoring-no-cta.html', summary: 'An informational system-status board; correct precisely because it has no primary CTA.', expectedVerdict: 'advisory-pass', expectedCategories: [], mustNotFlag: ['missing-primary-action'] },
   { file: 'good-ios-settings.html', summary: 'A clean, correct iOS grouped-settings screen (semantic colors, dark mode, clear title, 44pt rows). A true negative — nothing to flag.', expectedVerdict: 'advisory-pass', expectedCategories: [], mustNotFlag: ['off-grid-spacing', 'hardcoded-color', 'contrast', 'missing-label', 'missing-primary-action'] },
   { file: 'hidden-critical-warning.html', summary: 'A delete-account screen where the irreversible consequence is tiny/faint and the destructive action is styled as a calm prominent primary.', expectedVerdict: 'fail', expectedCategories: ['error-recovery', 'hierarchy'], mustNotFlag: [] },
+  { file: 'macos-dense-inspector.html', summary: 'macOS inspector — dense is idiomatic (no single CTA, ~28pt controls); must NOT be flagged as cluttered/sub-44pt/missing-CTA.', expectedVerdict: 'advisory-pass', expectedCategories: [], mustNotFlag: ['density', 'clutter', 'too-many-controls', 'missing-primary-action', 'small-target', 'off-grid-spacing'] },
+  { file: 'ipad-stretched-iphone.html', summary: 'iPad regular width but a stretched iPhone (narrow column, dead margins); must RAISE platform-fit.', expectedVerdict: 'advisory-pass', expectedCategories: ['platform-fit'], mustNotFlag: [] },
+  { file: 'good-web-dashboard.html', summary: 'Correct desktop-web dashboard (web-native nav, no iOS chrome); must NOT be flagged for lacking iOS chrome/tab-bar/SF-Symbols.', expectedVerdict: 'advisory-pass', expectedCategories: [], mustNotFlag: ['missing-ios-chrome', 'no-tab-bar', 'no-sf-symbols', 'missing-primary-action'] },
+  { file: 'all-cards-fragmented.html', summary: 'Card overload — every field in its own shadowed card; must RAISE visual (medium, verdict stays advisory-pass).', expectedVerdict: 'advisory-pass', expectedCategories: ['visual'], mustNotFlag: [] },
+  { file: 'error-without-recovery.html', summary: 'Payment error with no cause/retry and wiped fields; must fail on error-recovery.', expectedVerdict: 'fail', expectedCategories: ['error-recovery'], mustNotFlag: [] },
 ]
 
 // Inlined twin of scripts/benchmark-score.mjs (the Workflow sandbox can't import it).
@@ -24,6 +29,13 @@ function scoreFixture(actual, expected) {
   const falseNegatives = expected.expectedCategories.filter((c) => !found.has(c));
   const falsePositives = expected.mustNotFlag.filter((m) => flags.some((f) => String(f).includes(m)));
   return { verdictMatch: actual?.verdict === expected.expectedVerdict, truePositives, falseNegatives, falsePositives };
+}
+// Run-to-run consistency for ONE fixture's repeated runs: the modal-verdict fraction (1.0 = all agreed).
+function consistency(runs) {
+  if (!runs || !runs.length) return 1;
+  const counts = {};
+  for (const r of runs) counts[r.verdict] = (counts[r.verdict] || 0) + 1;
+  return Math.max(...Object.values(counts)) / runs.length;
 }
 
 const ACTUAL_SCHEMA = {
@@ -48,6 +60,7 @@ const JUDGE_SCHEMA = {
 // and `level` is self-reported by the agent (not proven against actual screenshots) — so for a stable,
 // comparable score prefer the default static path; use rendered for a thorough spot-check.
 const rendered = !!(args && args.rendered)
+const repeats = Math.max(1, (args && args.repeats) || 1)   // pass {repeats:3} to measure consistency
 const repoAbs = (args && args.repoAbs) || ''
 // Normalise an absolute OS path to a file:// URL base (C:\a\b -> file:///C:/a/b; /a/b -> file:///a/b).
 const fileBase = repoAbs ? 'file://' + (repoAbs.startsWith('/') ? '' : '/') + repoAbs.replace(/\\/g, '/') : ''
@@ -68,9 +81,15 @@ if (rendered) {
     reviews.push({ fx, actual, score: actual ? scoreFixture(actual, fx) : null })
   }
 } else {
-  reviews = await parallel(FIXTURES.map((fx) => () =>
-    agent(staticPrompt(fx), { label: `review:${fx.file}`, phase: 'Review', schema: ACTUAL_SCHEMA })
-      .then((actual) => ({ fx, actual, score: actual ? scoreFixture(actual, fx) : null }))))
+  // run each fixture `repeats` times (parallel); score the first run, keep all for the consistency metric
+  const flat = await parallel(FIXTURES.flatMap((fx) =>
+    Array.from({ length: repeats }, (_, k) => () =>
+      agent(staticPrompt(fx), { label: `review:${fx.file}${repeats > 1 ? '#' + (k + 1) : ''}`, phase: 'Review', schema: ACTUAL_SCHEMA })
+        .then((actual) => ({ fx, actual })))))
+  reviews = FIXTURES.map((fx) => {
+    const runs = flat.filter((r) => r && r.fx === fx && r.actual).map((r) => r.actual)
+    return { fx, actual: runs[0] || null, score: runs[0] ? scoreFixture(runs[0], fx) : null, runs }
+  })
 }
 
 const scored = reviews.filter((r) => r && r.score)
@@ -102,8 +121,14 @@ const judged = await parallel(scored.map((r) => () =>
 ))
 
 const judgeAgreement = judged.length ? judged.filter((j) => j.expertAgree).length / judged.length : 1
+const runsOf = (r) => (r.runs && r.runs.length) ? r.runs : (r.actual ? [r.actual] : []);
+const consistencyReport = repeats > 1
+  ? { repeats, agreement: reviews.length ? reviews.reduce((s, r) => s + consistency(runsOf(r)), 0) / reviews.length : 1,
+      perFixture: reviews.map((r) => ({ file: r.fx.file, verdicts: runsOf(r).map((x) => x.verdict) })) }
+  : { repeats: 1, note: 'pass {repeats:N} (e.g. 3) to measure run-to-run consistency / over-flagging variance' };
 return {
   perFixture: scored.map((r) => ({ file: r.fx.file, expectedVerdict: r.fx.expectedVerdict, verdict: r.actual.verdict, categories: r.actual.categories, score: r.score })),
   aggregate,
+  consistency: consistencyReport,
   judgePanel: { agreement: judgeAgreement, note: 'Opus judge-panel proxy (LLM-judges-LLM), NOT human ground truth', perFixture: judged },
 }

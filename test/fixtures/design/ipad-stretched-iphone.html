@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Library</title>
+<!-- iPad regular width, but a stretched iPhone: one 380px column centred in a sea of empty margin,
+     instead of restructuring into a sidebar + content + detail. The reviewer should flag platform-fit. -->
+<style>
+  :root{color-scheme:light dark;--bg:#f2f2f7;--card:#fff;--label:#1c1c1e;--label2:#8a8a8e;--sep:#3c3c4329;--tint:#0a84ff}
+  @media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--label:#fff;--label2:#98989d;--sep:#54545899}}
+  body{margin:0;background:var(--bg);color:var(--label);font:17px/1.4 -apple-system,system-ui,sans-serif;min-height:100vh}
+  /* the defect: fixed narrow column, huge dead margins on a wide iPad canvas */
+  .col{max-width:380px;margin:0 auto;padding:24px 16px}
+  h1{font-size:28px;font-weight:700;margin:8px 0 16px}
+  .item{display:flex;align-items:center;gap:12px;min-height:44px;padding:10px 0;border-bottom:.5px solid var(--sep)}
+  .thumb{width:40px;height:40px;border-radius:8px;background:var(--tint)}
+  .item .sub{color:var(--label2);font-size:14px}
+</style></head><body>
+<div class="col">
+  <h1>Library</h1>
+  <div class="item"><div class="thumb"></div><div>Documents<div class="sub">128 items</div></div></div>
+  <div class="item"><div class="thumb"></div><div>Photos<div class="sub">2,041 items</div></div></div>
+  <div class="item"><div class="thumb"></div><div>Music<div class="sub">312 items</div></div></div>
+  <div class="item"><div class="thumb"></div><div>Downloads<div class="sub">17 items</div></div></div>
+</div></body></html>

@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Checkout</title>
+<!-- A consequential error with NO recovery: it doesn't say what failed, offers no retry, and the form
+     fields were wiped. The reviewer should flag error-recovery (and state). -->
+<style>
+  :root{color-scheme:light dark;--bg:#fff;--label:#1c1c1e;--label2:#8a8a8e;--danger:#ff3b30;--field:#f2f2f7;--tint:#0a84ff}
+  @media(prefers-color-scheme:dark){:root{--bg:#000;--label:#fff;--label2:#98989d;--field:#1c1c1e}}
+  body{margin:0;background:var(--bg);color:var(--label);font:17px/1.4 -apple-system,system-ui,sans-serif}
+  .wrap{max-width:420px;margin:0 auto;padding:24px}
+  h1{font-size:24px;font-weight:700;margin:0 0 16px}
+  .err{color:var(--danger);font-size:15px;margin:0 0 16px}
+  label{display:block;font-size:13px;color:var(--label2);margin:14px 0 4px}
+  input{width:100%;min-height:44px;border:0;border-radius:10px;background:var(--field);color:var(--label);
+        font:inherit;padding:0 12px;box-sizing:border-box}
+  .btn{display:block;width:100%;min-height:44px;margin:20px 0 0;border:0;border-radius:12px;
+       font:600 17px -apple-system;background:var(--tint);color:#fff}
+</style></head><body><div class="wrap">
+  <h1>Payment</h1>
+  <!-- vague, unrecoverable, no retry; fields below are now empty (user's entry lost) -->
+  <p class="err" role="alert">Something went wrong.</p>
+  <label for=cc>Card number</label><input id=cc value="" autocomplete="off">
+  <label for=ex>Expiry</label><input id=ex value="">
+  <button class="btn">Continue</button>
+</div></body></html>

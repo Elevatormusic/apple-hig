@@ -1,5 +1,5 @@
 {
-  "note": "Seeded ground truth for the SP-D design benchmark. Structure is checked by test/fixtures-manifest.test.mjs; the reviewer is run against it by .claude/workflows/design-benchmark.js and scored by scripts/benchmark-score.mjs.",
+  "note": "Seeded ground truth for the SP-D design benchmark. Structure is checked by test/fixtures-manifest.test.mjs; the reviewer is run against it by scripts/design-benchmark.workflow.js and scored by scripts/benchmark-score.mjs. expectedVerdict only 'fail' when a critical/high blocks; medium issues (card overload, stretched-iPad) stay advisory-pass but must still be RAISED (expectedCategories).",
   "fixtures": [
     {
       "file": "perfect-tokens-wrong-hierarchy.html",
@@ -17,7 +17,7 @@
     },
     {
       "file": "good-ios-settings.html",
-      "summary": "Clean, correct iOS grouped-settings screen: semantic colors, dark mode, clear title, 44pt rows, no over-cards. A true negative.",
+      "summary": "Clean, correct iOS grouped-settings screen. A true negative.",
       "expectedVerdict": "advisory-pass",
       "expectedCategories": [],
       "mustNotFlag": ["off-grid-spacing", "hardcoded-color", "contrast", "missing-label", "missing-primary-action"]
@@ -27,6 +27,41 @@
       "summary": "Delete-account screen: the irreversible consequence is tiny/faint and the destructive action is styled as a calm prominent primary.",
       "expectedVerdict": "fail",
       "expectedCategories": ["error-recovery", "hierarchy"],
+      "mustNotFlag": []
+    },
+    {
+      "file": "macos-dense-inspector.html",
+      "summary": "macOS inspector panel — DENSE is idiomatic on macOS (~28pt controls, packed, no single CTA). Tests the macOS rubric: must NOT be flagged as cluttered / sub-44pt / missing-CTA.",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": [],
+      "mustNotFlag": ["density", "clutter", "too-many-controls", "missing-primary-action", "small-target", "off-grid-spacing"]
+    },
+    {
+      "file": "ipad-stretched-iphone.html",
+      "summary": "iPad at regular width but a stretched iPhone: one narrow column in a sea of empty margin instead of restructuring. Tests the iPad rubric: must RAISE platform-fit.",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": ["platform-fit"],
+      "mustNotFlag": []
+    },
+    {
+      "file": "good-web-dashboard.html",
+      "summary": "Correct desktop-web dashboard (web-native top nav + sidebar, semantic HTML, no iOS chrome). Tests the web rubric: must NOT be flagged for lacking iOS chrome / tab bar / SF Symbols.",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": [],
+      "mustNotFlag": ["missing-ios-chrome", "no-tab-bar", "no-sf-symbols", "missing-primary-action"]
+    },
+    {
+      "file": "all-cards-fragmented.html",
+      "summary": "Card overload: every profile field in its own equal-weight shadowed card, fragmenting reading flow. Must RAISE visual (medium, so verdict stays advisory-pass).",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": ["visual"],
+      "mustNotFlag": []
+    },
+    {
+      "file": "error-without-recovery.html",
+      "summary": "Payment error with no cause, no retry, and the form fields wiped. Must fail on error-recovery.",
+      "expectedVerdict": "fail",
+      "expectedCategories": ["error-recovery"],
       "mustNotFlag": []
     }
   ]
