@@ -31,6 +31,15 @@ test('the probe uses the same sRGB/WCAG constants as the unit-tested module (kep
   }
 });
 
+test('the visual-weight formula is identical in the probe and the unit-tested module (kept in sync)', () => {
+  const VW = readFileSync(new URL('scripts/visual-weight.mjs', root), 'utf8');
+  // the constants that DEFINE the squint test — must match verbatim across both files
+  for (const tok of ['(contrast - 1) / 20', '0.15 * (bold ? 1.5 : 1)']) {
+    assert.ok(P.includes(tok), `probe missing visual-weight token: ${tok}`);
+    assert.ok(VW.includes(tok), `visual-weight.mjs missing visual-weight token: ${tok}`);
+  }
+});
+
 test('the reviewer wires the probe into the rendered path as evidence:computed', () => {
   const A = readFileSync(new URL('agents/design-reviewer.md', root), 'utf8');
   assert.match(A, /dom-probe(\.js)?/i);

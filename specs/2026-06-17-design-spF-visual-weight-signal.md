@@ -36,6 +36,13 @@ status sits far down the list — that is an evidence-backed `hierarchy` finding
   the eye on subtle ones.
 - **Web/CSS only** (no rendered DOM for native here), same as the #1 evidence layer.
 - **Fill detection is background-color based** — gradient/image "blocks" and `box-shadow`-only emphasis are
-  under-counted; large hero images are treated as a fixed strong block (contrast assumed 8:1).
+  under-counted. A filled element that *wraps* content (a card/section/surface) is treated as a surface,
+  **not** a focal block (only a control-sized leaf fill — button/chip — competes), so a tinted container
+  cannot double-count its children and falsely outshout its own title. Large hero images are scored with a
+  fixed assumed contrast (8:1) and text ink ratio, so a vivid full-bleed photo and a pale placeholder weigh
+  the same — under/over-counted depending on the image.
+- **Area-driven, so very large text blocks can over-rank** — a long body paragraph (large bbox) can outweigh
+  a short title even though dense small text is not truly focal. The ranking is a prompt for the eye, not a
+  verdict; the reviewer caps a weight-only inversion at `confidence: medium` unless the screenshot agrees.
 - **"Intended primary" is still a judgment** the reviewer makes — the signal supplies the ranking, not the
   intent. Next (roadmap #4): render non-default states + RTL / largest Dynamic Type and re-measure.

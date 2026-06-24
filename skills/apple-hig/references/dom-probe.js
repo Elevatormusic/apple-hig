@@ -53,25 +53,32 @@
   // --- visual weight ("squint test"): which elements dominate the rendered view? (mirrors scripts/visual-weight.mjs) ---
   const pageBg = (() => { const c = parseColor(getComputedStyle(document.body).backgroundColor); return c && c.a > 0.1 ? c.rgb : [255, 255, 255]; })();
   const wf = (area, contrast, filled, bold) => { const cf = Math.max(0, Math.min(1, (contrast - 1) / 20)); const ink = filled ? 1 : 0.15 * (bold ? 1.5 : 1); return area * ink * cf; };
-  const inFilled = (el) => { let n = el.parentElement; while (n) { const b = parseColor(getComputedStyle(n).backgroundColor); if (b && b.a > 0.1 && ratio(b.rgb, pageBg) > 1.2) return true; n = n.parentElement; } return false; };
+  const buttonLike = (el) => el.matches('button,a,input,select,textarea,[role=button],[role=link]');
+  const isFilled = (el) => { const c = parseColor(getComputedStyle(el).backgroundColor); return !!(c && c.a > 0.1 && ratio(c.rgb, pageBg) > 1.2); };
+  // a filled element that WRAPS content (a card/section/surface) is not a focal block — counting its full
+  // area would double-count its own children and falsely outshout the title. Only a control-sized leaf fill
+  // (button/chip) is a focal block; a filled container is skipped so its contents carry the weight.
+  const wrapsContent = (el) => [...el.children].some((c) => [...c.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) || c.matches('button,a,input,select,img,[role=button]') || c.querySelector('button,a,input,select,img,[role=button]'));
+  const inFocalFill = (el) => { let n = el.parentElement; while (n) { if (isFilled(n) && (buttonLike(n) || !wrapsContent(n))) return true; n = n.parentElement; } return false; };
   const weights = [];
   document.querySelectorAll('h1,h2,h3,h4,button,a,[role=button],img,p,span,div,li,strong').forEach((el) => {
     if (!visible(el)) return;
     const r = el.getBoundingClientRect(); const area = Math.round(r.width * r.height);
     if (area < 250) return;
     const s = getComputedStyle(el);
-    const ownBg = parseColor(s.backgroundColor);
-    const filled = !!(ownBg && ownBg.a > 0.1 && ratio(ownBg.rgb, pageBg) > 1.2);
+    const filled = isFilled(el);
+    const focalFill = filled && (buttonLike(el) || !wrapsContent(el)); // leaf fill, not a container surface
+    if (filled && !focalFill) return; // a filled container is a surface — its children carry the weight
     const ownText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
-    if (!filled && !ownText && el.tagName !== 'IMG') return;
-    if (!filled && inFilled(el)) return; // text inside a filled block — the block already counts it
+    if (!focalFill && !ownText && el.tagName !== 'IMG') return;
+    if (!focalFill && inFocalFill(el)) return; // text inside a focal fill — the fill already counts it
     const bold = parseInt(s.fontWeight, 10) >= 700;
     let contrast;
-    if (filled) contrast = ratio(ownBg.rgb, pageBg);
+    if (focalFill) contrast = ratio(parseColor(s.backgroundColor).rgb, pageBg);
     else if (el.tagName === 'IMG') contrast = 8; // treat an image as a strong block
     else { const fgc = parseColor(s.color); const bg = bgOf(el); contrast = fgc ? ratio(fgc.a < 1 ? blend(fgc.rgb, bg, fgc.a) : fgc.rgb, bg) : 1; }
-    const weight = wf(area, contrast, filled, bold);
-    if (weight > 0) weights.push({ tag: el.tagName.toLowerCase(), text: (el.textContent || el.alt || '').trim().slice(0, 30), weight: Math.round(weight), filled });
+    const weight = wf(area, contrast, focalFill, bold);
+    if (weight > 0) weights.push({ tag: el.tagName.toLowerCase(), text: (el.textContent || el.alt || '').trim().slice(0, 30), weight: Math.round(weight), filled: focalFill });
   });
   const visualWeightTop = weights.sort((a, b) => b.weight - a.weight).slice(0, 6);
 
