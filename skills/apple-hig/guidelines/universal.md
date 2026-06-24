@@ -76,7 +76,10 @@ Pick the correct platform scope before applying values:
 | Apple Watch, complications, Digital Crown | [[watchos]] |
 | Apple TV, focus UI, Top Shelf, 10-foot UI | [[tvos]] |
 | Vision Pro, spatial, windows/volumes, ornaments | [[visionos]] |
-| **Web / Android** | Keep Apple **principles + tokens**, but defer to the *native* platform's conventions for chrome and navigation. Do **not** impose iOS chrome on the web by default. |
+| **Web app** (SPA/PWA/SaaS, dashboard, editor, stateful tool) | `profiles/web.md` → bind **Profile A**. WCAG + web conventions; **never** iOS chrome. |
+| **Marketing / content website** (landing, docs, blog, brochure) | `profiles/web.md` → bind **Profile B**. Content-first; no app-state rigor. |
+| **Desktop / cross-platform software** (Windows/Linux/Electron/Qt/Java — not Apple-native, not web) | `profiles/desktop-cross-platform.md`. Host-OS conventions (Fluent/GNOME/KDE); Apple PRINCIPLES only, as `inference`; never iOS/macOS chrome. |
+| **Android** | Keep Apple **principles**; defer to Material / the host platform's conventions for chrome and navigation. Do **not** impose iOS chrome. |
 
 ## Web & cross-platform note
 
@@ -118,18 +121,11 @@ The reference mirrors Apple's HIG taxonomy. Load only the files relevant to the 
 
 See also: [[principles]], [[accessibility]], [[licensing-and-assets]].
 
-## Web design rubric -- Apple principles, web-native execution (not iOS cosplay)
+## Web & desktop rubrics live in profiles/
 
-Apple's HIG is scoped to Apple platforms; it does NOT govern the web. Reuse Apple PRINCIPLES (clarity, deference, hierarchy, semantic color, accessibility) but judge a web UI by web conventions:
-
-- **Don't flag a web app for lacking iOS chrome** (bottom tab bars, nav bars, sheets, SF Symbols) -- those are not a web compliance gate. (apple_published -- the HIG is Apple-platform-scoped.)
-- **Desktop-web conventions at pointer widths** (persistent / sidebar nav, hover, right-click menus, denser layouts); reserve mobile chrome for narrow/touch viewports via responsive breakpoints. The web pointer-target floor is **WCAG 2.5.8's 24x24 CSS px** (wcag_external), NOT Apple's 44pt.
-- **URL / History / Back native** -- every primary view has a shareable URL; Back/Forward and history work; don't hijack history with app-modal nav. (community_convention -- WHATWG History API.)
-- **Visible, managed focus** -- keyboard-reachable in a logical order with a `:focus-visible` indicator (don't blanket-remove outlines); move/trap/restore focus on route and dialog changes. (wcag_external -- WCAG 2.1.1 / 2.4.7 / 2.4.11.)
-- **Semantic HTML + native form controls before ARIA** (labels, `type`/`inputmode`/`autocomplete`); build ARIA widgets only when no native element fits, then follow the ARIA APG. (wcag_external -- WCAG 1.3.1 / 4.1.2; ARIA APG.)
-- **Responsive via CSS media/container queries + `prefers-*`** (reduced-motion, color-scheme, contrast) -- not size classes; support fine AND coarse pointers on one page. (community_convention -- W3C CSS / WHATWG.)
-- **No SF Pro / SF Compact / SF Symbols off Apple platforms** (license) -- use the `system-ui` stack or Inter + inline SVG icons. (apple_published -- SF font / SF Symbols license.)
-- **Apple's VISUAL language on the web is conditional** on a genuine Apple-ecosystem surface (an Apple product's own marketing/docs, or a companion web view paired with an app) PLUS web-licit substitutes; borrowing iOS chrome on a generic SaaS purely to look "Apple" is cosplay -- flag it. (inference.)
-- The three OFFICIAL Apple web components -- **Apple Pay on the Web, Sign in with Apple JS, MapKit JS** -- ARE Apple-governed: render the official button/map, don't restyle beyond permitted parameters, and keep MapKit's Apple logo + "Legal" link visible. (apple_published.)
-
-**Authority discipline:** web focus, keyboard operability, semantic HTML, responsive breakpoints, contrast ratios, and modifier handling are W3C / WHATWG / MDN standards (`wcag_external` / `community_convention`) -- never badge them with Apple's name, and never relax them merely because the target is web.
+The detailed **web rubric** now lives in **`profiles/web.md`** — one file with two scope-bound profiles
+(Web Application and Marketing / Content Website). General desktop / cross-platform software (Windows /
+Linux / Electron / Qt / Java) lives in **`profiles/desktop-cross-platform.md`**. Both are web/host-native,
+NOT Apple-governed: judge by WCAG + the host platform conventions, reuse Apple's transferable PRINCIPLES only
+(tagged `inference`), and never impose iOS chrome. Pick the profile from the platform-selection table above;
+the `design-reviewer` loads it in place of a `platforms/<platform>.md` file for web/desktop targets.

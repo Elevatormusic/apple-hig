@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Single-plugin marketplace for apple-hig — design and review UIs to Apple's Human Interface Guidelines.",
-    "version": "1.5.0"
+    "version": "1.6.0"
   },
   "plugins": [
     {
       "name": "apple-hig",
       "source": "./",
-      "description": "Automatically design and review UIs to Apple's Human Interface Guidelines (iOS, iPadOS, macOS, watchOS, tvOS, visionOS). Complete on-disk reference, a HIG design-reviewer subagent, and /hig-review, /hig-scaffold, /hig-tokens commands.",
-      "version": "1.5.0",
+      "description": "Automatically design and review UIs to Apple's Human Interface Guidelines (iOS, iPadOS, macOS, watchOS, tvOS, visionOS) — and judge web, macOS, and desktop software by their own standards, never forced iOS chrome. Complete on-disk reference, a measuring design-reviewer subagent (contrast, target size, visual-weight hierarchy, large-text/reflow/RTL stress), and /hig-review, /hig-scaffold, /hig-tokens, /hig-sync commands.",
+      "version": "1.6.0",
       "author": {
         "name": "Shayan B"
       },

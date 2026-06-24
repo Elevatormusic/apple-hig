@@ -42,9 +42,11 @@ project, consult it for exact, sourced values and load only the files relevant t
 
 ## If the `apple-hig` guidelines/ folder is in this project
 
-Consult it for exact, sourced values. Load only what's relevant — `universal.md` first, then
-`platforms/<platform>.md`, then the few `components/`, `foundations/`, and `patterns/` files for the
-task, and `references/design-tokens.md` for exact numbers. Do not read the whole folder. Each file
+Consult it for exact, sourced values. Load only what's relevant — `universal.md` first, then the right
+rubric: `platforms/<platform>.md` for an Apple-native target, `profiles/web.md` for a web target (bind
+**web-app** vs **marketing-website**), or `profiles/desktop-cross-platform.md` for Windows/Linux/Electron/Qt
+software (host-OS conventions, never iOS chrome). Then the few `components/`, `foundations/`, and
+`patterns/` files for the task, and `references/design-tokens.md` for exact numbers. Do not read the whole folder. Each file
 stores a canonical Apple `source_url`; cite it when you state a spec, and treat exact numbers as
 version-dependent.
 
@@ -57,3 +59,6 @@ motion with no Reduce Motion path; **animations that loop a non-compositable pro
 off-screen/when backgrounded**; icon-only controls without a VoiceOver label; hardcoded type sizes /
 no Dynamic Type.
 Prefer system components and semantic values in every fix.
+**Bind the target first:** judge web, macOS, and desktop software by their OWN standards (WCAG + host-OS
+conventions) — never flag them for lacking iOS chrome (bottom tab bars, sheets, SF Symbols). The 44 pt
+target floor and Dynamic Type are Apple-platform rules; the web/desktop pointer floor is 24 px (WCAG 2.5.8).

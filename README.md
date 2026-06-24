@@ -94,10 +94,14 @@ spaces, and ornaments, with eyes-and-hands input.
   Apple platform (or any product that should follow the HIG) and loads only the relevant guideline
   files. You do not need to name it.
 - **`design-reviewer` subagent** — audits UI code (SwiftUI/UIKit/AppKit, React/React Native, Flutter,
-  HTML/CSS) and reports violations with the rule, the Apple `source_url`, the location, and a concrete
-  fix. Catches sub-44 pt targets, hardcoded/non-semantic colors, missing dark-mode variants, off-grid
-  spacing, low contrast, non-standard radii, motion that ignores Reduce Motion, janky/always-on
-  animations (looping a non-compositable property, or never pausing off-screen), and more.
+  HTML/CSS) with a staged method, reporting each finding with the rule, the `source_url`, the location, its
+  **authority / severity / confidence / evidence**, and a concrete fix. When it can render the screen it
+  **measures** rather than guesses — real WCAG contrast against the actual background, interactive-target
+  geometry, visual-weight hierarchy (the "squint test"), and whether the layout survives **largest text,
+  reflow at 320 px, the WCAG text-spacing overrides, and RTL**. It judges **web** (web-app vs
+  marketing-website profiles), **macOS**, and **Windows/Linux/Electron desktop software** by their own
+  standards — never forcing iOS chrome — and checks the error / empty / loading / offline states, not just
+  the happy path.
 - **Commands**
   - `/hig-review [path]` — run the design-reviewer on the current file/selection or a path.
   - `/hig-scaffold <platform> <component/screen> [stack]` — generate a HIG-compliant component or
@@ -304,7 +308,7 @@ npx github:elevatormusic/apple-hig --tool all --vendor             # all tools +
 ```
 
 No Node? Clone the repo and run `node scripts/install-rules.mjs --tool <slug>` (`--list` shows every
-tool). `--vendor` copies the full 161-file guideline set into your project so the assistant can read
+tool). `--vendor` copies the full guideline set into your project so the assistant can read
 exact, sourced specs; otherwise the rules file carries the core rules and key tokens inline.
 
 Tool slugs: `agents` · `cursor` · `windsurf` · `copilot` · `cline` · `roo` · `aider` · `gemini` ·
@@ -372,8 +376,11 @@ claude --plugin-dir /absolute/path/to/apple-hig
 ```
 
 Then confirm the `apple-hig` skill activates on a UI request, the commands appear, and the
-`design-reviewer` agent is available. Update later by pushing changes and bumping `version` in both
-manifests; users run `/plugin marketplace update apple-hig`.
+`design-reviewer` agent is available. To cut a release: bump `version` in **all four spots in lockstep** —
+`.claude-plugin/plugin.json`, `package.json`, and both `metadata.version` and `plugins[0].version` in
+`.claude-plugin/marketplace.json` (a test enforces they match) — add a `CHANGELOG.md` entry, run
+`node --test`, then push, create the matching git tag, and publish a GitHub Release. Users get the
+SessionStart notice and run `/plugin marketplace update apple-hig`.
 
 ## License
 
