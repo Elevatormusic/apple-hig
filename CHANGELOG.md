@@ -25,6 +25,9 @@ native desktop UIs.
 - The probe targets **JUCE 6.1+** for accessibility enrichment (the core works on 6.0/6/7/8); call it on the
   message thread once the editor is shown. See `references/native-juce-review.md`.
 - RTL is not assessed (JUCE has no bidi through JUCE 8); stress is reflow-only.
+- The probe header is **new in this release** and not yet compile-validated against a production JUCE build —
+  if you hit a build issue, please [open an issue](https://github.com/Elevatormusic/apple-hig/issues) and
+  it'll be fixed quickly. The `native-review` engine + CLI that produce the findings are fully tested.
 
 ## [1.6.0] — 2026-06-23
 
