@@ -3,6 +3,32 @@
 All notable changes to the apple-hig plugin. This project follows [Keep a Changelog](https://keepachangelog.com/)
 and [semantic versioning](https://semver.org/).
 
+## [1.7.0] — 2026-06-23
+
+Native **JUCE / C++** design review — the "measure, don't guess" capability extended beyond the browser to
+native desktop UIs.
+
+### Added
+- **JUCE design probe** (`skills/apple-hig/references/juce-design-probe.h`) — a header-only, `#if JUCE_DEBUG`
+  drop-in that walks a live `Component` + accessibility tree and emits a `native-render` JSON descriptor
+  (+ a snapshot PNG). No Projucer/CMake change.
+- **Native review** (`scripts/native-review.mjs`; `/hig-review <descriptor.json>` runs it) — runs the
+  existing contrast / geometry / visual-weight math on the descriptor to produce **measured** findings: low
+  contrast, sub-24px targets, clipped/truncated text, duplicate/overlapping rows, hierarchy. Same engine as
+  the web path.
+- **`evidence: extracted` tier** — deterministic from the live component tree, and honest about its limits: a
+  native review reaches at most `advisory-pass`, **never `verified-pass`** (it is not a pixel render), and
+  contrast is scored only on introspectable standard-widget nodes with a **coverage ratio** reported, so a
+  heavily custom-painted UI is never mistaken for "fully reviewed".
+
+### Notes
+- The probe targets **JUCE 6.1+** for accessibility enrichment (the core works on 6.0/6/7/8); call it on the
+  message thread once the editor is shown. See `references/native-juce-review.md`.
+- RTL is not assessed (JUCE has no bidi through JUCE 8); stress is reflow-only.
+- The probe header is **new in this release** and not yet compile-validated against a production JUCE build —
+  if you hit a build issue, please [open an issue](https://github.com/Elevatormusic/apple-hig/issues) and
+  it'll be fixed quickly. The `native-review` engine + CLI that produce the findings are fully tested.
+
 ## [1.6.0] — 2026-06-23
 
 A major upgrade to the `design-reviewer`: it now **measures** what it can instead of eyeballing it, and

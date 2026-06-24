@@ -237,6 +237,18 @@ Record the modes you ran in `stagesRun` and the ones you skipped in `stagesSkipp
 requires at least `level: visual`, and a hierarchy finding at `confidence: high` requires the
 **grayscale/blur** weight pass.
 
+**Native (JUCE) descriptor path.** A native C++/JUCE app can't render in a browser, so it normally falls to
+`static`. But if the user instruments it with the **JUCE design probe**
+(`${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/references/juce-design-probe.h`, see
+`references/native-juce-review.md`) you get a **`native-render` descriptor JSON** (+ a snapshot PNG). Run
+`scripts/native-review.mjs` (`reviewNativeDescriptor`) on it: it reuses the contrast / geometry / visual-
+weight math to emit findings tagged **`evidence: extracted`** — deterministic from the live component tree,
+but **not a pixel render, so a native review reaches at most `advisory-pass`, never `verified-pass`.** Scope
+contrast to `measurable` nodes only (a custom-painted node is `measurable:false` — **never** contrast-score
+it), and **report the coverage ratio** — heavily custom-painted pro-audio UIs may have a low introspectable
+fraction, which is surfaced, not hidden. Use the PNG to confirm the duplicate-row / clipped-caption /
+orphaned-label class by eye (these surface as `duplicate`/`clip`/`overlap` findings + the snapshot).
+
 ## Output format
 
 One-line **summary** (platform(s), stack, scope, level, counts by severity). Then group findings by

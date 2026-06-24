@@ -101,7 +101,9 @@ spaces, and ornaments, with eyes-and-hands input.
   reflow at 320 px, the WCAG text-spacing overrides, and RTL**. It judges **web** (web-app vs
   marketing-website profiles), **macOS**, and **Windows/Linux/Electron desktop software** by their own
   standards — never forcing iOS chrome — and checks the error / empty / loading / offline states, not just
-  the happy path.
+  the happy path. For **native JUCE/C++ apps** (which can't render in a browser), a drop-in design probe
+  (`references/juce-design-probe.h`) walks the live component tree → a JSON descriptor the reviewer measures
+  the same way (`/hig-review <descriptor>.json`); see [Native JUCE review](#native-juce--c-review).
 - **Commands**
   - `/hig-review [path]` — run the design-reviewer on the current file/selection or a path.
   - `/hig-scaffold <platform> <component/screen> [stack]` — generate a HIG-compliant component or
@@ -289,6 +291,24 @@ then prefer the cache over the bundle. Everyone else keeps the bundled reference
 
 Note: control-size minimums, spacing, and corner radii aren't exposed at runtime, so they stay
 bundled; Catalyst-resolved iOS values are very close but not a pure on-device render.
+
+## Native JUCE / C++ review
+
+A native JUCE app can't render in a browser, so it normally falls to a static (source-only) review. A
+**drop-in design probe** changes that: it walks the live `Component` tree and emits a JSON descriptor the
+reviewer **measures** — real contrast, sub-24px targets, clipped/truncated text, duplicate/overlapping rows,
+hierarchy — instead of guessing from source.
+
+1. Add `skills/apple-hig/references/juce-design-probe.h` to a **debug** build and, on the message thread once
+   the editor is shown, call `hig::writeDesignProbe(*getTopLevelComponent(), jsonFile, pngFile);`.
+2. `/hig-review hig-probe.json` → the reviewer runs `scripts/native-review.mjs` on the descriptor and reports
+   the findings + a **coverage ratio** + the snapshot PNG.
+
+Honest limits: findings are `evidence: extracted` (deterministic, but a native review reaches at most
+`advisory-pass` — **never `verified-pass`**, since it isn't a pixel render); colours drawn inside a custom
+`paint()` aren't introspectable, so they're `measurable:false` and never contrast-scored (the coverage ratio
+shows how much of the UI was actually measured); JUCE **6.1+** for accessibility enrichment; RTL isn't
+assessed. See `references/native-juce-review.md`.
 
 ## Use it in other AI coding tools
 
