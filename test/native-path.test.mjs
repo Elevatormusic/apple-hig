@@ -14,7 +14,7 @@ test('reviewer documents the native JUCE descriptor path + the extracted tier + 
 
 test('the /hig-review command routes a native descriptor to the native-review CLI (it has Bash; the agent does not)', () => {
   const C = readFileSync(new URL('../commands/hig-review.md', import.meta.url), 'utf8');
-  assert.match(C, /native-render descriptor/i);
+  assert.match(C, /native-render[\s`]*descriptor/i);
   assert.match(C, /scripts\/native-review\.mjs/);
   assert.match(C, /coverage|introspectable/i);
   assert.match(C, /never .{0,16}verified-pass|advisory-pass/i);
