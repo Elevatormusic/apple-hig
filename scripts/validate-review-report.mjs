@@ -10,7 +10,11 @@ export const AUTHORITIES = ['apple_published', 'platform_api_observed', 'wcag_ex
   'project_recommendation', 'community_convention', 'inference'];
 export const SEVERITIES = ['critical', 'high', 'medium', 'low', 'advisory'];
 export const CONFIDENCES = ['high', 'medium', 'low'];
-export const EVIDENCE = ['static-code', 'computed', 'screenshot', 'a11y-tree', 'inferred'];
+export const EVIDENCE = ['static-code', 'computed', 'screenshot', 'a11y-tree', 'inferred', 'extracted'];
+// `extracted` = deterministic from a native introspection (e.g. the JUCE component tree) — stronger than
+// `inferred`, but NOT a true pixel render, so it cannot clear `verified-pass`. Only measured tiers can.
+const VERIFIABLE_EVIDENCE = new Set(['computed', 'screenshot', 'a11y-tree']);
+export const canVerifiedPass = (evidence) => VERIFIABLE_EVIDENCE.has(evidence);
 
 const FINDING_REQUIRED = ['id', 'ruleId', 'category', 'authority', 'severity', 'confidence',
   'evidence', 'location', 'problem', 'userImpact', 'fix', 'howToVerify'];

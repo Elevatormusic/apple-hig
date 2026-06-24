@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Elevatormusic/apple-hig/schemas/native-render.schema.json",
+  "title": "Native render descriptor",
+  "description": "The JSON a native introspection probe (the JUCE design probe) emits and the apple-hig reviewer's native path consumes. Geometry is in root-LOGICAL coordinates; `measurable:false` marks a custom-painted / non-introspectable node that must NOT be contrast-scored.",
+  "type": "object",
+  "required": ["meta", "elements"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["juceVersion", "scaleFactor", "rootBounds", "shown"],
+      "properties": {
+        "juceVersion": { "type": "string" },
+        "scaleFactor": { "type": "number", "description": "snapshot scale; 1 = 1:1 pixel-to-geometry" },
+        "rootBounds": { "$ref": "#/$defs/rect" },
+        "snapshotPath": { "type": "string" },
+        "shown": { "type": "boolean", "description": "editor attached to a native peer (a11y available only when true)" },
+        "axCoverageRatio": { "type": "number", "description": "fraction of nodes with accessibility data" }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "bounds", "measurable"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "description": "standard widget class, or 'custom/unknown'" },
+          "role": { "type": "string" },
+          "label": { "type": "string" },
+          "value": { "type": "string", "description": "control value, kept separate from label" },
+          "bounds": { "$ref": "#/$defs/rect" },
+          "fg": { "type": "string", "description": "hex, or 'not introspectable'" },
+          "bg": { "type": "string", "description": "hex, or 'not introspectable'" },
+          "fgIntrospectable": { "type": "boolean" },
+          "bgIntrospectable": { "type": "boolean" },
+          "fontPt": { "type": "number", "description": "Font::getHeightInPoints()" },
+          "bold": { "type": "boolean" },
+          "visible": { "type": "boolean" },
+          "showing": { "type": "boolean" },
+          "enabled": { "type": "boolean" },
+          "checkable": { "type": "boolean" },
+          "checked": { "type": "boolean" },
+          "measurable": { "type": "boolean", "description": "false = custom-painted; exclude from contrast scoring" },
+          "snapshotMayBeBlank": { "type": "boolean", "description": "GPU/Web/Video subtree; do not pixel-score" },
+          "textOverflows": { "type": "boolean", "description": "probe-computed: text exceeds its bounds (clip/truncation)" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "rect": {
+      "type": "object",
+      "required": ["x", "y", "w", "h"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number" }, "h": { "type": "number" } }
+    }
+  }
+}
