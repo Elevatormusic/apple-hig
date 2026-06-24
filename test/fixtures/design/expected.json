@@ -63,6 +63,20 @@
       "expectedVerdict": "fail",
       "expectedCategories": ["error-recovery"],
       "mustNotFlag": []
+    },
+    {
+      "file": "web-ios-cosplay.html",
+      "summary": "Desktop web app cosplaying as iOS (fixed bottom tab bar + iOS large title on a wide pointer layout). Tests the web rubric's other direction: must RAISE platform-fit (iOS chrome imposed on desktop web), but not fail.",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": ["platform-fit"],
+      "mustNotFlag": []
+    },
+    {
+      "file": "ipad-splitview-good.html",
+      "summary": "Correct iPad regular-width layout: sidebar -> list -> detail, restructured for the canvas. A true negative — must NOT flag platform-fit / stretched-iPhone.",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": [],
+      "mustNotFlag": ["stretched-iphone", "platform-fit", "empty-margins"]
     }
   ]
 }

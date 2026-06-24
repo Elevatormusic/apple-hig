@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Mail</title>
+<!-- A CORRECT iPad regular-width layout: sidebar -> list -> detail, restructured for the canvas (no dead
+     margins). A true negative — the reviewer must NOT flag platform-fit / stretched-iPhone. -->
+<style>
+  :root{color-scheme:light dark;--bg:#f2f2f7;--side:#ececf1;--list:#fff;--label:#1c1c1e;--label2:#8a8a8e;--sep:#3c3c4329;--tint:#0a84ff}
+  @media(prefers-color-scheme:dark){:root{--bg:#000;--side:#1c1c1e;--list:#000;--label:#fff;--label2:#98989d;--sep:#54545899}}
+  *{box-sizing:border-box}
+  body{margin:0;height:100vh;background:var(--bg);color:var(--label);font:15px/1.4 -apple-system,system-ui,sans-serif}
+  .split{display:grid;grid-template-columns:240px 320px 1fr;height:100vh}
+  aside{background:var(--side);border-right:.5px solid var(--sep);padding:12px}
+  aside a{display:flex;align-items:center;gap:10px;min-height:36px;padding:6px 10px;border-radius:8px;color:var(--label);text-decoration:none}
+  aside a[aria-current=page]{background:var(--tint);color:#fff}
+  .list{background:var(--list);border-right:.5px solid var(--sep);overflow:auto}
+  .row{padding:12px 16px;border-bottom:.5px solid var(--sep)}
+  .row .t{font-weight:600}.row .p{color:var(--label2);font-size:13px;margin-top:2px}
+  .detail{padding:28px 32px;overflow:auto}
+  .detail h1{font-size:24px;margin:0 0 6px}.detail .meta{color:var(--label2);font-size:14px;margin-bottom:20px}
+</style></head><body>
+<div class="split">
+  <aside aria-label="Mailboxes">
+    <a href="#" aria-current="page">Inbox</a><a href="#">Flagged</a><a href="#">Sent</a><a href="#">Archive</a>
+  </aside>
+  <div class="list" aria-label="Messages">
+    <div class="row"><div class="t">Dana Cho</div><div class="p">Q3 roadmap review — notes attached…</div></div>
+    <div class="row"><div class="t">Build bot</div><div class="p">Nightly: 264/264 passing</div></div>
+    <div class="row"><div class="t">Sam Ortiz</div><div class="p">Re: design benchmark numbers</div></div>
+  </div>
+  <div class="detail">
+    <h1>Q3 roadmap review</h1>
+    <div class="meta">Dana Cho · Today 9:14 AM</div>
+    <p>Here are the notes from the planning session. The headline is that we're prioritising the
+       evidence layer next, then the squint signal…</p>
+  </div>
+</div></body></html>
