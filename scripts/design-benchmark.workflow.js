@@ -61,9 +61,11 @@ const JUDGE_SCHEMA = {
 // to workflow agents; `repoAbs` must be absolute (Windows paths are normalised to a file:// URL below);
 // and `level` is self-reported by the agent (not proven against actual screenshots) — so for a stable,
 // comparable score prefer the default static path; use rendered for a thorough spot-check.
-const rendered = !!(args && args.rendered)
-const repeats = Math.max(1, (args && args.repeats) || 1)   // pass {repeats:3} to measure consistency
-const repoAbs = (args && args.repoAbs) || ''
+// args may arrive as an object OR a JSON-encoded string depending on how it's passed — normalise both.
+const A = (typeof args === 'string') ? (() => { try { return JSON.parse(args); } catch { return {}; } })() : (args || {});
+const rendered = !!A.rendered
+const repeats = Math.max(1, A.repeats || 1)   // pass {repeats:3} to measure consistency / over-flagging
+const repoAbs = A.repoAbs || ''
 // Normalise an absolute OS path to a file:// URL base (C:\a\b -> file:///C:/a/b; /a/b -> file:///a/b).
 const fileBase = repoAbs ? 'file://' + (repoAbs.startsWith('/') ? '' : '/') + repoAbs.replace(/\\/g, '/') : ''
 const GUARDS = `Apply the method honestly — establish the task, judge the visual/task hierarchy, states, and accessibility; respect the false-positive guards (don't flag decorative/disabled/logotype contrast, off-grid numbers alone, brand colors with paired light+dark, or a missing CTA on a monitoring screen). Return ONLY: the \`verdict\`, the finding \`categories\` you raised (hierarchy|task-fit|ia|state|error-recovery|accessibility|visual|interaction|platform-fit|content), \`flags\` (a short tag per rule), and \`level\`. Do NOT read expected.json or any answer key.`
