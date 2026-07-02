@@ -7,13 +7,20 @@ Apple's published HIG and design resources with version-dependent framing ("re-v
 Apple's own files (fonts, token exports, templates) are never bundled into this repo — values are
 documented, assets are linked.
 
+## Built: the review router (1.9.0, on main — release pending)
+
+Routing-table-driven reviewer, BUILT and merged 2026-07-02: per-subsystem focused passes, targeted
+`--only` audits, lazy per-row rule loading, deterministic microcopy checks, static state-coverage +
+motion rows, blind-spot-honest verdicts (invariant C), fan-out for large reviews. Spec:
+[2026-06-24-review-router-design.md](specs/2026-06-24-review-router-design.md); the v1.9.0 tag +
+GitHub release ship on the maintainer's go.
+
 ## Active
 
-- **Review router (1.8.0)** — routing-table-driven reviewer: per-subsystem focused passes, targeted
-  `--only` audits, lazy per-row rule loading, fan-out for large reviews; three new routed subsystems
-  (microcopy & consistency, static state-coverage, motion). Spec:
-  [2026-06-24-review-router-design.md](specs/2026-06-24-review-router-design.md) — at the
-  spec-review gate; implementation plan next.
+- **Recipe-consuming state checks** — the mechanical follow-on to the router's states row:
+  programmatically check control state styling against the 1.8.0 control-recipe tables
+  (`control-tokens-macos/-ios.md`), feeding the router's states/buttons rows and the native JUCE
+  probe. In brainstorming.
 
 ## Shipped in 1.8.0: the platform token layer
 
