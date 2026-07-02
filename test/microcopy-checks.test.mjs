@@ -86,3 +86,12 @@ test('unexplained acronym: styled words inside all-caps multi-word labels are NO
   assert.equal(f.length, 0); // MODE/DEPTH are styling, owned by the all-caps check
   assert.equal(unexplainedAcronym(['HEQ']).length, 1); // single-token acronyms still fire
 });
+
+test('casing consistency: punctuation/whitespace-only variants are NOT case patterns (review fix)', () => {
+  assert.equal(casingConsistency(['Loading...', 'Loading…']).length, 0); // ellipsis migration pair
+  assert.equal(casingConsistency(['Name', 'Name:']).length, 0);
+  assert.equal(casingConsistency(['Sign in', 'Sign-in']).length, 0);
+  assert.equal(casingConsistency(['Save ', 'Save']).length, 0);
+  // and the real case clash still fires
+  assert.equal(casingConsistency(['COMBINE MODE', 'Combine mode']).length, 1);
+});

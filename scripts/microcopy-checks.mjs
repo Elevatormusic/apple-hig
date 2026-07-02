@@ -14,6 +14,13 @@ const find = (check, severity, authority, message, offenders) =>
   ({ check, severity, authority, message, offenders });
 
 // 1) Casing consistency — apple_published (Writing HIG: one casing style, applied consistently).
+// Fires ONLY on differing per-token CASE signatures — punctuation/whitespace variants of the same
+// casing ("Loading..." vs "Loading…", "Name" vs "Name:") are not case patterns and never fire.
+const caseClass = (t) => /^[0-9]+$/.test(t) ? 'num'
+  : t === t.toLowerCase() ? 'lower'
+  : t === t.toUpperCase() ? 'UPPER'
+  : t[0] === t[0].toUpperCase() && t.slice(1) === t.slice(1).toLowerCase() ? 'Title'
+  : 'Mixed';
 export function casingConsistency(labels, opts = {}) {
   const allow = new Set((opts.acronymAllowlist ?? DEFAULT_ACRONYM_ALLOWLIST).map(a => a.toUpperCase()));
   const groups = new Map();
@@ -23,15 +30,16 @@ export function casingConsistency(labels, opts = {}) {
     // single tokens that are acronyms/units/allowlisted can't establish a casing conflict
     if (toks.length === 1 && (allow.has(toks[0].toUpperCase()) || UNIT_TOKENS.has(toks[0].toUpperCase()))) continue;
     const norm = toks.map(t => t.toLowerCase()).join(' ');
-    if (!groups.has(norm)) groups.set(norm, new Set());
-    groups.get(norm).add(s);
+    const sig = toks.map(caseClass).join('·');
+    if (!groups.has(norm)) groups.set(norm, new Map());
+    if (!groups.get(norm).has(sig)) groups.get(norm).set(sig, s); // one exemplar per signature
   }
   const out = [];
-  for (const [norm, forms] of groups) {
-    if (forms.size >= 2) {
+  for (const [norm, sigs] of groups) {
+    if (sigs.size >= 2) {
       out.push(find('casing-consistency', 'medium', 'apple_published',
-        `"${norm}" ships in ${forms.size} different case patterns on one surface — pick title case OR sentence case and apply it consistently (Writing HIG).`,
-        [...forms]));
+        `"${norm}" ships in ${sigs.size} different case patterns on one surface — pick title case OR sentence case and apply it consistently (Writing HIG).`,
+        [...sigs.values()]));
     }
   }
   return out;

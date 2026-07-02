@@ -17,6 +17,7 @@ test('invariant C: blind spots forbid verified-pass', () => {
 test('invariant C: blindSpots/coverage shape errors are caught', () => {
   const base = { schema: 1, scope: 'screen', level: 'full', findings: [], verdict: 'advisory-pass' };
   assert.equal(validateReport({ ...base, blindSpots: 'the graph' }).valid, false);
+  assert.equal(validateReport({ ...base, blindSpots: ['x', 42] }).valid, false); // elements must be strings
   assert.equal(validateReport({ ...base, coverage: 1.4 }).valid, false);
   assert.equal(validateReport({ ...base, coverage: 0.8, blindSpots: [] }).valid, true);
 });

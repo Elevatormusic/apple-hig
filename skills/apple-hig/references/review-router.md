@@ -22,12 +22,12 @@ watchOS/visionOS have token references only).
 | subsystem | scopes | rubric dims | rules files | method |
 |---|---|---|---|---|
 | typography | component+ | platform rubric "Typography & hierarchy" | `references/design-tokens-<platform>.md` + `guidelines/foundations/typography.md` | static |
-| color | component+ | "Color / contrast / dark mode" + the contrast-thresholds dim | `references/design-tokens-<platform>.md` + `guidelines/foundations/color.md` + `guidelines/foundations/dark-mode.md` | both |
+| color | element+ | "Color / contrast / dark mode" + the contrast-thresholds dim | `references/design-tokens-<platform>.md` + `guidelines/foundations/color.md` + `guidelines/foundations/dark-mode.md` | both |
 | layout | component+ | "Layout & spacing" | `guidelines/foundations/layout.md` | probe |
 | buttons | element+ | "Components & controls" | `references/control-tokens-macos.md` / `references/control-tokens-ios.md` + `guidelines/components/buttons.md` | both |
 | navigation | screen+ | "Navigation & IA" | platform rubric + `guidelines/patterns/navigation.md` | static |
 | motion | component+ | "Motion & animation" | `guidelines/foundations/motion.md` | static |
-| states | component+ | "States" dim + the Stage-5 non-default-state pass bars | `references/control-tokens-<platform>.md` (state recipes, macOS/iOS) | static |
+| states | element+ | "States" dim + the Stage-5 non-default-state pass bars | `references/control-tokens-<platform>.md` (state recipes, macOS/iOS) | static |
 | microcopy | element+ | "Content & writing / voice" | `scripts/microcopy-checks.mjs` definitions + `guidelines/foundations/writing.md` | static |
 | accessibility | element+ | the accessibility dims (contrast / targets / keyboard / VoiceOver / reduce-*) | `guidelines/foundations/accessibility.md` | both |
 | icons | component+ | iconography guidance | `guidelines/foundations/sf-symbols.md` + `guidelines/foundations/interface-icons.md` | static |
