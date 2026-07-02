@@ -43,42 +43,29 @@ Verified against the current macOS design-resource generation (June 2026). Fix b
    Base 3 gains the clause that the ship-SF prohibition targets third parties (Apple's own web
    properties ship SF under Apple's license).
 
-## New capability: macOS control-state token layer
+## Next up (continued): the platform token layer covers ALL export content
 
-The current macOS design-resource generation defines things the plugin has no equivalent of at any
-level — not missing rows, missing *categories*. Needs its own spec (design questions: where these
-live, how the reviewer consumes them, how they feed the review-router's state subsystem and the
-native JUCE probe):
+The program above grew to the full four-platform scope
+([spec](specs/2026-07-01-platform-token-layer-design.md), at the review gate). All four platform
+exports were audited and drafted with adversarial row-by-row verification, and a deterministic
+coverage matrix proved **100% of non-plumbing export tokens** are carried (colors 1,022/1,022,
+typography 492/492, shadow/border/gradient 97/97; only Figma-internal `x- Kit` excluded):
 
-- **Per-control, per-state recipes** — five button variants (bordered / bordered-tinted /
-  bordered-destructive / prominent / prominent-destructive) × idle/clicked/disabled; toggle knobs
-  (incl. clicked-glow), slider tracks/knobs/tick marks, segmented controls, input fields
-  (idle/focus/disabled fills *and* borders). Enables deterministic "is this state styled to spec"
-  checks instead of qualitative state guidance.
-- **Over-glass context** — a parallel recipe set for the same controls when placed on Liquid Glass;
-  the concept that control styling is context-dependent.
-- **Window-activation dimension** — active vs inactive window variants for controls and surfaces.
-- **Shadows and window/panel borders** — elevation values (windows active/inactive ×
-  with/without-sidebar, panels, glass surfaces, knobs) and the standardized macOS 27 window-border
-  specs; the plugin currently has no shadow/elevation values on any platform.
-- **Token composition** — recipes are layered aliases (accent color + vibrant fill compositing);
-  document the model, not just resolved values.
-- **Glyph fills** (colored/neutral/primary × idle/disabled), **selected-state fill ladder**, and a
-  **progress-indicator fade mask** — smaller, same family.
-
-## Queued: remaining platform token audits (same method as macOS)
-
-Current-generation design-resource exports now cover iOS/iPadOS, watchOS, and visionOS (local-only,
-never committed — same rule as above). Each gets the macOS treatment: adversarially-verified audit of
-the platform's rubric + token claims against the export, then a fix/coverage pass:
-
-- **iOS/iPadOS 27** — beyond the accent refresh in the fix batch: elevated vs base background ramp,
-  the new quinary label tier, `Labels - Liquid Glass` variants, iOS `Controls` state tokens, ramp
-  Bold/Italic variants (Body bold is w600, not w700), materials values.
-- **watchOS** — the watch type ramp (incl. Footnote 1/2), system colors, and the four Vibrant
-  families (backgrounds/colors/fills/labels) — the watchOS rubric currently has no numeric layer.
-- **visionOS** — XL Title 1/2 display styles, the visionOS ramp, labels, materials.
-- **tvOS** — no export available yet; re-audit when one exists.
+- **iOS/iPadOS 27** — accent refresh, elevated background ramps, quinary label tier,
+  `Labels - Liquid Glass`, real Bold-variant weights (Body bold = w600), materials + Liquid Glass
+  incl. shadows and the Widget Glass gradient, toggle/slider control recipes.
+- **macOS 27** — full ramp + ladders + surfaces + materials + Liquid Glass (fills AND shadows),
+  window/panel shadow + border geometry (the macOS 27 standardized window borders), and the
+  control-state recipe layer: five button variants × states, window-activation (active/inactive)
+  variants, over-glass context deltas, input-field focus geometry, layered-alias composition model.
+- **watchOS** — the watch ramp with the complete per-size table (all six size classes ×
+  ten styles), system colors, the four Vibrant families, edge-scrim gradients.
+- **visionOS** — XL Title ramp, glass-tuned system colors, labels, materials incl. specular
+  border/shadow geometry.
+- **tvOS** — no export available yet; audit when one exists.
+- Follow-on (queued): the reviewer *capability* that consumes the recipe tables mechanically
+  (deterministic control-state checks feeding the review-router's states subsystem and the native
+  JUCE probe); a `/hig-tokens --platform` flag.
 
 ## Queued (existing backlog)
 
