@@ -3,7 +3,7 @@ title: Design Tokens (consolidated)
 source_url: https://developer.apple.com/design/human-interface-guidelines
 platforms: [ios, ipados, macos, watchos, tvos, visionos]
 value_type: exact-spec
-last_verified: 2026-06-14
+last_verified: 2026-07-01
 ---
 
 > 🔄 **Prefer live values when present.** If `~/.cache/apple-hig/live-tokens.json` exists and its
@@ -17,23 +17,27 @@ last_verified: 2026-06-14
 > 🔢 **exact-spec / version-dependent.** Single source for the `/hig-tokens` command. Values are
 > the **iOS** reference set unless noted; re-verify on Apple. In code, prefer **semantic** names
 > over raw values. Detailed guidance lives in [[color]], [[typography]], [[layout]].
+>
+> 📄 **Full per-platform tables** (complete ramps, label/fill ladders, materials, Liquid Glass,
+> backgrounds incl. elevated): `references/design-tokens-ios.md` (iOS/iPadOS 27),
+> `design-tokens-macos.md`, `design-tokens-watchos.md`, `design-tokens-visionos.md`.
 
 ## Colors — system (light → dark, hex)
 
 | token | light | dark |
 |---|---|---|
-| blue | #007AFF | #0A84FF |
-| cyan | #32ADE6 | #64D2FF |
+| blue | #0088FF | #0091FF |
+| cyan | #00C0E8 | #3CD3FE |
 | green | #34C759 | #30D158 |
-| indigo | #5856D6 | #5E5CE6 |
-| mint | #00C7BE | #63E6E2 |
-| orange | #FF9500 | #FF9F0A |
+| indigo | #6155F5 | #6D7CFF |
+| mint | #00C8B3 | #00DAC3 |
+| orange | #FF8D28 | #FF9230 |
 | pink | #FF2D55 | #FF375F |
-| purple | #AF52DE | #BF5AF2 |
-| red | #FF3B30 | #FF453A |
-| teal | #30B0C7 | #40CBE0 |
-| yellow | #FFCC00 | #FFD60A |
-| brown | #A2845E | #AC8E68 |
+| purple | #CB30E0 | #DB34F2 |
+| red | #FF383C | #FF4245 |
+| teal | #00C3D0 | #00D2E0 |
+| yellow | #FFCC00 | #FFD600 |
+| brown | #AC7F5E | #B78A66 |
 | gray | #8E8E93 | #8E8E93 |
 | gray2 | #AEAEB2 | #636366 |
 | gray3 | #C7C7CC | #48484A |
@@ -49,16 +53,22 @@ last_verified: 2026-06-14
 | secondaryLabel | rgba(60,60,67,0.6) | rgba(235,235,245,0.6) |
 | tertiaryLabel | rgba(60,60,67,0.3) | rgba(235,235,245,0.3) |
 | quaternaryLabel | rgba(60,60,67,0.18) | rgba(235,235,245,0.16) |
+| quinaryLabel | rgba(60,60,67,0.09) | rgba(235,235,245,0.09) |
 | placeholderText | rgba(60,60,67,0.3) | rgba(235,235,245,0.3) |
 | separator | rgba(60,60,67,0.29) | rgba(84,84,88,0.6) |
 | opaqueSeparator | #C6C6C8 | #38383A |
-| link | #007AFF | #0984FF |
+| link | #0088FF | #0091FF |
 | systemBackground | #FFFFFF | #000000 |
 | secondarySystemBackground | #F2F2F7 | #1C1C1E |
 | tertiarySystemBackground | #FFFFFF | #2C2C2E |
 | systemGroupedBackground | #F2F2F7 | #000000 |
 | secondarySystemGroupedBackground | #FFFFFF | #1C1C1E |
 | tertiarySystemGroupedBackground | #F2F2F7 | #2C2C2E |
+
+> **Elevated (dark) ramp.** The dark values above are the **base** ramp. Dark mode also has an
+> **elevated** ramp for content above a base surface (sheets, popovers): background
+> Primary/Secondary/Tertiary = `#1C1C1E` / `#2C2C2E` / `#3A3A3C` (grouped elevated matches). Full
+> base+elevated tables are in `references/design-tokens-ios.md`.
 
 Default tint/accent = `blue`.
 
