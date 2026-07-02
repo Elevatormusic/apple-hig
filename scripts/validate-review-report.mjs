@@ -55,5 +55,15 @@ export function validateReport(report) {
   if (!blocking && report.verdict === 'fail')
     e('verdict=fail requires at least one critical/high finding at confidence>=medium');
 
+  // Invariant C (blind-spot honesty): a blind spot covering a review-relevant area forbids a
+  // verified clean bill. blindSpots is optional; when present and non-empty, the verdict must
+  // degrade to advisory-pass / incomplete / fail. (Review-router spec, 2026-07-02.)
+  if (report.blindSpots !== undefined && !Array.isArray(report.blindSpots))
+    e('blindSpots must be an array of strings when present');
+  if (Array.isArray(report.blindSpots) && report.blindSpots.length > 0 && report.verdict === 'verified-pass')
+    e('verified-pass is not allowed with blind spots (degrade to advisory-pass or incomplete and name the gaps)');
+  if (report.coverage !== undefined && !(typeof report.coverage === 'number' && report.coverage >= 0 && report.coverage <= 1))
+    e('coverage must be a number in [0,1] when present');
+
   return { valid: errors.length === 0, errors };
 }

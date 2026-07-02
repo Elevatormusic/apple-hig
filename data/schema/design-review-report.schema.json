@@ -12,6 +12,10 @@
     "deploymentTarget": { "type": ["string", "null"] },
     "stagesRun": { "type": "array", "items": { "type": "string" } },
     "stagesSkipped": { "type": "array", "items": { "type": "string" } },
+    "coverage": { "type": "number", "minimum": 0, "maximum": 1,
+      "description": "router rows ran / rows applicable (optional; review-router 1.9.0)" },
+    "blindSpots": { "type": "array", "items": { "type": "string" },
+      "description": "review-relevant areas that could NOT be reviewed; non-empty forbids verified-pass (invariant C)" },
     "verdict": { "enum": ["verified-pass", "advisory-pass", "fail", "incomplete"] },
     "findings": {
       "type": "array",
