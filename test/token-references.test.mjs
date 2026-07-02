@@ -37,3 +37,27 @@ test('macOS token reference: keystone values from the macOS 27 export', () => {
   // no Figma plumbing content (naming the exclusion in prose is fine)
   assert.doesNotMatch(m, /Nested Symbol|Symbol BG/i);
 });
+
+// ---- iOS ----
+test('iOS token reference: keystone values from the iOS 27 export', () => {
+  const m = ref('design-tokens-ios.md');
+  assert.match(m, /value_type: exact-spec/);
+  // 27 palette
+  assert.match(m, /#0088FF/i);
+  assert.match(m, /#FF383C/i);
+  // quinary label tier
+  assert.match(m, /[Qq]uinary/);
+  assert.match(m, /0\.09/);
+  // elevated background ramp
+  assert.match(m, /[Ee]levated/);
+  assert.match(m, /#3A3A3C/i);
+  // Labels - Liquid Glass
+  assert.match(m, /#1A1A1A/i);
+  assert.match(m, /#EDEDED/i);
+  // real Bold-variant weights: Body bold is 600, not 700
+  assert.match(m, /Body[^\n]*(600|Semibold)/i);
+  // Widget Glass gradient (addendum merged) + a materials/LG shadow value
+  assert.match(m, /gradient/i);
+  assert.match(m, /blur/i);
+  assert.doesNotMatch(m, /Nested Symbol|Symbol BG/i);
+});
