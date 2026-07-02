@@ -201,6 +201,8 @@ Default tint/accent = **Blue**. Apply via `Color.blue` / `UIColor.systemBlue` (a
 contrast, and vibrancy automatically).
 
 
+## Liquid Glass — surface shadows & the Widget Glass gradient (typed rows)
+
 > 🔢 **exact-spec / version-dependent.** These are the typed **shadow** rows (and the one **gradient**
 > fill) the Liquid Glass fill-stack table above deferred ("shadows are a later recipe spec"). Each
 > Liquid Glass surface in the iOS 27 export carries a **multi-layer shadow stack**: an outer drop
@@ -265,4 +267,4 @@ and a `#222222` blur-10 halo). Apply via the widget system background, not a lit
 > covered above; the 6 typed `Controls` rows are in `references/control-tokens-ios.md`.
 
 See also: [[color]], [[typography]], [[dark-mode]], [[materials]], [[liquid-glass]], [[layout]],
-`references/design-tokens.md` (quick-source), the `/hig-tokens` command.## Liquid Glass — surface shadows & the Widget Glass gradient (typed rows)
+`references/design-tokens.md` (quick-source), the `/hig-tokens` command.

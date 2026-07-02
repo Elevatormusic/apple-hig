@@ -60,6 +60,12 @@ test('iOS token reference: keystone values from the iOS 27 export', () => {
   assert.match(m, /gradient/i);
   assert.match(m, /blur/i);
   assert.doesNotMatch(m, /Nested Symbol|Symbol BG/i);
+  // merge-seam guards (reviewer-caught defect class): the addendum heading must be a real heading
+  // line, headings must never be glued onto a previous line, and the file must end on See-also.
+  assert.match(m, /^## Liquid Glass — surface shadows/m, 'addendum section heading missing/not a heading');
+  assert.doesNotMatch(m, /[^\n\r#]##[^#]/, 'a heading is glued onto the end of another line');
+  const lastLine = m.trimEnd().split('\n').filter(Boolean).at(-1);
+  assert.ok(/`\/hig-tokens` command\.$/.test(lastLine.trim()), 'file must end with the See-also block');
 });
 
 // ---- watchOS ----
