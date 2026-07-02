@@ -26,8 +26,10 @@ Guidelines live at `${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/guidelines/` and toke
 unresolved, find them with Glob `**/apple-hig/guidelines/**/*.md`.) Always load `universal.md`; then — per
 its platform-selection table — load the matching rubric: a **`platforms/<platform>.md`** file for an
 Apple-native target, **`profiles/web.md`** for a web app or marketing/content website, or
-**`profiles/desktop-cross-platform.md`** for Windows/Linux/Electron/Qt/Java software. Then load the few
-topic files relevant to the unit. Pull each rule's `source_url` from the file's front-matter.
+**`profiles/desktop-cross-platform.md`** for Windows/Linux/Electron/Qt/Java software. Then load
+`${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/references/review-router.md` — the index of review subsystems —
+and load each row's rules files **only when that row runs** (Step 0.5). Pull each rule's `source_url`
+from the file's front-matter.
 
 ## Step 0 — Classify the request scope (proportionality)
 
@@ -40,6 +42,22 @@ fabricate a screen/task model for a one-element question.
 | component | states + interaction + the component's local hierarchy | local hierarchy only |
 | screen | all of 1–7 | task model + hierarchy MANDATORY |
 | flow | all of 1–7 + flow-level (entry/back/cancel/save/resume, modal stacking) | review the sequence |
+
+## Step 0.5 — Route the review (the router drives coverage)
+
+Load `references/review-router.md`. Resolve the applicable rows:
+- An explicit **`--only <subsystems>`** in the request wins: exactly those rows, nothing else.
+- Otherwise scope-gate using the router's default row sets (element → its element+ set; component →
+  + component rows; screen/flow → all applicable rows). Rows gated out are "not reviewed (out of
+  scope)" — one line in the report, NOT blind spots.
+
+Then audit **row by row**: load that row's rules files (and nothing else), run its method (`static` =
+read the source; `probe` = the rendered checks below; `both` = both), and tag every finding with
+`subsystem: <row id>`. The router's method notes define the microcopy/states/motion passes. A row whose
+method **cannot run** (a probe row with nothing rendered, a `measurable:false` custom-paint region,
+states the source declares but you cannot drive) is a **blind spot** — record it in `blindSpots`, never
+silently skip it. Stages 1–7 below remain the how-to-judge method; the router decides *which*
+subsystems get a pass and *what rules are in context* while judging them.
 
 ## The review method
 
@@ -256,6 +274,7 @@ severity (🔴 critical/high → 🟠 medium → 🟡 low → ⚪ advisory). For
 
 ```
 [severity · confidence] <ruleId> — <file>:<line> (or <selector/element>)
+  Subsystem: <router row id>
   Category: <category>   Authority: <authority>   Evidence: <evidence>
   Problem:     <what's wrong, quoting the code/element>
   User impact: <who is hurt and how>
@@ -267,6 +286,13 @@ severity (🔴 critical/high → 🟠 medium → 🟡 low → ⚪ advisory). For
 End with **Looks good:** a short balanced list. **Avoid false positives:** do not flag decorative,
 disabled, or logotype elements for contrast; do not flag a number merely for being off-grid; do not flag
 brand/data colors that adapt with paired light+dark; do not demand a primary CTA on a monitoring/browsing
-screen. The **last line** must be machine-readable:
+screen.
 
-`HIG-VERDICT: <verdict> level=<static|visual|full> scope=<element|component|screen|flow> (critical=n high=n medium=n low=n advisory=n)`
+Then **Coverage:** `rows ran / rows applicable`, a **Blind spots:** list (one line each: the row or
+region + why it could not be reviewed), and one line naming the rows out of scope. **A blind spot
+covering a review-relevant area caps the verdict at `advisory-pass`** (or `incomplete`) — never
+`verified-pass`, and never an unqualified clean bill; name the gaps next to the verdict.
+
+The **last line** must be machine-readable:
+
+`HIG-VERDICT: <verdict> level=<static|visual|full> scope=<element|component|screen|flow> rows=<ran>/<applicable> blind=<n> (critical=n high=n medium=n low=n advisory=n)`

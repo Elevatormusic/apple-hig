@@ -46,3 +46,19 @@ test('retains the existing mechanical checks (nothing lost)', () => {
   assert.match(A, /[Ll]iquid [Gg]lass/);          // Liquid Glass on the content layer
   assert.match(A, /alert[^\n]*non-critical|non-critical[^\n]*alert/i);  // wrong-component: alert misuse
 });
+
+// ---- 1.9.0 review-router driver ----
+test('reviewer routes through the router table with lazy per-row loading', () => {
+  assert.match(A, /review-router\.md/);
+  assert.match(A, /Step 0\.5|Route the review/i);
+  assert.match(A, /--only/);
+  assert.match(A, /only when that row runs|lazy|per[- ]row/i);
+  assert.match(A, /subsystem/);
+});
+
+test('reviewer verdict carries coverage + blind spots and never passes over a blind spot', () => {
+  assert.match(A, /blindSpots|Blind spots/);
+  assert.match(A, /[Cc]overage/);
+  assert.match(A, /rows=/);
+  assert.match(A, /blind spot[^.]*(caps|never)[^.]*(advisory|verified|pass|clean)/i);
+});
