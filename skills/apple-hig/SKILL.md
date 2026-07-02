@@ -28,9 +28,10 @@ Apple at runtime. **Load only the files relevant to the current task — never r
    and/or patterns. Load 1–4 files, not the whole tree.
 4. **For exact numbers** (colors/hex, type ramp, spacing, radii, control sizes), load
    `references/design-tokens.md` (compact, iOS-led) — and for platform-exact values the matching
-   platform token reference: `references/design-tokens-macos.md`, `-ios.md` (full set),
-   `-watchos.md`, `-visionos.md`; for control **state** styling (button/toggle/slider states,
-   focus geometry) add `references/control-tokens-macos.md` / `-ios.md`.
+   platform token reference: `references/design-tokens-macos.md`, `references/design-tokens-ios.md`
+   (full set), `references/design-tokens-watchos.md`, `references/design-tokens-visionos.md`; for
+   control **state** styling (button/toggle/slider states, focus geometry) add
+   `references/control-tokens-macos.md` / `references/control-tokens-ios.md`.
 5. **Whenever fonts, SF Symbols, or templates come up,** load `guidelines/licensing-and-assets.md`
    and never bundle/redistribute Apple assets — link only.
 6. **Apply, then cite.** When you state a spec, you can cite the file's `source_url`. Prefer system
