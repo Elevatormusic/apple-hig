@@ -9,6 +9,27 @@ Review UI code for Apple Human Interface Guidelines compliance.
 **Target:** $ARGUMENTS
 If no target is given, review the file/selection currently in focus.
 
+**Targeted audit (`--only`):** if `$ARGUMENTS` contains `--only <subsystems>` (comma-separated row
+ids from `${CLAUDE_PLUGIN_ROOT}/skills/apple-hig/references/review-router.md`, e.g.
+`--only buttons,motion`), pass the flag through to the design-reviewer verbatim — it audits exactly
+those router rows and loads only their rules. This is the cheap path: use it when I name specific
+areas.
+
+**Microcopy assist:** when the review includes the `microcopy` row and you have Bash, extract the
+visible label strings from the target and run the deterministic checks yourself, then hand the JSON
+findings to the reviewer as input alongside the target:
+
+```
+node -e "import('node:url').then(u => import(u.pathToFileURL(process.argv[1]).href)).then(m => console.log(JSON.stringify(m.runMicrocopyChecks(JSON.parse(process.argv[2])), null, 1)))" "${CLAUDE_PLUGIN_ROOT}/scripts/microcopy-checks.mjs" "[\"label one\",\"label two\"]"
+```
+
+**Fan-out (large reviews):** when the target spans many screens/components (a directory, a whole
+app), dispatch **one design-reviewer per router row-group** in parallel via the Task tool — each
+subagent gets the same target plus `--only <rows>` so its entire context is one subsystem — then
+merge: dedupe findings by file:line, keep each finding's subsystem tag, recompute the coverage line
+from the union, and emit ONE combined verdict (the strictest of the parts; every part's blind spots
+carry into the combined report).
+
 **Native JUCE descriptor?** If the target is a `native-render` descriptor JSON produced by the JUCE design
 probe (a top-level `meta` + `elements`; see `references/native-juce-review.md`), do **not** dispatch the
 subagent — it has no Bash and no browser for native. Instead run, with your Bash tool:

@@ -80,3 +80,9 @@ test('runMicrocopyChecks: defaults = casing + all-caps + acronym + ellipsis + de
   assert.ok(!checks.has('redundant-copy'));
   for (const x of f) assert.doesNotMatch(x.message, /3\.1\.2/);
 });
+
+test('unexplained acronym: styled words inside all-caps multi-word labels are NOT acronyms', () => {
+  const f = unexplainedAcronym(['COMBINE MODE', 'PREFERRED DEPTH']);
+  assert.equal(f.length, 0); // MODE/DEPTH are styling, owned by the all-caps check
+  assert.equal(unexplainedAcronym(['HEQ']).length, 1); // single-token acronyms still fire
+});

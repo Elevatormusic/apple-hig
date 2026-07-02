@@ -62,3 +62,11 @@ test('reviewer verdict carries coverage + blind spots and never passes over a bl
   assert.match(A, /rows=/);
   assert.match(A, /blind spot[^.]*(caps|never)[^.]*(advisory|verified|pass|clean)/i);
 });
+
+test('hig-review supports --only targeted audits, microcopy assist, and the fan-out path', () => {
+  const cmd = readFileSync(new URL('../commands/hig-review.md', import.meta.url), 'utf8');
+  assert.match(cmd, /--only/);
+  assert.match(cmd, /review-router\.md/);
+  assert.match(cmd, /fan[- ]?out|one design-reviewer per/i);
+  assert.match(cmd, /microcopy-checks\.mjs/);
+});

@@ -87,6 +87,10 @@ export function unexplainedAcronym(labels, opts = {}) {
   const out = [];
   const seen = new Set();
   for (const s of labels) {
+    // A fully all-caps multi-word label is STYLING — its words are indistinguishable from
+    // acronyms, and the long-all-caps check owns that label. Skip it here.
+    const letters = s.replace(/[^A-Za-z]/g, '');
+    if (letters && letters === letters.toUpperCase() && tokens(s).length > 1) continue;
     for (const t of tokens(s)) {
       if (!isAcronymish(t) || allow.has(t) || UNIT_TOKENS.has(t.toUpperCase()) || seen.has(t)) continue;
       seen.add(t);
