@@ -38,11 +38,14 @@ test('27-gen palette: design-tokens.md, design-tokens-ios.md, and hig-tokens.md 
 test('stale values are gone from the refreshed files', () => {
   const dt = at('skills/apple-hig/references/design-tokens.md');
   const ht = at('commands/hig-tokens.md');
-  for (const [name, text] of [['design-tokens.md', dt], ['hig-tokens.md', ht]]) {
+  const ig = at('integrations/apple-hig.md');
+  for (const [name, text] of [['design-tokens.md', dt], ['hig-tokens.md', ht], ['integrations/apple-hig.md', ig]]) {
     assert.doesNotMatch(text, /#0984FF/i, `${name} still has the link-dark typo`);
     assert.doesNotMatch(text, /#007AFF/i, `${name} still has the pre-27 blue`);
     assert.doesNotMatch(text, /#FF3B30/i, `${name} still has the pre-27 red`);
+    assert.doesNotMatch(text, /#30B0C7/i, `${name} still has the pre-27 teal`);
   }
+  assert.match(ig, /#0088FF/i, 'integrations ruleset missing the 27 blue');
   // quinary tier + elevated ramp arrived in the quick source
   assert.match(dt, /quinary/i);
   assert.match(dt, /elevated/i);

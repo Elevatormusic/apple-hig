@@ -362,7 +362,10 @@ standard — one file covers most of the list. These conventions move fast; chec
 `skills/apple-hig/SKILL.md` is a router, not the content. On each task it loads
 `guidelines/universal.md`, detects the platform, then loads only the specific component/foundation/
 pattern files needed (there is a keyword-to-file routing table in the skill). Exact numbers come from
-`references/design-tokens.md`. Nothing is fetched from Apple at runtime.
+`references/design-tokens.md` plus the per-platform token references (`design-tokens-macos.md`,
+`design-tokens-ios.md`, `design-tokens-watchos.md`, `design-tokens-visionos.md`) and the
+control-state recipe references (`control-tokens-macos.md`, `control-tokens-ios.md`). Nothing is
+fetched from Apple at runtime.
 
 ## Repository layout
 

@@ -24,8 +24,11 @@ watchOS, and visionOS**, transcribed from the current-generation Apple Design Re
   third-party clause (Apple's own properties ship SF under Apple's license); the desktop rubric can
   load the macOS token/recipe references as an optional Apple-grade reference aesthetic — never
   `apple_published` requirements on non-Apple hosts.
+- **Routing:** the skill's exact-numbers step now routes to the per-platform token references and
+  the control-recipe files; each platform file points at its token reference.
 - **Tests:** token keystone corpus tests, recipe alias-resolution + merge-seam guards, and
-  cross-file palette/value sync tests (`design-tokens.md` ↔ `design-tokens-ios.md` ↔ `/hig-tokens`).
+  cross-file palette/value sync tests (`design-tokens.md` ↔ `design-tokens-ios.md` ↔ `/hig-tokens`
+  ↔ `integrations/apple-hig.md`).
 
 ### Fixed
 - **27-generation system palette** in `design-tokens.md`, the `/hig-tokens` fallback, and

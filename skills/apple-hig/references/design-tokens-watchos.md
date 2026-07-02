@@ -66,9 +66,10 @@ loosens as sizes shrink. (Each style also ships Left/Center/Right-aligned varian
 
 ## Colors — System (watchOS palette)
 
-Watch system colors are their own set (brighter, dark-context tuned) and **differ from the iOS
-system palette** — e.g. watch Red `#FF4245` vs iOS `#FF3B30`, watch Blue `#0091FF` vs iOS dark
-`#0A84FF`. Apply via `Color.red` etc.; these hexes are a design aid.
+Watch system colors are dark-context tuned and **match the iOS 27 dark-appearance palette** (the
+watch UI is always dark) — e.g. watch Blue `#0091FF` = iOS 27 dark Blue (iOS light is `#0088FF`),
+watch Red `#FF4245` = iOS 27 dark Red. There is no light column on watchOS. Apply via `Color.red`
+etc.; these hexes are a design aid.
 
 | # | token | hex |
 |---|---|---|

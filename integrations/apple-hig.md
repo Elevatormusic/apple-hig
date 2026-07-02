@@ -31,8 +31,8 @@ project, consult it for exact, sourced values and load only the files relevant t
 
 ## Key tokens (iOS reference set; use semantic names in code)
 
-- System colors (light → dark) include **mint** `#00C7BE`/`#63E6E2`, **cyan** `#32ADE6`/`#64D2FF`,
-  **teal** `#30B0C7`/`#40CBE0`, blue `#007AFF`/`#0A84FF`. Every color has a light and dark value.
+- System colors (light → dark) include **mint** `#00C8B3`/`#00DAC3`, **cyan** `#00C0E8`/`#3CD3FE`,
+  **teal** `#00C3D0`/`#00D2E0`, blue `#0088FF`/`#0091FF`. Every color has a light and dark value.
 - Type ramp (size/leading pt): Large Title 34/41, Title 1 28/34, Headline & Body 17/22,
   Subhead 15/20, Footnote 13/18, Caption 2 11/13.
 - Spacing: 4, 8, 12, 16, 20, 24, 32. Corner radii: 8 / 12 / 16, and a capsule for prominent controls.
