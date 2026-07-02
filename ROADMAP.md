@@ -15,6 +15,13 @@ documented, assets are linked.
   [2026-06-24-review-router-design.md](specs/2026-06-24-review-router-design.md) — at the
   spec-review gate; implementation plan next.
 
+## Shipped in 1.8.0: the platform token layer
+
+Everything in the two sections below **shipped in v1.8.0** (2026-07-01): the four platform token
+references + two control-state recipe references, the 27-generation corrections, and the
+web/desktop profile wiring (macOS values usable as reference aesthetics for Apple-style websites
+and Windows/Mac desktop software). Design/plan docs for this program are maintained locally.
+
 ## Next up: macOS 27 token refresh — correctness fixes
 
 Verified against the current macOS design-resource generation (June 2026). Fix batch:
@@ -45,11 +52,11 @@ Verified against the current macOS design-resource generation (June 2026). Fix b
 
 ## Next up (continued): the platform token layer covers ALL export content
 
-The program above grew to the full four-platform scope
-([spec](specs/2026-07-01-platform-token-layer-design.md), at the review gate). All four platform
-exports were audited and drafted with adversarial row-by-row verification, and a deterministic
-coverage matrix proved **100% of non-plumbing export tokens** are carried (colors 1,022/1,022,
-typography 492/492, shadow/border/gradient 97/97; only Figma-internal `x- Kit` excluded):
+The program above grew to the full four-platform scope (design/plan docs maintained locally). All
+four platform exports were audited and drafted with adversarial row-by-row verification, and a
+deterministic coverage matrix proved **100% of non-plumbing export tokens** are carried (colors
+1,022/1,022, typography 492/492, shadow/border/gradient 97/97; only Figma-internal `x- Kit`
+excluded):
 
 - **iOS/iPadOS 27** — accent refresh, elevated background ramps, quinary label tier,
   `Labels - Liquid Glass`, real Bold-variant weights (Body bold = w600), materials + Liquid Glass
