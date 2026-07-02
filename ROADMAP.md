@@ -29,10 +29,11 @@ Verified against the current macOS design-resource generation (June 2026). Fix b
    the "macOS has no iOS-style Dynamic Type ramp" lines so they deny only the *auto-scaling
    mechanism*, not the existence of a macOS size ramp. Add sidebar active/inactive fills (the
    macOS 27 sidebar behavior the file already describes in prose).
-3. **macOS color ladders** (`foundations/color.md`, `references/design-tokens.md`) — macOS label
-   alpha ladder (6 tiers incl. quinary/seximal), system-fill ladder, vibrant label/fill variants and
-   the plus-lighter/plus-darker convention; annotate the iOS accent table as pre-26-refresh and list
-   the macOS 27 accent deltas (iOS column re-verified separately).
+3. **Color ladders + accent refresh** (`foundations/color.md`, `references/design-tokens.md`) —
+   update the iOS accent table in place to the current generation (the 27-gen values are identical
+   across the iOS and macOS kits); add the macOS label alpha ladder (6 tiers incl. quinary/seximal),
+   the new iOS quinary label tier, system-fill ladders, vibrant label/fill variants and the
+   plus-lighter/plus-darker convention.
 4. **Materials + Liquid Glass values** (`foundations/materials.md`, `foundations/liquid-glass.md`) —
    material tint/alpha table for all five thicknesses (drop the stale "ultraThick is not a standard
    material" claim); macOS Liquid Glass numeric appendix (Dock, Menus, Notification, Regular
@@ -64,6 +65,20 @@ native JUCE probe):
   document the model, not just resolved values.
 - **Glyph fills** (colored/neutral/primary × idle/disabled), **selected-state fill ladder**, and a
   **progress-indicator fade mask** — smaller, same family.
+
+## Queued: remaining platform token audits (same method as macOS)
+
+Current-generation design-resource exports now cover iOS/iPadOS, watchOS, and visionOS (local-only,
+never committed — same rule as above). Each gets the macOS treatment: adversarially-verified audit of
+the platform's rubric + token claims against the export, then a fix/coverage pass:
+
+- **iOS/iPadOS 27** — beyond the accent refresh in the fix batch: elevated vs base background ramp,
+  the new quinary label tier, `Labels - Liquid Glass` variants, iOS `Controls` state tokens, ramp
+  Bold/Italic variants (Body bold is w600, not w700), materials values.
+- **watchOS** — the watch type ramp (incl. Footnote 1/2), system colors, and the four Vibrant
+  families (backgrounds/colors/fills/labels) — the watchOS rubric currently has no numeric layer.
+- **visionOS** — XL Title 1/2 display styles, the visionOS ramp, labels, materials.
+- **tvOS** — no export available yet; re-audit when one exists.
 
 ## Queued (existing backlog)
 
