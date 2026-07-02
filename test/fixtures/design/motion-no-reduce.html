@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- SEEDED FIXTURE (review-router motion row): a persistent decorative pulse animating BOX-SHADOW
+     (a paint property, repaints every frame) in an infinite loop, with NO prefers-reduced-motion
+     guard and no off-screen pause. Expected findings (both medium/low — advisory-pass): (1) the
+     missing reduced-motion fallback; (2) the non-compositable paint-property loop (animate
+     transform/opacity instead). Must not be flagged: the palette, layout, or the single calm CTA. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sync status</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 17px/1.5 system-ui; margin: 0; display: grid; place-items: center; min-height: 100vh;
+         background: Canvas; color: CanvasText; }
+  .card { text-align: center; padding: 32px; }
+  .beacon { width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 16px;
+            background: #34C759; animation: pulse 1.2s ease-in-out infinite; }
+  /* paint-property loop: box-shadow repaints every frame; runs forever; no reduced-motion guard */
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.55); }
+    70%  { box-shadow: 0 0 0 24px rgba(52, 199, 89, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p { color: color-mix(in srgb, CanvasText 62%, transparent); margin: 0 0 20px; }
+  button { font: 600 17px system-ui; padding: 11px 22px; border-radius: 980px; border: none;
+           background: #0088FF; color: #fff; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="beacon" aria-hidden="true"></div>
+  <h1>Syncing</h1>
+  <p>Your library is up to date.</p>
+  <button>Done</button>
+</div>
+</body>
+</html>

@@ -5,28 +5,45 @@
       "file": "perfect-tokens-wrong-hierarchy.html",
       "summary": "Correct tokens, broken hierarchy: two co-equal primaries, metadata louder than title, buried critical failure.",
       "expectedVerdict": "fail",
-      "expectedCategories": ["hierarchy", "visual"],
-      "mustNotFlag": ["off-grid-spacing", "hardcoded-color"]
+      "expectedCategories": [
+        "hierarchy",
+        "visual"
+      ],
+      "mustNotFlag": [
+        "off-grid-spacing",
+        "hardcoded-color"
+      ]
     },
     {
       "file": "monitoring-no-cta.html",
       "summary": "Informational monitoring board; correct with no primary CTA.",
       "expectedVerdict": "advisory-pass",
       "expectedCategories": [],
-      "mustNotFlag": ["missing-primary-action"]
+      "mustNotFlag": [
+        "missing-primary-action"
+      ]
     },
     {
       "file": "good-ios-settings.html",
       "summary": "Clean, correct iOS grouped-settings screen. A true negative.",
       "expectedVerdict": "advisory-pass",
       "expectedCategories": [],
-      "mustNotFlag": ["off-grid-spacing", "hardcoded-color", "contrast", "missing-label", "missing-primary-action"]
+      "mustNotFlag": [
+        "off-grid-spacing",
+        "hardcoded-color",
+        "contrast",
+        "missing-label",
+        "missing-primary-action"
+      ]
     },
     {
       "file": "hidden-critical-warning.html",
       "summary": "Delete-account screen: the irreversible consequence is tiny/faint and the destructive action is styled as a calm prominent primary.",
       "expectedVerdict": "fail",
-      "expectedCategories": ["error-recovery", "hierarchy"],
+      "expectedCategories": [
+        "error-recovery",
+        "hierarchy"
+      ],
       "mustNotFlag": []
     },
     {
@@ -34,13 +51,22 @@
       "summary": "macOS inspector panel — DENSE is idiomatic on macOS (~28pt controls, packed, no single CTA). Tests the macOS rubric: must NOT be flagged as cluttered / sub-44pt / missing-CTA.",
       "expectedVerdict": "advisory-pass",
       "expectedCategories": [],
-      "mustNotFlag": ["density", "clutter", "too-many-controls", "missing-primary-action", "small-target", "off-grid-spacing"]
+      "mustNotFlag": [
+        "density",
+        "clutter",
+        "too-many-controls",
+        "missing-primary-action",
+        "small-target",
+        "off-grid-spacing"
+      ]
     },
     {
       "file": "ipad-stretched-iphone.html",
       "summary": "iPad at regular width but a stretched iPhone: one narrow column in a sea of empty margin instead of restructuring. Tests the iPad rubric: must RAISE platform-fit.",
       "expectedVerdict": "advisory-pass",
-      "expectedCategories": ["platform-fit"],
+      "expectedCategories": [
+        "platform-fit"
+      ],
       "mustNotFlag": []
     },
     {
@@ -48,27 +74,38 @@
       "summary": "Correct desktop-web dashboard (web-native top nav + sidebar, semantic HTML, no iOS chrome). Tests the web rubric: must NOT be flagged for lacking iOS chrome / tab bar / SF Symbols.",
       "expectedVerdict": "advisory-pass",
       "expectedCategories": [],
-      "mustNotFlag": ["missing-ios-chrome", "no-tab-bar", "no-sf-symbols", "missing-primary-action"]
+      "mustNotFlag": [
+        "missing-ios-chrome",
+        "no-tab-bar",
+        "no-sf-symbols",
+        "missing-primary-action"
+      ]
     },
     {
       "file": "all-cards-fragmented.html",
       "summary": "Card overload: every profile field in its own equal-weight shadowed card, fragmenting reading flow. Must RAISE visual (medium, so verdict stays advisory-pass).",
       "expectedVerdict": "advisory-pass",
-      "expectedCategories": ["visual"],
+      "expectedCategories": [
+        "visual"
+      ],
       "mustNotFlag": []
     },
     {
       "file": "error-without-recovery.html",
       "summary": "Payment error with no cause, no retry, and the form fields wiped. Must fail on error-recovery.",
       "expectedVerdict": "fail",
-      "expectedCategories": ["error-recovery"],
+      "expectedCategories": [
+        "error-recovery"
+      ],
       "mustNotFlag": []
     },
     {
       "file": "web-ios-cosplay.html",
       "summary": "Desktop web app cosplaying as iOS (fixed bottom tab bar + iOS large title on a wide pointer layout). Tests the web rubric's other direction: must RAISE platform-fit (iOS chrome imposed on desktop web), but not fail.",
       "expectedVerdict": "advisory-pass",
-      "expectedCategories": ["platform-fit"],
+      "expectedCategories": [
+        "platform-fit"
+      ],
       "mustNotFlag": []
     },
     {
@@ -76,7 +113,38 @@
       "summary": "Correct iPad regular-width layout: sidebar -> list -> detail, restructured for the canvas. A true negative — must NOT flag platform-fit / stretched-iPhone.",
       "expectedVerdict": "advisory-pass",
       "expectedCategories": [],
-      "mustNotFlag": ["stretched-iphone", "platform-fit", "empty-margins"]
+      "mustNotFlag": [
+        "stretched-iphone",
+        "platform-fit",
+        "empty-margins"
+      ]
+    },
+    {
+      "file": "states-missing-branches.html",
+      "summary": "Fetch-and-render list whose source declares ONLY the happy path — no loading, error, or empty branch. The absence is the defect (router states row, static read).",
+      "expectedVerdict": "fail",
+      "expectedCategories": [
+        "state",
+        "error-recovery"
+      ],
+      "mustNotFlag": [
+        "hardcoded-color",
+        "off-grid-spacing",
+        "missing-primary-action"
+      ]
+    },
+    {
+      "file": "motion-no-reduce.html",
+      "summary": "Persistent decorative box-shadow pulse loop: paint-property animation + no prefers-reduced-motion guard (router motion row). Both findings medium/low.",
+      "expectedVerdict": "advisory-pass",
+      "expectedCategories": [
+        "accessibility"
+      ],
+      "mustNotFlag": [
+        "hardcoded-color",
+        "missing-primary-action",
+        "contrast"
+      ]
     }
   ]
 }

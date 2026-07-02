@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- SEEDED FIXTURE (review-router states row): a fetch-and-render device list with NO loading,
+     NO error, and NO empty branch — the ABSENCE is the defect (the source declares exactly one
+     state). Expected: an "unhandled non-default state" gap on all three (network fetch → loading +
+     error; list → empty). On failure the user gets a silent blank panel = misleading clean UI.
+     Must not be flagged: the palette (semantic tokens, paired light/dark), the grid, the type. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devices</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 17px/1.4 system-ui; margin: 0; background: Canvas; color: CanvasText; }
+  header { padding: 16px 20px; border-bottom: 1px solid color-mix(in srgb, CanvasText 15%, transparent); }
+  h1 { font-size: 22px; margin: 0; }
+  ul { list-style: none; margin: 0; padding: 8px 20px; }
+  li { padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, CanvasText 10%, transparent); }
+  .name { font-weight: 600; }
+  .meta { color: color-mix(in srgb, CanvasText 62%, transparent); font-size: 15px; }
+</style>
+</head>
+<body>
+<header><h1>Devices</h1></header>
+<ul id="devices"></ul>
+<script>
+  // The component's entire state model: fetch succeeds -> rows render. Nothing else exists.
+  async function load() {
+    const res = await fetch('/api/devices');          // no try/catch, no res.ok check -> no error state
+    const devices = await res.json();
+    const ul = document.getElementById('devices');    // no "loading" placeholder was ever shown
+    for (const d of devices) {                        // devices.length === 0 -> silent blank list, no empty state
+      const li = document.createElement('li');
+      li.innerHTML = '<div class="name"></div><div class="meta"></div>';
+      li.querySelector('.name').textContent = d.name;
+      li.querySelector('.meta').textContent = d.sampleRate + ' Hz · ' + d.bitDepth + '-bit';
+      ul.appendChild(li);
+    }
+  }
+  load();
+</script>
+</body>
+</html>
