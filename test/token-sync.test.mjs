@@ -111,3 +111,19 @@ test('desktop profile: macOS reference values wired with non-Apple authority fra
   assert.match(d, /reference (value|aesthetic)/i);
   assert.match(d, /NOTHING in this file is `apple_published`/);
 });
+
+test('SKILL.md routes exact-number lookups to all platform token references', () => {
+  const s = at('skills/apple-hig/SKILL.md');
+  for (const f of ['design-tokens-macos', 'design-tokens-ios', 'design-tokens-watchos', 'design-tokens-visionos']) {
+    assert.match(s, new RegExp(f), `SKILL.md routing missing ${f}`);
+  }
+  assert.match(s, /control-tokens-macos/, 'SKILL.md routing missing the control-recipe references');
+});
+
+test('each platform file points at its token reference', () => {
+  const g = (p) => at('skills/apple-hig/guidelines/platforms/' + p);
+  assert.match(g('ios.md'), /design-tokens-ios/);
+  assert.match(g('macos.md'), /design-tokens-macos/);
+  assert.match(g('watchos.md'), /design-tokens-watchos/);
+  assert.match(g('visionos.md'), /design-tokens-visionos/);
+});

@@ -39,6 +39,9 @@ controls float in Liquid Glass chrome above it. See [[liquid-glass]], [[ios]] na
   (~13 pt on iPad) — approximate, de-facto system rendering; Apple does not publish an exact size.
 - List row min height ~**44 pt**. Touch target **44×44 pt**.
 - Scale factors **@2x / @3x** (most modern iPhones are @3x).
+- **Full numeric token set:** [[design-tokens-ios]] (ramp incl. bold-variant weights + leading
+  variants, label/fill ladders, backgrounds incl. elevated, materials, Liquid Glass — exact-spec,
+  version-dependent); control-state recipes in [[control-tokens-ios]].
 
 ## iPhone frame sizes (points, portrait)
 

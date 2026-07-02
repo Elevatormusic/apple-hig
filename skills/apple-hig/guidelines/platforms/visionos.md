@@ -49,6 +49,8 @@ Prioritize comfort — minimize fatigue and motion discomfort.
 - Apple publishes "**23 million pixels**" total. A teardown estimate is ~**3660 × 3200 px per
   eye** (iFixit/UploadVR) — Apple does **not** publish a per-eye number. Don't design to pixels;
   design in **points** and at comfortable angular sizes.
+- **Full numeric token set:** [[design-tokens-visionos]] (XL Title ramp, glass-tuned system
+  colors, labels, materials incl. specular border/shadow geometry — exact-spec, version-dependent).
 
 ## Conventions
 
