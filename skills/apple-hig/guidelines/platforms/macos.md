@@ -42,14 +42,17 @@ keyboard shortcuts, windows, and multiple windows. Denser layouts than iOS are a
 - **Control sizes:** mini / small / medium → **rounded-rectangle** shapes; **large / x-large** →
   **capsule** shapes (Liquid Glass).
 - Default window backgrounds via the dynamic semantic color `NSColor.windowBackgroundColor` (resolves
-  per appearance/environment; not a fixed value). Approximate light → dark hex ~`#ECECEC` → ~`#323232`
-  is a secondary-source reference only (system color values refreshed June 9 2025 and may change per
-  release). See [[color]].
-- **Typography:** default text **13 pt**, minimum legible size **10 pt**. macOS has **no iOS-style Dynamic
-  Type ramp**, and is **not** in Apple's Larger-Text accessibility criterion (that lists iOS/tvOS/visionOS/
-  watchOS only). macOS 14 Sonoma+ instead exposes **"Use Preferred Reading Size"** (System Settings ▸
-  Accessibility ▸ Display ▸ Text Size) which adopting apps MAY support for key text/sidebars (13 pt default,
-  developer-supportable ~8–42 pt). See the Larger Text rubric dimension.
+  per appearance/environment; not a fixed value). macOS 27 design-resource export: window fill
+  **`#FFFFFF`** light → **`#1E1E1E`** dark (**with-sidebar** dark goes to `#000000`); `#ECECEC` is now
+  the Materials Regular light base, not the window fill. Hex is a design aid and may change per
+  release — apply the NSColor. See [[color]] and the full table set in [[design-tokens-macos]].
+- **Typography:** default text **13 pt**, minimum legible size **10 pt**. macOS DOES have a defined SF Pro
+  text-style ramp (LargeTitle 26 · Title1 22 · Title2 17 · Title3 15 · Headline 13 w700 · Body 13 · Callout
+  12 · Subheadline 11 · Footnote/Caption1/Caption2 10 pt — full table in [[design-tokens-macos]]); what it
+  lacks is **iOS-style Dynamic Type auto-scaling**. It is also **not** in Apple's Larger-Text accessibility
+  criterion (that lists iOS/tvOS/visionOS/watchOS only). macOS 14 Sonoma+ instead exposes **"Use Preferred
+  Reading Size"** (System Settings ▸ Accessibility ▸ Display ▸ Text Size) which adopting apps MAY support for
+  key text/sidebars (13 pt default, developer-supportable ~8–42 pt). See the Larger Text rubric dimension.
 
 ## Conventions
 
@@ -80,8 +83,9 @@ REVERSE — do **not** impose iOS chrome on the Mac.
    "one primary task per window" to the per-window *task*, never to overall control count). FAIL: iOS-style
    single-column with oversized margins on a wide window. (Designing for macOS.)
 2. **Typography & hierarchy** `apple_published` — system font, ~13pt body, ~10–11pt legible floor, a small
-   set of sizes/weights; custom fonts scale relative to a text style. FAIL: hard-coded pixel fonts, sub-10pt
-   body, importing the iOS Dynamic Type ramp wholesale. (No full iOS Dynamic Type ramp — see dim 10.)
+   set of sizes/weights (macOS ships a defined SF Pro ramp — see [[design-tokens-macos]]); custom fonts scale
+   relative to a text style. FAIL: hard-coded pixel fonts, sub-10pt body, importing the iOS Dynamic Type ramp
+   (with its auto-scaling behavior) wholesale. (macOS has a size ramp but no iOS Dynamic Type auto-scaling — see dim 10.)
 3. **Color / contrast / dark mode** `apple_published` — dynamic semantic NSColors (`windowBackgroundColor`,
    `labelColor`, `controlAccentColor`) not fixed hex; full light AND dark, contrast verified in BOTH;
    respects user accent + highlight; selection shown by accent PLUS a second cue. FAIL: hardcoded backgrounds
@@ -114,7 +118,8 @@ REVERSE — do **not** impose iOS chrome on the Mac.
    with a path to the relevant System Settings privacy pane. FAIL: blank pane, silent failure, app-blocking
    modal, hidden disabled commands.
 10. **Accessibility · Larger Text / Preferred Reading Size** `apple_published` — macOS has NO iOS-style
-    Dynamic Type ramp AND is NOT in Apple's Larger-Text ASC criterion; the real mechanism is **"Use Preferred
+    Dynamic Type auto-scaling (it does ship a defined SF Pro size ramp — [[design-tokens-macos]]) AND is NOT
+    in Apple's Larger-Text ASC criterion; the real mechanism is **"Use Preferred
     Reading Size"** (System Settings ▸ Accessibility ▸ Display ▸ Text Size, macOS 14+), opt-in for key text/
     sidebars (13pt default, ~8–42pt). Judge: if the app opts in, key text scales/reflows without truncation;
     generally an in-app text-size control or tolerance of display zoom keeps the layout usable. FAIL: text
@@ -171,9 +176,10 @@ REVERSE — do **not** impose iOS chrome on the Mac.
     customizable toolbars, traffic lights, pointer hover, right/Control-click context menus, full keyboard
     shortcuts, dense multi-column layouts, drag-and-drop. WRONG to borrow from iOS: bottom tab bar as primary
     nav, large-title navigation bars, 44pt-everywhere targets, one-CTA/minimal-controls dogma, no-dense-
-    layouts, full-screen sheets for routine settings, hamburger replacing the menu bar, demanding an iOS
-    Dynamic Type ramp.
+    layouts, full-screen sheets for routine settings, hamburger replacing the menu bar, demanding iOS
+    Dynamic Type auto-scaling (macOS has its own size ramp, not that scaling mechanism).
 
 **iOS defaults WRONG here:** demanding one prominent CTA / minimal controls; 44pt-everywhere; a bottom tab
 bar as primary nav; "no dense layouts"; full-screen sheets for routine settings; a hamburger replacing the
-menu bar; **requiring an iOS Dynamic Type ramp** (macOS uses Preferred Reading Size, not Dynamic Type).
+menu bar; **requiring iOS Dynamic Type auto-scaling** (macOS ships its own SF Pro size ramp — see
+[[design-tokens-macos]] — but uses Preferred Reading Size, not Dynamic Type, for user text scaling).

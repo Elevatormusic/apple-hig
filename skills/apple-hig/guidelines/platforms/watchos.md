@@ -30,7 +30,7 @@ big tap targets, high contrast.
 
 ## Typography & color
 
-- System font is **SF Compact** with its own watch type ramp (don't reuse iOS sizes); **complications use SF Compact Rounded** (when drawing text as an image in a graphic complication). See [[typography]].
+- System font is **SF Compact** with its own watch type ramp (don't reuse iOS sizes); **complications use SF Compact Rounded** (when drawing text as an image in a graphic complication). See [[typography]] and the numeric ramp in [[design-tokens-watchos]].
 - High-contrast, mostly **dark** UI (OLED, true black saves power); use system colors. See [[color]].
 
 ## App icon
@@ -57,4 +57,4 @@ big tap targets, high contrast.
 - Design **notifications** (short + long look) and **complications** as first-class entry points.
 - Keep motion brief; respect battery and Reduce Motion. See [[motion]].
 
-See also: [[ios]], [[typography]], [[complications and widgets → widgets]], [[notifications]], [[icons]].
+See also: [[ios]], [[typography]], [[design-tokens-watchos]], [[complications and widgets → widgets]], [[notifications]], [[icons]].

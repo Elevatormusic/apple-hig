@@ -3,7 +3,7 @@ title: Color
 source_url: https://developer.apple.com/design/human-interface-guidelines/color
 platforms: [ios, ipados, macos, watchos, tvos, visionos]
 value_type: exact-spec
-last_verified: 2026-06-14
+last_verified: 2026-07-01
 ---
 
 # Color
@@ -23,18 +23,18 @@ token export only*.
 
 | Name | Light | Dark |
 |---|---|---|
-| systemBlue | `#007AFF` | `#0A84FF` |
+| systemBlue | `#0088FF` | `#0091FF` |
 | systemGreen | `#34C759` | `#30D158` |
-| systemIndigo | `#5856D6` | `#5E5CE6` |
-| systemOrange | `#FF9500` | `#FF9F0A` |
+| systemIndigo | `#6155F5` | `#6D7CFF` |
+| systemOrange | `#FF8D28` | `#FF9230` |
 | systemPink | `#FF2D55` | `#FF375F` |
-| systemPurple | `#AF52DE` | `#BF5AF2` |
-| systemRed | `#FF3B30` | `#FF453A` |
-| systemTeal | `#30B0C7` | `#40CBE0` |
-| systemMint | `#00C7BE` | `#63E6E2` |
-| systemCyan | `#32ADE6` | `#64D2FF` |
-| systemYellow | `#FFCC00` | `#FFD60A` |
-| systemBrown | `#A2845E` | `#AC8E68` |
+| systemPurple | `#CB30E0` | `#DB34F2` |
+| systemRed | `#FF383C` | `#FF4245` |
+| systemTeal | `#00C3D0` | `#00D2E0` |
+| systemMint | `#00C8B3` | `#00DAC3` |
+| systemCyan | `#00C0E8` | `#3CD3FE` |
+| systemYellow | `#FFCC00` | `#FFD600` |
+| systemBrown | `#AC7F5E` | `#B78A66` |
 
 `systemBlue` is the default iOS **tint/accent**.
 
@@ -57,10 +57,11 @@ token export only*.
 | secondaryLabel | `rgba(60,60,67,0.6)` | `rgba(235,235,245,0.6)` |
 | tertiaryLabel | `rgba(60,60,67,0.3)` | `rgba(235,235,245,0.3)` |
 | quaternaryLabel | `rgba(60,60,67,0.18)` | `rgba(235,235,245,0.16)` |
+| quinaryLabel | `rgba(60,60,67,0.09)` | `rgba(235,235,245,0.09)` |
 | placeholderText | `rgba(60,60,67,0.3)` | `rgba(235,235,245,0.3)` |
 | separator | `rgba(60,60,67,0.29)` | `rgba(84,84,88,0.6)` |
 | opaqueSeparator | `#C6C6C8` | `#38383A` |
-| link | `#007AFF` | `#0984FF` |
+| link | `#0088FF` | `#0091FF` |
 
 ## Background colors (iOS)
 
@@ -75,10 +76,12 @@ token export only*.
 
 ## macOS semantic roles (NSColor)
 
-`controlAccentColor` (user-chosen, default blue), `windowBackgroundColor` `#ECECEC` → `#323232`,
-`controlBackgroundColor`, `labelColor` (0.85 alpha black/white), `selectedContentBackgroundColor`
-`#0063E1` / `#0058D0`, `gridColor`, `separatorColor`. macOS colors are dynamic and respond to the
-user's accent + highlight choices in System Settings.
+`controlAccentColor` (user-chosen, default blue), `windowBackgroundColor` `#FFFFFF` → `#1E1E1E`
+(with-sidebar dark → `#000000`; macOS 27 design-resource export — `#ECECEC` is now the Materials
+Regular light base, not the window fill), `controlBackgroundColor`, `labelColor` (0.85 alpha black/
+white), `selectedContentBackgroundColor` `#0063E1` / `#0058D0`, `gridColor`, `separatorColor`. macOS
+colors are dynamic and respond to the user's accent + highlight choices in System Settings. Full macOS
+token tables: [[design-tokens-macos]].
 
 ## Contrast (accessibility)
 

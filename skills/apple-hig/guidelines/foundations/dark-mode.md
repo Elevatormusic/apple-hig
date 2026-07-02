@@ -38,7 +38,7 @@ Let the system manage this by using semantic background colors (`systemBackgroun
 - **Don't assume inversion.** Many colors flip light↔dark, but some don't. Dark backgrounds are
   dimmer; foreground colors are brighter. Verify each.
 - **Desaturate vivid colors.** Highly saturated colors can vibrate against dark backgrounds —
-  use the system's dark-variant colors (e.g. `systemBlue` `#0A84FF` in dark) rather than the
+  use the system's dark-variant colors (e.g. `systemBlue` `#0091FF` in dark) rather than the
   light hue. The system palette is pre-tuned for this.
 - **Test contrast in both modes.** Re-check legibility, contrast, and accessibility in light and
   dark, including over translucent materials and at the worst-case background.

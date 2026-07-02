@@ -67,16 +67,18 @@ test('software profile: nothing apple_published; host-OS conventions; cardinal s
 });
 
 test('macOS overhaul: Dynamic-Type fix, control sizes, Larger-Text not overclaimed, markers kept', () => {
-  // stale claim removed, Preferred Reading Size in
-  assert.ok(has(mac, 'no iOS-style Dynamic Type ramp'), 'macOS Dynamic-Type reframed');
+  // stale claim removed, Preferred Reading Size in. (2026-07-01: reworded again — macOS DOES have
+  // a size ramp; what it lacks is Dynamic Type AUTO-SCALING. The old phrase over-denied the ramp.)
+  assert.ok(has(mac, 'Dynamic Type auto-scaling'), 'macOS Dynamic-Type reframed (auto-scaling only)');
+  assert.doesNotMatch(mac, /has no iOS-style Dynamic Type ramp/);
   assert.match(mac, /Preferred Reading Size/);
   assert.doesNotMatch(mac, /user adjusts via display zoom/); // old stale line gone
   // verified control-size pair, not the invented 28/24/20 ramp
   assert.match(mac, /28×28 pt/);
   assert.match(mac, /20×20 pt/);
   assert.doesNotMatch(mac, /28\/24\/20pt/);
-  // Larger Text overclaim removed
-  assert.match(mac, /NOT in Apple's Larger-Text ASC criterion/);
+  // Larger Text overclaim removed (wrap-tolerant: the phrase spans a line break post-27-rewording)
+  assert.match(mac, /NOT[\s\r\n]+in Apple's Larger-Text ASC criterion/);
   // reviewer-keyed markers preserved
   assert.match(mac, /## Design rubric/);
   assert.match(mac, /iOS defaults WRONG here/);

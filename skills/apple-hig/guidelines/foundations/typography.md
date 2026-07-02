@@ -3,14 +3,16 @@ title: Typography
 source_url: https://developer.apple.com/design/human-interface-guidelines/typography
 platforms: [ios, ipados, macos, watchos, tvos, visionos]
 value_type: exact-spec
-last_verified: 2026-06-14
+last_verified: 2026-07-01
 ---
 
 # Typography
 
 > 🔢 **exact-spec / version-dependent.** Sizes/leading below are the **iOS** Dynamic Type
 > ramp at the default "Large" size. watchOS (SF Compact), macOS, tvOS, and visionOS have their
-> own ramps — see each platform file. Re-verify on Apple.
+> own ramps — see each platform file. The **visionOS** ramp (incl. the XL Title 1/2 display
+> styles, and Large Title 29 / Title 3 19 / Callout 15 pt, which differ from iOS) is transcribed in
+> `references/design-tokens-visionos.md`. Re-verify on Apple.
 
 ## System fonts (link, never bundle — see [[licensing-and-assets]])
 
@@ -42,7 +44,11 @@ last_verified: 2026-06-14
 | Caption 2 | SF Pro Text | Regular | 11 | 13 |
 
 - **Body 17 pt tracking ≈ −0.43 pt** (tracking is published per-size in Apple Design Resources
-  and adjusts dynamically at runtime).
+  and adjusts dynamically at runtime; the 27 export lists tracking 0 for the ramp).
+- **Bold weights:** the emphasized ("Bold") variant is **Semibold (600)** for Headline/Body/Callout/
+  Subhead/Footnote/Caption 2; **Bold (700)** only for Large Title / Title 1 / Title 2 / Title 3;
+  and **Medium (500)** for Caption 1. Full per-style + Loose/Tight leading tables in
+  `references/design-tokens-ios.md`.
 - Minimum legible size guidance **≈ 11 pt**.
 
 ## Dynamic Type (must support)

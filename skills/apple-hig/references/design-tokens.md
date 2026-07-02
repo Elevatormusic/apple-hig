@@ -16,7 +16,8 @@ last_verified: 2026-07-01
 
 > 🔢 **exact-spec / version-dependent.** Single source for the `/hig-tokens` command. Values are
 > the **iOS** reference set unless noted; re-verify on Apple. In code, prefer **semantic** names
-> over raw values. Detailed guidance lives in [[color]], [[typography]], [[layout]].
+> over raw values. Detailed guidance lives in [[color]], [[typography]], [[layout]]. Per-platform
+> exact-spec token sets: [[design-tokens-watchos]] (SF Compact ramp, watch system colors, vibrant families).
 >
 > 📄 **Full per-platform tables** (complete ramps, label/fill ladders, materials, Liquid Glass,
 > backgrounds incl. elevated): `references/design-tokens-ios.md` (iOS/iPadOS 27),

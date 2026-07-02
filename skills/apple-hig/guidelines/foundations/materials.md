@@ -26,8 +26,10 @@ and thick."
 | `.regular` (**default**) | Overlay views that partially obscure onscreen content |
 | `.thick` | Overlay views that fully obscure onscreen content and require a **dark** color scheme |
 
-> Note: `.ultraThick` is available in the SwiftUI `Material` API but is **not** enumerated as a
-> standard HIG material.
+> Note: `.ultraThick` is available in the SwiftUI `Material` API. On **macOS** the design-resource
+> export defines a full **Ultra Thick** material (light `#ECECEC` α0.88 / dark `#2C2C2C` α0.82) — see
+> the macOS material table in [[design-tokens-macos]]. iOS/iPadOS HIG prose enumerates four standard
+> materials (ultra-thin/thin/regular/thick); `.ultraThick` sits above that set.
 
 Plus `.bar` / system chrome materials for bars. UIKit equivalent: `UIBlurEffect` styles
 (`.systemUltraThinMaterial … .systemThickMaterial`, regular/prominent variants).

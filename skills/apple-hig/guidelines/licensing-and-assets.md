@@ -21,6 +21,9 @@ last_verified: 2026-06-14
 - ❌ Use **SF Symbols — or confusingly similar glyphs — in app icons, logos, or any
   trademark use.** Apple may require modification or discontinuance.
 - ❌ Use SF fonts to mock up UI for **non-Apple** operating systems.
+- ❌ Commit or redistribute Apple's **design-token exports** (Figma variable/token JSON from the
+  UI kits). Documenting the **numeric values** with citations is fine (see below); the files are
+  Apple's. Authoritative restriction text: the [Apple Design Resources License](https://developer.apple.com/support/downloads/terms/apple-design-resources/Apple-Design-Resources-License-20230621-English.pdf).
 
 ## What you MAY do
 
