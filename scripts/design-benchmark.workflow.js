@@ -21,6 +21,8 @@ const FIXTURES = [
   { file: 'error-without-recovery.html', summary: 'Payment error with no cause/retry and wiped fields; must fail on error-recovery.', expectedVerdict: 'fail', expectedCategories: ['error-recovery'], mustNotFlag: [] },
   { file: 'web-ios-cosplay.html', summary: 'Desktop web app cosplaying as iOS (fixed bottom tab bar on a wide layout); must RAISE platform-fit (iOS chrome on desktop web), not fail.', expectedVerdict: 'advisory-pass', expectedCategories: ['platform-fit'], mustNotFlag: [] },
   { file: 'ipad-splitview-good.html', summary: 'Correct iPad regular-width sidebar->list->detail (restructured, no dead margins); must NOT flag platform-fit/stretched-iPhone.', expectedVerdict: 'advisory-pass', expectedCategories: [], mustNotFlag: ['stretched-iphone', 'platform-fit', 'empty-margins'] },
+  { file: 'states-missing-branches.html', summary: 'Fetch-and-render list whose source declares ONLY the happy path — no loading, error, or empty branch. The absence is the defect (router states row, static read).', expectedVerdict: 'fail', expectedCategories: ['state', 'error-recovery'], mustNotFlag: ['hardcoded-color', 'off-grid-spacing', 'missing-primary-action'] },
+  { file: 'motion-no-reduce.html', summary: 'Persistent decorative box-shadow pulse loop: paint-property animation + no prefers-reduced-motion guard (router motion row). Both findings medium/low.', expectedVerdict: 'advisory-pass', expectedCategories: ['accessibility'], mustNotFlag: ['hardcoded-color', 'missing-primary-action', 'contrast'] },
 ]
 
 // Inlined twin of scripts/benchmark-score.mjs (the Workflow sandbox can't import it).
