@@ -61,3 +61,22 @@ test('iOS token reference: keystone values from the iOS 27 export', () => {
   assert.match(m, /blur/i);
   assert.doesNotMatch(m, /Nested Symbol|Symbol BG/i);
 });
+
+// ---- watchOS ----
+test('watchOS token reference: ramp incl. complete per-size table + vibrant families', () => {
+  const m = ref('design-tokens-watchos.md');
+  assert.match(m, /value_type: exact-spec/);
+  // default ramp: Body 16, Footnote 2 exists
+  assert.match(m, /Body[^\n]*16/);
+  assert.match(m, /Footnote 2/);
+  // complete per-size series: Title 1 xxLarge 39 and Footnote 2 xSmall 10 must be present
+  assert.match(m, /39 \(1\.064\)/);
+  assert.match(m, /10 \(1\.250\)/);
+  // watch palette
+  assert.match(m, /#0091FF/i);
+  // vibrant families + exact gradient stops
+  assert.match(m, /Vibrant Blur Top/);
+  assert.match(m, /a=1 @0/);
+  assert.match(m, /a=0 @1/);
+  assert.doesNotMatch(m, /Nested Symbol|Symbol BG/i);
+});
