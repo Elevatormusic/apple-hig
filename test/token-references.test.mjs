@@ -80,3 +80,20 @@ test('watchOS token reference: ramp incl. complete per-size table + vibrant fami
   assert.match(m, /a=0 @1/);
   assert.doesNotMatch(m, /Nested Symbol|Symbol BG/i);
 });
+
+// ---- visionOS ----
+test('visionOS token reference: XL titles, glass palette, specular geometry', () => {
+  const m = ref('design-tokens-visionos.md');
+  assert.match(m, /value_type: exact-spec/);
+  // XL display styles
+  assert.match(m, /XL Title 1[^\n]*48/);
+  assert.match(m, /XL Title 2[^\n]*38/);
+  // glass platter fill + border width
+  assert.match(m, /#959595/i);
+  assert.match(m, /1\.4px/);
+  // button specular border + recessed inner highlight
+  assert.match(m, /#979797/i);
+  assert.match(m, /0\.5px/);
+  assert.match(m, /−0\.5|-0\.5/); // recessed inner-highlight offset-y
+  assert.doesNotMatch(m, /Nested Symbol|Symbol BG/i);
+});
