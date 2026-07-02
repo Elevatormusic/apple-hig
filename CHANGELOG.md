@@ -3,6 +3,38 @@
 All notable changes to the apple-hig plugin. This project follows [Keep a Changelog](https://keepachangelog.com/)
 and [semantic versioning](https://semver.org/).
 
+## [1.9.0] — 2026-07-02
+
+The review router: reviews are now driven by a routing table
+(`references/review-router.md`) — one row per design subsystem — so coverage is explicit, focused,
+and cheap to target.
+
+### Added
+- **The routing table:** 14 subsystem rows (typography, color, layout, buttons, navigation, motion,
+  states, microcopy, accessibility, icons, forms, feedback, platform-fit, data-viz), each indexing
+  its rubric dims + rules files + method (`static`/`probe`/`both`). Rows lazy-load their rules only
+  when they run; typography/color/buttons/states rows load the 1.8.0 per-platform token and
+  control-recipe references.
+- **Targeted audits:** `/hig-review --only buttons,motion` reviews exactly those rows — one
+  subsystem's rules in context, nothing else.
+- **Deterministic microcopy checks** (`scripts/microcopy-checks.mjs`, unit-tested): casing
+  consistency (the one near-fail), redundant copy (off by default), long all-caps (INFO, NN/g),
+  unexplained acronym (WCAG 3.1.4 AAA — always advisory, audience allowlist, pro-tool profile),
+  ellipsis correctness, destructive-verb prompt-to-verify. Authority tiers are research-validated;
+  casing is never cited to WCAG 3.1.2.
+- **Static state-coverage row:** the source's branches ARE the state model — a missing
+  loading/error/empty branch is flagged as the missing state; present branches are judged by the
+  Stage-5 pass bars, and state *styling* by the control-recipe tables on macOS/iOS.
+- **Static motion row:** reads `@keyframes`/`transition`/animation calls + tokens; flags
+  paint-property loops, missing reduced-motion fallbacks, ad-hoc durations.
+- **Blind-spot-honest verdicts:** reports carry `coverage` + `blindSpots[]`; a blind spot covering
+  a review-relevant area caps the verdict at `advisory-pass` (invariant C, enforced in
+  `validate-review-report.mjs`); the `HIG-VERDICT` line gains `rows=<ran>/<applicable> blind=<n>`.
+- **Fan-out:** large reviews dispatch one reviewer per row-group in parallel (`--only` per
+  subagent) and merge into a single verdict.
+- **Fixtures:** states (missing-branches list) + motion (unreduced paint-property pulse) join the
+  behavioral benchmark set.
+
 ## [1.8.0] — 2026-07-01
 
 The platform token layer: full, verified numeric token references for **iOS/iPadOS 27, macOS 27,
