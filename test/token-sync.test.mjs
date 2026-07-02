@@ -88,3 +88,26 @@ test('foundations corrections landed', () => {
   assert.match(lic, /Apple-Design-Resources-License|apple-design-resources/i,
     'licensing-and-assets.md missing the Design Resources License citation');
 });
+
+test('web profile: apple.com anchors, Base-3 third-party clause, token wiring', () => {
+  const w = at('skills/apple-hig/guidelines/profiles/web.md');
+  // Profile B observed anchors (site-observed, community_convention)
+  assert.match(w, /#0071e3/i);
+  assert.match(w, /#0066cc/i);
+  assert.match(w, /#1d1d1f/i);
+  assert.match(w, /980px/);
+  assert.match(w, /site-observed/i);
+  // Base 3 third-party clause
+  assert.match(w, /third-part(y|ies)/i);
+  // wiring to the token references for Apple-language surfaces
+  assert.match(w, /design-tokens-macos/);
+});
+
+test('desktop profile: macOS reference values wired with non-Apple authority framing', () => {
+  const d = at('skills/apple-hig/guidelines/profiles/desktop-cross-platform.md');
+  assert.match(d, /design-tokens-macos/);
+  assert.match(d, /control-tokens-macos/);
+  // framing: reference values, never apple_published requirements on non-Apple hosts
+  assert.match(d, /reference (value|aesthetic)/i);
+  assert.match(d, /NOTHING in this file is `apple_published`/);
+});

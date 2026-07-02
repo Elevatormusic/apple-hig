@@ -60,9 +60,10 @@ styling not structure, px-locked body that won't scale. Hierarchy = `inference`;
 
 ### Base 3 — SF font / SF Symbols prohibition  `apple_published`
 FAIL if the site ships SF Pro, SF Compact, New York, or SF Symbols glyphs as typeface/iconset off an Apple
-platform (license). PASS: `system-ui` stack or a web-licensed font + an open inline-SVG icon set. This is
-the ONE Apple-authoritative typography rule on the web; the substitutes are `community_convention`.
-— https://developer.apple.com/fonts/
+platform (license). **This prohibition targets third-party sites: Apple's own web properties ship SF under
+Apple's license and are not a Base 3 violation.** PASS: `system-ui` stack or a web-licensed font + an open
+inline-SVG icon set. This is the ONE Apple-authoritative typography rule on the web; the substitutes are
+`community_convention`. — https://developer.apple.com/fonts/
 
 ### Base 4 — Color / contrast / dark mode  `community_convention`
 PASS: token-based palette with paired light+dark; honors `prefers-color-scheme`; declares `color-scheme`
@@ -273,6 +274,15 @@ URLs; no keyword-stuffed or empty headings. FAIL: multiple/zero H1, generic page
 heading levels used for styling. Mixed: heading structure = `wcag_external` (1.3.1); title/meta/schema/OG/
 canonical = `community_convention`. — https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements
 
+### Profile B reference anchors — observed apple.com conventions  `community_convention` (optional)
+
+**Site-observed** values from apple.com's marketing pages — reference anchors for an Apple-style
+marketing site, NOT HIG rules; never fail a site for deviating from them. CTA `#0071e3` · link
+`#0066cc` · text near-black `#1d1d1f` · surface `#f5f5f7` · secondary grey `#6e6e73` · pill radius
+`980px` · body 17px/25px · labels 12px w600 · display headlines ≥40px. For a site adopting the
+**macOS app aesthetic** (e.g. a desktop product's site), the exact platform values live in
+[[design-tokens-macos]] / [[design-tokens-ios]] — same status here: reference, not requirement.
+
 ---
 
 ## Platform-fit notes (both profiles)
@@ -283,4 +293,6 @@ canonical = `community_convention`. — https://developer.mozilla.org/en-US/docs
   the default modal, segmented controls / picker wheels / iOS switches for an "Apple look", SF Symbols, 44pt
   targets as a web floor. Flag these as `platform-fit` failures.
 - **Conditional Apple visual language:** legitimate only on a genuine Apple-ecosystem surface; the three
-  official Apple web components are the only `apple_published` exception, rendered unrestyled.
+  official Apple web components are the only `apple_published` exception, rendered unrestyled. When a
+  surface DOES legitimately adopt Apple visual language, take exact values from [[design-tokens-macos]] /
+  [[design-tokens-ios]] (reference-grade on the web, still never a requirement).

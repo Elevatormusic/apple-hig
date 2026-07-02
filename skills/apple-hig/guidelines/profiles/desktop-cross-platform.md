@@ -33,6 +33,13 @@ traffic-light window buttons). The WRONG-to-borrow direction is the thing to fla
   `wcag_external` (W3C).
 - Native a11y/theme APIs (UI Automation, AT-SPI2/ATK, ThemeResource/SystemColors) → `platform_api_observed`.
 - Transferred Apple principles → `inference`.
+- **Apple-grade reference values (optional):** when the maintainer explicitly wants an Apple-grade
+  aesthetic for Windows/Mac desktop software, load [[design-tokens-macos]] (type ramp, label/fill
+  ladders, surfaces, materials) and [[control-tokens-macos]] (per-control state recipes) as the
+  **reference value set** — authority here is `inference` (a transferred reference aesthetic),
+  NEVER `apple_published` requirements on a non-Apple host, and never grounds to fail an app that
+  follows its own host-OS conventions instead. On an actual macOS target, defer to
+  [[macos]] + those references directly, where the values ARE `apple_published`.
 
 ---
 
