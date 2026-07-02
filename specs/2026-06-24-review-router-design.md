@@ -42,6 +42,14 @@ Four units:
 
 Each row = `subsystem · scopes · criteria(rubric dim) · guideline file · method`:
 
+> **1.8.0 token-layer wiring (added 2026-07-02):** rows now point at the per-platform exact-value
+> references shipped in v1.8.0 — typography rows lazy-load `references/design-tokens-<platform>.md`
+> (real ramps incl. emphasized weights), color/contrast rows load its palettes/ladders, and the
+> buttons/controls + states rows load `references/control-tokens-macos.md` / `-ios.md` so state
+> styling is judged against Apple's actual per-state recipes (LLM-judged against the tables; a
+> *mechanical* recipe-diff checker stays deferred). This is the lazy-loading win working as
+> designed: a `--only buttons` audit on macOS loads one rubric row + one recipe file.
+
 - Typography & type ramp · component+ · `static`
 - Color / contrast / dark mode · component+ · `probe` (measured) + `static` (hardcoded-colour)
 - Layout & spacing · component+ · `probe`
@@ -142,6 +150,22 @@ gap-audit's thin dimensions (states/microcopy/motion) are the static side — ch
 - The render/probe is still required for the layout/contrast layer — the router doesn't replace it, it
   schedules both as method-tagged rows.
 
+## Blind-spot-honest verdict (folded in from the reviewability backlog, 2026-07-02)
+
+The router makes review coverage *legible* — every row either ran, was scope-gated out, or was
+**blind** (a `probe` row with no render available, a `measurable:false` custom-paint region, states
+the source declares but the reviewer couldn't drive). The verdict must surface that honestly:
+
+- Every report carries a **`coverage`** figure and an explicit **`blindSpots[]`** list (one entry
+  per skipped/blind row or region, with the reason).
+- **`verified-pass` AND plain `pass` are forbidden when a blind spot covers a review-relevant
+  area** — the verdict degrades to `advisory-pass` (or `incomplete`) with the gaps named. A partial
+  review must never read as a clean bill.
+- Scope-gated-out rows are NOT blind spots (they were deliberately out of scope for the request);
+  the report lists them one line under "not reviewed (out of scope)".
+- `validate-review-report.mjs` enforces the rule mechanically (a report with `blindSpots.length > 0`
+  and verdict `pass`/`verified-pass` is invalid).
+
 ## Testing
 
 - **Router structural test:** every row references a real rubric dimension + an existing guideline file (no
@@ -154,8 +178,12 @@ gap-audit's thin dimensions (states/microcopy/motion) are the static side — ch
 - **Scope-gating:** an element request loads only the element-scope rows; `--only` loads exactly the named
   rows.
 
-## Scope (1.8.0)
+## Scope (1.9.0 — renumbered; the platform token layer shipped as 1.8.0)
 
 IN: the router table + driver + scope-gating + `--only` filter; the three new routed subsystems (microcopy/
-consistency, static state-coverage, motion) with criteria + tests. Fan-out is wired as the large-review path.
-DEFERRED: a deterministic graph-axes check (custom-paint blind spot); whole-app exhaustive crawling.
+consistency, static state-coverage, motion) with criteria + tests; the 1.8.0 token-layer row wiring; the
+blind-spot-honest verdict (coverage + `blindSpots[]` + the no-pass-over-blind-spots rule, enforced in
+`validate-review-report.mjs`). Fan-out is wired as the large-review path.
+DEFERRED: a mechanical recipe-diff state checker (comparing rendered state styling against the
+control-tokens recipes programmatically); a deterministic graph-axes check (custom-paint blind spot);
+whole-app exhaustive crawling.
