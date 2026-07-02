@@ -3,6 +3,42 @@
 All notable changes to the apple-hig plugin. This project follows [Keep a Changelog](https://keepachangelog.com/)
 and [semantic versioning](https://semver.org/).
 
+## [1.8.0] — 2026-07-01
+
+The platform token layer: full, verified numeric token references for **iOS/iPadOS 27, macOS 27,
+watchOS, and visionOS**, transcribed from the current-generation Apple Design Resources exports
+(values cited, files never bundled) with 100% export coverage.
+
+### Added
+- **Platform token references:** `references/design-tokens-macos.md`, `design-tokens-ios.md`,
+  `design-tokens-watchos.md`, `design-tokens-visionos.md` — type ramps incl. real bold-variant
+  weights and Loose/Tight leading variants, label/fill ladders incl. the quinary/seximal tiers,
+  27-generation system palettes, backgrounds/surfaces (incl. the dark elevated ramps), materials,
+  Liquid Glass fills + shadows, separators, vibrant families, macOS window/panel shadow + border
+  geometry, the complete watch per-size ramp, and visionOS specular border/shadow geometry.
+- **Control-state recipe references:** `references/control-tokens-macos.md` (five button variants ×
+  idle/clicked/disabled, window-activation variants, over-glass context deltas, input-field focus
+  geometry, toggle/slider knobs and tracks, the layered-alias composition model) and
+  `references/control-tokens-ios.md` (toggle/slider recipes).
+- **Profile wiring:** web Profile B gains site-observed apple.com reference anchors and Base 3 the
+  third-party clause (Apple's own properties ship SF under Apple's license); the desktop rubric can
+  load the macOS token/recipe references as an optional Apple-grade reference aesthetic — never
+  `apple_published` requirements on non-Apple hosts.
+- **Tests:** token keystone corpus tests, recipe alias-resolution + merge-seam guards, and
+  cross-file palette/value sync tests (`design-tokens.md` ↔ `design-tokens-ios.md` ↔ `/hig-tokens`).
+
+### Fixed
+- **27-generation system palette** in `design-tokens.md`, the `/hig-tokens` fallback, and
+  `color.md` (blue is now `#0088FF`/`#0091FF`; red/orange/teal/mint/cyan/indigo/purple/brown and
+  yellow-dark also shifted).
+- **macOS window backgrounds** `#FFFFFF`/`#1E1E1E` (the stale ~`#ECECEC`/~`#323232` pair removed;
+  `#ECECEC` is now the Materials-Regular light base).
+- **Link pair** tracks systemBlue (`#0088FF`/`#0091FF`; fixes the `#0984FF` typo), quinary label
+  tier added, elevated background ramps documented, `dark-mode.md` systemBlue updated.
+- **macOS wording** now denies only Dynamic Type *auto-scaling* (macOS ships a real size ramp);
+  dropped the stale "ultraThick is not a standard HIG material" claim (macOS 27 defines Ultra
+  Thick); added the Apple Design Resources License citation to `licensing-and-assets.md`.
+
 ## [1.7.1] — 2026-06-23
 
 Patch — the JUCE design probe now **compiles on the common `JUCE_WEB_BROWSER=0`** configuration. Validated on
