@@ -471,7 +471,11 @@ if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
   try { desc = JSON.parse(readFileSync(path, 'utf8')); } catch (e) { console.error(`cannot read ${path}: ${e.message}`); process.exit(2); }
   const errs = validateDescriptor(desc);
   if (errs.length) { console.error(`not a valid native-render descriptor:\n  ${errs.join('\n  ')}`); process.exit(2); }
-  const r = reviewNativeDescriptor(desc);
+  // `--aesthetic apple-macos` opts the swept descriptor into tier-3 recipe diffing against Apple's macOS
+  // reference tokens (a reference aesthetic, not an authority-of-record). Only 'apple-macos' is recognised.
+  const ai = process.argv.indexOf('--aesthetic');
+  const opts = (ai !== -1 && process.argv[ai + 1] === 'apple-macos') ? { aestheticProfile: 'apple-macos' } : {};
+  const r = reviewNativeDescriptor(desc, opts);
   if (process.argv.includes('--json')) { console.log(JSON.stringify(r, null, 2)); process.exit(0); }
   const pct = (r.coverage.ratio * 100).toFixed(0);
   console.log(`Native JUCE review (evidence: extracted) — verdict: ${r.verdict}  ·  never verified-pass (not a pixel render)`);

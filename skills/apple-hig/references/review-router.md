@@ -51,7 +51,9 @@ screen/flow → all applicable rows (navigation, platform-fit, data-viz join).
   flags / switch); enumerate expected states for the component class (fetch → loading+error+empty;
   list → empty; capability → offline/no-permission); a missing branch IS the missing state — flag
   the absence (the Stage-5 pass bars judge the present branches' copy/recovery). On macOS/iOS,
-  judge state *styling* against the control-tokens recipe tables.
+  judge state *styling* against the control-tokens recipe tables. For native JUCE targets, a
+  swept `native-render` descriptor carries measured per-state colour samples (`element.states`),
+  so this row runs on real data instead of source branches.
 - **motion** (static): read `@keyframes`/`transition`/`animation` (web) or animation calls (native)
   + duration/easing tokens; flag layout/paint-property animation, missing reduced-motion fallback,
   ad-hoc durations when motion tokens exist. Runtime *feel* stays eyeball-only — a probe-less

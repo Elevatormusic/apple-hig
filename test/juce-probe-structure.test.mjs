@@ -25,8 +25,26 @@ test('the header emits every descriptor field the reviewer consumes', () => {
   for (const f of ELEMENT_FIELDS) assert.ok(H.includes(`"${f}"`), `header does not emit "${f}"`);
 });
 
+test('the header emits the state-sweep fields it can actually produce (states + sweep)', () => {
+  // ONLY the sweep fields the PROBE emits: per-element "states" and the top-level "sweep" block.
+  // `recipe`/`appearance`/`primary` are NOT asserted here — the probe cannot know a control's macOS recipe
+  // address, its intended light/dark appearance, or its prominence; those are harness/author-annotated
+  // fields (documented explicitly in native-juce-review.md). This is an explicit split, never a silent one.
+  for (const f of ['states', 'sweep']) assert.ok(H.includes(`"${f}"`), `header does not emit "${f}"`);
+  // The per-state and sweep-block sub-fields the validator requires must be emitted too.
+  for (const f of ['normal', 'rgb', 'alpha', 'grid', 'sweptControls', 'blindSpots', 'sideEffects']) {
+    assert.ok(H.includes(`"${f}"`), `header does not emit "${f}"`);
+  }
+});
+
 test('the public entry points exist', () => {
-  for (const fn of ['describeComponentTree', 'writeDesignProbe', 'describeAtSize']) {
+  for (const fn of ['describeComponentTree', 'writeDesignProbe', 'describeAtSize', 'sweepStates']) {
     assert.ok(H.includes(fn), `header missing ${fn}`);
   }
+});
+
+test('describeAtSize does NOT sweep (layout probe) but describeComponentTree defaults sweep on', () => {
+  // describeAtSize passes sweep=false explicitly; the sweep parameter defaults true.
+  assert.match(H, /describeComponentTree \(root, "hig-probe\.png", \/\*sweep\*\/ false\)/);
+  assert.match(H, /bool sweep = true/);
 });

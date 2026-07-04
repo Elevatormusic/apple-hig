@@ -39,7 +39,9 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/native-review.mjs" <path-to-descriptor.json>
 ```
 
 and present its output: the measured findings (`evidence: extracted`), the **coverage ratio** (custom-painted
-nodes aren't contrast-scored), and the snapshot PNG to confirm the duplicate/clip/overlap class by eye. A
+nodes aren't contrast-scored), and the snapshot PNG to confirm the duplicate/clip/overlap class by eye. Add
+`--aesthetic apple-macos` to also diff the descriptor's swept per-state colour samples against Apple's macOS
+control recipes (a reference aesthetic, not the authority of record — `advisory` findings only). A
 native review is **advisory-pass at most — never `verified-pass`** (deterministic, not a pixel render). For
 all other (source) targets:
 
