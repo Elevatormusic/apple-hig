@@ -10,6 +10,7 @@ import { contrastRatio } from './wcag-contrast.mjs';
 import { boxesOverlap, overlapDepth } from './layout-robustness.mjs';
 import { visualWeight } from './visual-weight.mjs';
 import { validateDescriptor } from './native-descriptor.mjs';
+import { parseRecipes, compositeAlpha } from './recipe-tokens.mjs';
 
 const isLarge = (el) => el.fontPt >= 18 || (el.bold && el.fontPt >= 14);
 const rect = (b) => ({ left: b.x, top: b.y, right: b.x + b.w, bottom: b.y + b.h });
@@ -63,13 +64,303 @@ export function hierarchyFindings(elements) {
   return [{ category: 'hierarchy', severity: 'low', element: top.id, evidence: 'extracted', message: `dominant element by visual weight: ${top.id} ("${(top.label || top.value).slice(0, 32)}")` }];
 }
 
-export function reviewNativeDescriptor(descriptor) {
+// =========================================================================================================
+// STATE CHECKER — three tiers over the JUCE state-sweep samples (descriptor `element.states`). All findings
+// are `evidence: extracted` (deterministic samples of the live component tree, not a pixel render on glass).
+// The reframing is research-verified (2026-07-02): Apple's own macOS recipes contain idle==state equalities
+// (23 raw), so a naive "every state must differ" is WRONG — hence tier 1 is inertness-across-ALL-states,
+// tier 2 is a one-direction threshold-gated "disabled louder" check, and tier 3 diffs against the actual
+// recipes with the equality expectations as ground truth. See specs/2026-07-02-state-checker-design.md.
+// =========================================================================================================
+
+const SWEEP_STATES = ['normal', 'over', 'down', 'disabled', 'toggledOn', 'toggledOff'];
+const RGB_TOL = 2;      // per-channel |Δ| ≤ 2 (of 255) counts as identical (research: V4 hover overlay ≈ 5% is a REAL delta)
+const ALPHA_TOL = 0.01; // |Δalpha| ≤ 0.01 counts as identical
+
+const hasRgb = (s) => s && Array.isArray(s.rgb) && s.rgb.length === 3 && s.rgb.every((n) => typeof n === 'number');
+const chDiff = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]), Math.abs(a[2] - b[2]));
+
+// Two swept samples are "the same" iff mean rgb within RGB_TOL on every channel AND every co-indexed grid
+// entry within RGB_TOL AND alpha within ALPHA_TOL. A missing grid on either side means "compare mean only"
+// (graceful degradation — an empty/absent grid must not throw or force a false difference).
+function samplesEqual(a, b) {
+  if (!hasRgb(a) || !hasRgb(b)) return false;               // can't prove equality without both colours
+  if (chDiff(a.rgb, b.rgb) > RGB_TOL) return false;
+  if (Math.abs((a.alpha ?? 1) - (b.alpha ?? 1)) > ALPHA_TOL) return false;
+  const ga = Array.isArray(a.grid) ? a.grid : [];
+  const gb = Array.isArray(b.grid) ? b.grid : [];
+  const n = Math.min(ga.length, gb.length);
+  for (let i = 0; i < n; i++) {
+    if (Array.isArray(ga[i]) && Array.isArray(gb[i]) && ga[i].length === 3 && gb[i].length === 3
+      && chDiff(ga[i], gb[i]) > RGB_TOL) return false;
+  }
+  return true;
+}
+
+// A control is a "primary action" if the descriptor flags it — the sweep/probe signal for a prominent/CTA.
+const isPrimaryAction = (el) => el.primary === true || el.prominent === true || /prominent/i.test(el.variant || '');
+
+// ---- TIER 1: inertness ----------------------------------------------------------------------------------
+// A swept control whose samples are identical across ALL its swept states is unstyled — the motivating bug.
+// A single equal PAIR among otherwise-differing states is NOT a finding (Apple ships equal pairs).
+function tier1Inertness(el) {
+  const states = el.states;
+  if (!states || typeof states !== 'object') return null;
+  const present = SWEEP_STATES.filter((k) => states[k] && hasRgb(states[k]));
+  if (present.length < 2) return null; // nothing to compare (only `normal`, or none measurable)
+  // Inert = every swept pair equal. Compare each to the first; equality here is transitive within tolerance.
+  const first = states[present[0]];
+  const allEqual = present.every((k) => samplesEqual(states[k], first));
+  if (!allEqual) return null;
+  return {
+    category: 'unstyled-control-states',
+    severity: isPrimaryAction(el) ? 'high' : 'medium',
+    element: el.id,
+    evidence: 'extracted',
+    message: `control renders identically across all ${present.length} swept states (${present.join('/')}) — states appear unstyled`,
+  };
+}
+
+// ---- TIER 2: disabled-not-louder ------------------------------------------------------------------------
+// Only when both `normal` and `disabled` exist. Metric: with an introspectable bg, compare WCAG contrast of
+// the state mean-colour vs that bg — flag only when disabled contrast EXCEEDS normal by > 0.5 (clearly
+// louder). Else fall back to mean alpha — flag when disabled alpha > normal alpha + 0.05. One-direction,
+// threshold-gated: even Apple's recipes violate naive dimming (the prominent accent-swap — dark disabled
+// #0A99FF is BRIGHTER than idle #0091FF), so a symmetric "must be dimmer" rule would false-positive.
+const CONTRAST_LOUDER_MARGIN = 0.5;
+const ALPHA_LOUDER_MARGIN = 0.05;
+
+function tier2DisabledDirection(el) {
+  const n = el.states?.normal;
+  const d = el.states?.disabled;
+  if (!n || !d) return null; // only when both normal AND disabled samples exist
+  if (el.bgIntrospectable && Array.isArray(el.bg) && hasRgb(n) && hasRgb(d)) {
+    const cn = contrastRatio(n.rgb, el.bg);
+    const cd = contrastRatio(d.rgb, el.bg);
+    if (cd > cn + CONTRAST_LOUDER_MARGIN) {
+      return {
+        category: 'disabled-louder', severity: 'low', element: el.id, evidence: 'extracted',
+        message: `disabled contrast ${cd.toFixed(2)}:1 exceeds normal ${cn.toFixed(2)}:1 — disabled reads louder than idle`,
+      };
+    }
+    return null;
+  }
+  // alpha fallback
+  const an = n.alpha ?? 1;
+  const ad = d.alpha ?? 1;
+  if (ad > an + ALPHA_LOUDER_MARGIN) {
+    return {
+      category: 'disabled-louder', severity: 'low', element: el.id, evidence: 'extracted',
+      message: `disabled alpha ${ad.toFixed(2)} exceeds normal alpha ${an.toFixed(2)} — disabled reads louder than idle`,
+    };
+  }
+  return null;
+}
+
+// ---- TIER 3: recipe diff (opt-in, apple-macos only) -----------------------------------------------------
+// The descriptor state → the recipe's sparse state axis (Apple: 01=Idle, 03=Clicked, 04=Disabled; no hover).
+const STATE_TO_RECIPE = { normal: 'Idle', down: 'Clicked', disabled: 'Disabled' };
+
+// Export-sanctioned NO-SIGNAL identities (research 2026-07-02, directionModel): the 18 Disabled==Idle + 3
+// Clicked==Idle cells that carry no state signal at the fill level — where Apple's export declares two states
+// EQUAL, an observed difference IS the finding, and an observed equality is correct. Keyed
+// context>group>variant>appearance>[stateA,stateB]. Only the tier-3-relevant (button/toggle-fill) entries
+// are transcribed here; entries whose values alias across appearance are handled by the skip rules below,
+// not by this table.
+const EQUALITY_IDENTITIES = [
+  // CA 02 Bordered Tinted: Disabled == Idle, both appearances (directionModel: "CA 02 Bordered Tinted Light+Dark").
+  { context: 'CONTENT AREA', group: 'Buttons', variant: '02 — Bordered Tinted', appearance: 'Light', states: ['Idle', 'Disabled'] },
+  { context: 'CONTENT AREA', group: 'Buttons', variant: '02 — Bordered Tinted', appearance: 'Dark', states: ['Idle', 'Disabled'] },
+  // CA 03 Bordered Destructive: Clicked == Idle == Disabled, both appearances (directionModel: "CA 03 ... Light+Dark").
+  { context: 'CONTENT AREA', group: 'Buttons', variant: '03 — Bordered Destructive', appearance: 'Light', states: ['Idle', 'Disabled'] },
+  { context: 'CONTENT AREA', group: 'Buttons', variant: '03 — Bordered Destructive', appearance: 'Light', states: ['Idle', 'Clicked'] },
+  { context: 'CONTENT AREA', group: 'Buttons', variant: '03 — Bordered Destructive', appearance: 'Dark', states: ['Idle', 'Disabled'] },
+  { context: 'CONTENT AREA', group: 'Buttons', variant: '03 — Bordered Destructive', appearance: 'Dark', states: ['Idle', 'Clicked'] },
+  // CA 02 Bordered Tinted Dark: Clicked == Idle (directionModel clicked-exceptions: "CA 02 Dark Clicked == Idle").
+  { context: 'CONTENT AREA', group: 'Buttons', variant: '02 — Bordered Tinted', appearance: 'Dark', states: ['Idle', 'Clicked'] },
+  // CA toggle-knob Dark fills: Disabled == Idle (directionModel: "CA Toggle knob Dark fills ... both").
+  { context: 'CONTENT AREA', group: 'Knobs — Toggle', variant: 'Fills', appearance: 'Dark', states: ['Idle', 'Disabled'] },
+];
+
+// Cells whose direction/values are export-defined, NOT heuristic — skip tier-3 entirely on these
+// (research 2026-07-02, directionModel, rule c):
+//   - toggle-knob Clicked fills (incl. the in-doc `#FF0000` Figma authoring marker)
+//   - any base layer that aliases across appearance (the "(**dark**)"-in-Light cases) — a pixel probe can't
+//     reproduce a cross-appearance/vibrant blend, so its direction is not ours to judge.
+function recipeCellSkipped(cells) {
+  for (const c of cells) {
+    if (c.kind !== 'fill' || !Array.isArray(c.layers)) continue;
+    for (const l of c.layers) {
+      // the Figma authoring marker (pure #FF0000) — never a shippable value
+      if (l.hex && l.hex.toUpperCase() === '#FF0000') return true;
+      // a fully-transparent placeholder toggle fill (Clicked = `#FFFFFF` α0) carries no colour signal
+      if (l.hex && (l.alpha ?? 1) === 0) return true;
+      // cross-appearance / vibrant alias ("(**dark**)"-in-Light, plus-lighter/plus-darker) → export-defined
+      if (l.aliasRaw && (/\(\*\*(?:dark|light)\*\*\)/i.test(l.aliasRaw) || l.blend)) return true;
+    }
+  }
+  return false;
+}
+
+// Composite a recipe fill cell's LITERAL layers (draw order, layer 0 = bottom) into a single {rgb, alpha}.
+// `bg` (the element's introspectable background, or null) is what a translucent bottom layer composites over
+// — a swept sample IS a composite over the real backdrop, so the recipe expectation must be too. Returns null
+// when the cell has no literal fill we can reproduce (aliases-only, absent, translucent-with-no-known-bg) —
+// tier 3 then has no ground truth to diff against and skips the state (never invents a value; research rule d).
+function recipeExpectedColor(cells, resolve, bg) {
+  const fills = cells.filter((c) => c.kind === 'fill' && Array.isArray(c.layers) && c.layers.length);
+  if (!fills.length) return null;
+  const cell = fills[0];
+  // Resolve every layer to a literal {hex, alpha}; bail if any layer cannot be reproduced by a pixel probe.
+  const lits = [];
+  for (const l of cell.layers) {
+    if (l.hex) { lits.push({ rgb: hexToRgb(l.hex), alpha: l.alpha ?? 1 }); continue; }
+    if (l.aliasRaw) {
+      if (l.blend) return null; // blend-mode layer — not literally reproducible
+      const r = resolve(l.aliasRaw);
+      if (!r || !r.hex) return null;
+      lits.push({ rgb: hexToRgb(r.hex), alpha: r.alpha ?? 1 });
+      continue;
+    }
+    return null;
+  }
+  const cAlpha = compositeAlpha(lits);
+  // If the whole stack is translucent (composite alpha < ~1), the on-screen colour depends on the backdrop.
+  // Composite over a known introspectable bg; without one we cannot reproduce the sampled pixel → skip.
+  let acc;
+  if (cAlpha < 0.999) {
+    if (!Array.isArray(bg) || bg.length < 3) return null;
+    acc = bg.slice(0, 3);
+  } else {
+    acc = lits[0].rgb.slice(); // opaque bottom layer
+  }
+  const startIdx = cAlpha < 0.999 ? 0 : 1;
+  for (let i = startIdx; i < lits.length; i++) {
+    const { rgb, alpha } = lits[i];
+    acc = acc.map((c, k) => rgb[k] * alpha + c * (1 - alpha));
+  }
+  return { rgb: acc.map(Math.round), alpha: cAlpha };
+}
+
+function hexToRgb(hex) {
+  const h = String(hex).replace('#', '');
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+}
+
+const RECIPE_DIFF_TOL = 8; // per-channel tolerance for "the sample matches the recipe" (probe/quantisation slack)
+
+// Lazily parse the two macOS token references once per review (read relative to THIS script, like the other
+// reference reads in the repo). Cached so a whole descriptor is one parse.
+let _recipes = null;
+function loadMacosRecipes() {
+  if (_recipes) return _recipes;
+  const ref = (p) => readFileSync(new URL('../skills/apple-hig/references/' + p, import.meta.url), 'utf8');
+  _recipes = parseRecipes({ controlTokensText: ref('control-tokens-macos.md'), designTokensText: ref('design-tokens-macos.md') });
+  return _recipes;
+}
+
+// True when tier 3 OWNS this element (apple-macos profile + a recipe address) — tier 2 defers to it.
+function tier3Covers(el, opts) {
+  return opts && opts.aestheticProfile === 'apple-macos' && el.recipe && el.recipe.context && el.recipe.group;
+}
+
+function tier3RecipeDiff(el, recipes) {
+  const out = [];
+  const { context, group, variant } = el.recipe;
+  const appearance = el.appearance || 'Light'; // descriptor may carry the sampled appearance; default Light
+  const states = el.states || {};
+
+  // Expected color per recipe state, from the parsed recipes (skipping export-defined cells).
+  const expected = {};   // recipeState -> {rgb, alpha} | null
+  const skipState = {};  // recipeState -> true when the cell is export-defined (toggle clicked, cross-appearance)
+  for (const recipeState of ['Idle', 'Clicked', 'Disabled']) {
+    const cells = recipes.get(context, group, variant, appearance, recipeState);
+    if (!cells.length) { expected[recipeState] = null; continue; }
+    if (recipeCellSkipped(cells)) { skipState[recipeState] = true; continue; }
+    const bg = (el.bgIntrospectable && Array.isArray(el.bg)) ? el.bg : null;
+    expected[recipeState] = recipeExpectedColor(cells, recipes.resolve, bg);
+  }
+
+  // (1) Equality identities: where the recipe declares two states EQUAL, an observed difference is a finding.
+  // A state named in an identity is OWNED by this check — the value-diff loop below skips it so one violated
+  // identity is reported once, not twice (as both "idle==disabled differ" AND "disabled ≠ expected").
+  const identityCovered = new Set();
+  for (const id of EQUALITY_IDENTITIES) {
+    if (id.context !== context || id.group !== group || id.variant !== variant || id.appearance !== appearance) continue;
+    const [ra, rb] = id.states;
+    if (skipState[ra] || skipState[rb]) continue;            // one side is export-defined → not ours to judge
+    identityCovered.add(ra); identityCovered.add(rb);
+    const da = descriptorStateFor(states, ra);
+    const db = descriptorStateFor(states, rb);
+    if (!hasRgb(da) || !hasRgb(db)) continue;                // need both samples
+    if (chDiff(da.rgb, db.rgb) > RECIPE_DIFF_TOL) {
+      out.push({
+        category: 'recipe-state-diff', severity: 'advisory', element: el.id, evidence: 'extracted',
+        message: `reference aesthetic (macOS): recipe declares ${ra}==${rb} for ${variant} but the samples differ (${fmt(da.rgb)} vs ${fmt(db.rgb)})`,
+      });
+    }
+  }
+
+  // (2) Value diffs: where the recipe declares a concrete literal colour for a state, the sample should match.
+  for (const recipeState of ['Idle', 'Clicked', 'Disabled']) {
+    if (skipState[recipeState]) continue;                    // export-defined (e.g. toggle Clicked) → skip
+    if (identityCovered.has(recipeState)) continue;          // already judged by an equality identity (1)
+    const exp = expected[recipeState];
+    if (!exp) continue;                                      // no reproducible literal → nothing to diff
+    const sample = descriptorStateFor(states, recipeState);
+    if (!hasRgb(sample)) continue;
+    if (chDiff(sample.rgb, exp.rgb) > RECIPE_DIFF_TOL) {
+      out.push({
+        category: 'recipe-state-diff', severity: 'advisory', element: el.id, evidence: 'extracted',
+        message: `reference aesthetic (macOS): ${variant} ${recipeState} sampled ${fmt(sample.rgb)} but the recipe expects ${fmt(exp.rgb)}`,
+      });
+    }
+  }
+  return out;
+}
+
+// Map a recipe state name back to the descriptor sample (normal↔Idle, down↔Clicked, disabled↔Disabled).
+function descriptorStateFor(states, recipeState) {
+  for (const [dk, rk] of Object.entries(STATE_TO_RECIPE)) if (rk === recipeState) return states[dk];
+  return undefined;
+}
+
+const fmt = (rgb) => `[${rgb.map((n) => Math.round(n)).join(',')}]`;
+
+// The state checker entry point. Runs tier 1 + tier 2 (universal) and, opt-in, tier 3 (apple-macos).
+export function stateFindings(descriptor, opts = {}) {
+  const els = (descriptor && descriptor.elements) || [];
+  const out = [];
+  const recipes = opts.aestheticProfile === 'apple-macos' ? loadMacosRecipes() : null;
+  for (const el of els) {
+    if (!el || typeof el !== 'object') continue;
+    const t1 = tier1Inertness(el);
+    if (t1) out.push(t1);
+    // Tier 2 defers to tier 3 whenever tier 3 owns the element (recipe wins over heuristic).
+    if (!tier3Covers(el, opts)) {
+      const t2 = tier2DisabledDirection(el);
+      if (t2) out.push(t2);
+    }
+    if (recipes && tier3Covers(el, opts)) {
+      try { out.push(...tier3RecipeDiff(el, recipes)); } catch { /* degrade: never throw on malformed samples */ }
+    }
+  }
+  return out;
+}
+
+export function reviewNativeDescriptor(descriptor, opts = {}) {
   const els = descriptor.elements || [];
-  const findings = [...contrastFindings(els), ...geometryFindings(els), ...hierarchyFindings(els)];
+  const findings = [
+    ...contrastFindings(els), ...geometryFindings(els), ...hierarchyFindings(els),
+    ...stateFindings(descriptor, opts),
+  ];
   const cov = coverage(els);
   const blocking = findings.some((f) => f.severity === 'high' || f.severity === 'critical');
+  // Sweep blind spots (proven-unforceable states) pass through so the report layer (invariant C) surfaces
+  // them — the reviewer must SAY what wasn't checked. Empty array when the descriptor carries no sweep.
+  const blindSpots = (descriptor.sweep && Array.isArray(descriptor.sweep.blindSpots)) ? descriptor.sweep.blindSpots : [];
   // a native (introspection) review is deterministic but not a pixel render — never `verified-pass`.
-  return { findings, coverage: cov, verdict: blocking ? 'fail' : 'advisory-pass' };
+  return { findings, coverage: cov, blindSpots, verdict: blocking ? 'fail' : 'advisory-pass' };
 }
 
 // --- CLI: `node scripts/native-review.mjs <descriptor.json> [--json]` ---
@@ -91,6 +382,9 @@ if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
   const sorted = [...r.findings].sort((a, b) => (order[a.severity] ?? 9) - (order[b.severity] ?? 9));
   if (!sorted.length) console.log('  (no measured issues on the introspectable subset)');
   for (const f of sorted) console.log(`  [${f.severity}] ${f.category} — ${f.element}: ${f.message}`);
+  if (r.blindSpots.length) {
+    console.log(`Sweep blind spots (proven-unforceable states — NOT checked): ${r.blindSpots.join('; ')}.`);
+  }
   console.log('Confirm the duplicate/clip/overlap class against the snapshot PNG.');
   process.exit(0);
 }
