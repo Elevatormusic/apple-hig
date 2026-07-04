@@ -247,3 +247,117 @@ test('degrade: a state missing rgb / with an empty grid does not throw', () => {
 test('degrade: a descriptor with no elements returns no findings', () => {
   assert.deepEqual(stateFindings(desc([])), []);
 });
+
+// --------------------------------------------------------------------------------------------------------
+// S2 RECHECK REPROS (coordinator review of 938aa14) — D1..D5
+// --------------------------------------------------------------------------------------------------------
+
+// D1 — ambiguous recipe address: {context, group} alone matches MULTIPLE recipe rows (CA Controls: Active/
+// Inactive × Off/On); diffing against an arbitrary fills[0] false-flagged a CORRECT checkbox and printed a
+// literal `undefined` variant in the message. Ambiguity must SKIP, never guess.
+test('D1: an ambiguous recipe address (context+group only) produces no tier-3 findings', () => {
+  const e = el('checkbox', {
+    normal: st([0, 136, 255]),   // a correct [Active, On] blue
+    disabled: st([0, 125, 235]),
+  }, { recipe: { context: 'CONTENT AREA', group: 'Controls' }, appearance: 'Light',
+       bgIntrospectable: true, bg: [255, 255, 255] });
+  const f = stateFindings(desc([e]), { aestheticProfile: 'apple-macos' });
+  assert.equal(f.filter((x) => x.category === 'recipe-state-diff').length, 0, 'ambiguous address → skip, not guess');
+  assert.ok(!f.some((x) => /undefined/.test(x.message || '')), 'no literal "undefined" in any finding message');
+});
+
+// D2a — a mid-diff throw must be FALSIFIABLE: an explicit advisory finding, and tier 2 falls back for that
+// element (tier-3 ownership only counts when tier 3 actually completed).
+test('D2a: a tier-3 throw emits recipe-diff-unavailable AND tier 2 still runs for that element', () => {
+  const e = el('exploder', { normal: st([100, 100, 100], 0.5), disabled: st([100, 100, 100], 0.7) }, {
+    // tier3Covers reads context+group only; the diff destructures `variant` → synthetic mid-diff failure.
+    recipe: { context: 'CONTENT AREA', group: 'Buttons', get variant() { throw new Error('synthetic mid-diff failure'); } },
+  });
+  const f = stateFindings(desc([e]), { aestheticProfile: 'apple-macos' });
+  assert.equal(f.filter((x) => x.category === 'recipe-diff-unavailable' && x.element === 'exploder').length, 1);
+  assert.equal(f.filter((x) => x.category === 'disabled-louder' && x.element === 'exploder').length, 1,
+    'tier 2 falls back when tier 3 died mid-diff');
+});
+
+// D2b — an unreadable recipe reference must degrade to a review-level blind spot, not crash the review;
+// tiers 1–2 and the other emitters survive. (_loadRecipes is the injectable seam for the unreadable file.)
+test('D2b: a failed recipe load degrades to a review-level blind spot; tiers 1-2 survive', () => {
+  const c = [120, 120, 120];
+  const inert = el('inert-d2b', { normal: st(c), over: st(c), down: st(c), disabled: st(c) });
+  const loud = el('loud-d2b', { normal: st([100, 100, 100], 0.5), disabled: st([100, 100, 100], 0.7) },
+    { recipe: { context: 'CONTENT AREA', group: 'Buttons', variant: '01 — Bordered' } });
+  const opts = { aestheticProfile: 'apple-macos', _loadRecipes: () => { throw new Error('EACCES: reference unreadable'); } };
+  const r = reviewNativeDescriptor(desc([inert, loud]), opts);
+  assert.ok(r.blindSpots.includes('recipe tables unavailable — tier-3 skipped'), 'declared, not silent');
+  assert.ok(r.findings.some((x) => x.category === 'unstyled-control-states' && x.element === 'inert-d2b'), 'tier 1 survives');
+  assert.ok(r.findings.some((x) => x.category === 'disabled-louder' && x.element === 'loud-d2b'), 'tier 2 replaces the dead tier 3');
+  assert.ok(!r.findings.some((x) => x.category === 'recipe-state-diff'), 'tier 3 skipped');
+});
+
+// D3 — an identity that HOLDS between the samples must still be value-diffed once: a consistently-wrong
+// pair (both states gray when the recipe says blue) must not pass clean.
+test('D3: a consistently-wrong expected-equal pair still gets ONE representative value-diff', () => {
+  const e = el('gray-tinted', { normal: st([128, 128, 128]), disabled: st([128, 128, 128]) },
+    { recipe: { context: 'CONTENT AREA', group: 'Buttons', variant: '02 — Bordered Tinted' }, appearance: 'Light' });
+  const t3 = stateFindings(desc([e]), { aestheticProfile: 'apple-macos' }).filter((x) => x.category === 'recipe-state-diff');
+  assert.equal(t3.length, 1, 'identity holds → one representative value-diff against the recipe colour');
+});
+
+test('D3: a missing identity partner does not un-check the present state', () => {
+  const e = el('half-tinted', { normal: st([128, 128, 128]) },
+    { recipe: { context: 'CONTENT AREA', group: 'Buttons', variant: '02 — Bordered Tinted' }, appearance: 'Light' });
+  const t3 = stateFindings(desc([e]), { aestheticProfile: 'apple-macos' }).filter((x) => x.category === 'recipe-state-diff');
+  assert.equal(t3.length, 1, 'Idle sampled wrong → value-diff fires even though disabled was not swept');
+});
+
+// D4 — Apple-sanctioned disabled deltas must NOT fire tier 2 (research 2026-07-02, directionModel):
+// the prominent accent-swap measures Δ=+0.519 contrast points over black; the sanctioned plus-darker
+// overlay composite ≈ Δ+0.57 over white. Both are export-shipped, not dimming failures.
+test('D4: the sanctioned prominent accent-swap (idle #0091FF → disabled #0A99FF, Δ=0.519 over black) must NOT fire', () => {
+  const e = el('accent-swap', { normal: st([0, 145, 255]), disabled: st([10, 153, 255]) },
+    { bgIntrospectable: true, bg: [0, 0, 0] });
+  assert.equal(stateFindings(desc([e])).filter((x) => x.category === 'disabled-louder').length, 0);
+});
+
+test('D4: the sanctioned plus-darker overlay (idle #0088FF → composited ≈#007DEB, Δ≈0.57 over white) must NOT fire', () => {
+  const e = el('pd-overlay', { normal: st([0, 136, 255]), disabled: st([0, 125, 235]) },
+    { bgIntrospectable: true, bg: [255, 255, 255] });
+  assert.equal(stateFindings(desc([e])).filter((x) => x.category === 'disabled-louder').length, 0);
+});
+
+test('D4: a large hue rotation at similar alpha (colour swap) skips the contrast path', () => {
+  // red → blue is export-style state feedback (accent swap), not a dimming failure — even though the raw
+  // contrast delta over white (≈+4.4) is far beyond any margin.
+  const e = el('hue-swap', { normal: st([200, 30, 30]), disabled: st([30, 30, 200]) },
+    { bgIntrospectable: true, bg: [255, 255, 255] });
+  assert.equal(stateFindings(desc([e])).filter((x) => x.category === 'disabled-louder').length, 0);
+});
+
+test('D4: a genuinely louder disabled still fires (falsifiability guard)', () => {
+  // Same-hue gray, far darker on white: Δ well beyond the 0.75 margin, no hue rotation → must fire.
+  const e = el('still-louder', { normal: st([160, 160, 160]), disabled: st([20, 20, 20]) },
+    { bgIntrospectable: true, bg: [255, 255, 255] });
+  assert.equal(stateFindings(desc([e])).filter((x) => x.category === 'disabled-louder').length, 1);
+});
+
+// D5 — 2-state sweeps that are pixel-identical are often SANCTIONED (stock V4 linear sliders + tickboxes
+// paint identically enabled vs disabled; Apple ships 18 Disabled==Idle identities — research 2026-07-02,
+// J7-lnf4 + directionModel). The medium/high finding requires ≥3 present states; 2-state gets an info note.
+test('D5: a 2-state all-identical sweep is an info note, not unstyled-control-states', () => {
+  const c = [100, 100, 100];
+  const e = el('slider-like', { normal: st(c), disabled: st(c) });
+  const f = stateFindings(desc([e]));
+  assert.equal(f.filter((x) => x.category === 'unstyled-control-states').length, 0,
+    'pixel-identical enabled-vs-disabled is V4/export-sanctioned — not a medium finding');
+  const note = f.filter((x) => x.category === 'two-state-inert');
+  assert.equal(note.length, 1);
+  assert.equal(note[0].severity, 'info');
+});
+
+test('D5: a 3-state all-identical sweep still fires unstyled-control-states at medium', () => {
+  const c = [100, 100, 100];
+  const e = el('three-inert', { normal: st(c), over: st(c), down: st(c) });
+  const t1 = stateFindings(desc([e])).filter((x) => x.category === 'unstyled-control-states');
+  assert.equal(t1.length, 1);
+  assert.equal(t1[0].severity, 'medium');
+});
