@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 234" width="760" height="234" role="img" aria-label="Lines of code: 6,365 of plugin code and 17,795 of Apple HIG reference.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 234" width="760" height="234" role="img" aria-label="Lines of code: 9,099 of plugin code and 19,090 of Apple HIG reference.">
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #1f2328; }
     .muted { fill: #656d76; }
@@ -15,15 +15,15 @@
 
   <text x="24" y="92" font-size="13" font-weight="600">Plugin code</text>
   <rect class="track" x="200" y="72" width="470" height="30" rx="5"/>
-  <rect x="200.0" y="72" width="80.7" height="30" fill="#f1c40f"><title>JavaScript: 3,054 lines</title></rect><rect x="280.7" y="72" width="64.9" height="30" fill="#e34c26"><title>HTML: 2,457 lines</title></rect><rect x="345.6" y="72" width="8.9" height="30" fill="#7fb86b"><title>JSON: 337 lines</title></rect><rect x="354.5" y="72" width="8.3" height="30" fill="#9aa0a6"><title>Other: 315 lines</title></rect><rect x="362.8" y="72" width="2.9" height="30" fill="#2aa198"><title>YAML: 108 lines</title></rect><rect x="365.6" y="72" width="1.9" height="30" fill="#f05138"><title>Swift: 73 lines</title></rect><rect x="367.6" y="72" width="0.6" height="30" fill="#ff9f1a"><title>SVG: 21 lines</title></rect>
-  <text class="value" x="378.1118291654959" y="92" font-size="13">6,365</text>
+  <rect x="200.0" y="72" width="128.5" height="30" fill="#f1c40f"><title>JavaScript: 5,220 lines</title></rect><rect x="328.5" y="72" width="62.6" height="30" fill="#e34c26"><title>HTML: 2,543 lines</title></rect><rect x="391.1" y="72" width="16.1" height="30" fill="#9aa0a6"><title>Other: 655 lines</title></rect><rect x="407.3" y="72" width="11.8" height="30" fill="#7fb86b"><title>JSON: 479 lines</title></rect><rect x="419.0" y="72" width="2.7" height="30" fill="#2aa198"><title>YAML: 108 lines</title></rect><rect x="421.7" y="72" width="1.8" height="30" fill="#f05138"><title>Swift: 73 lines</title></rect><rect x="423.5" y="72" width="0.5" height="30" fill="#ff9f1a"><title>SVG: 21 lines</title></rect>
+  <text class="value" x="434.01938187532744" y="92" font-size="13">9,099</text>
 
   <text x="24" y="144" font-size="13" font-weight="600">HIG reference</text>
   <text class="muted" x="24" y="159" font-size="10.5">Markdown</text>
   <rect class="track" x="200" y="124" width="470" height="30" rx="5"/>
-  <rect x="200" y="124" width="470.0" height="30" rx="5" fill="#4a7fd6"><title>Apple HIG reference: 17,795 lines</title></rect>
-  <text class="value" x="680" y="144" font-size="13">17,795</text>
+  <rect x="200" y="124" width="470.0" height="30" rx="5" fill="#4a7fd6"><title>Apple HIG reference: 19,090 lines</title></rect>
+  <text class="value" x="680" y="144" font-size="13">19,090</text>
 
-  <rect x="24" y="175" width="11" height="11" rx="2" fill="#f1c40f"/><text class="muted" x="40" y="184" font-size="11.5">JavaScript 3,054</text><rect x="165.2" y="175" width="11" height="11" rx="2" fill="#e34c26"/><text class="muted" x="181.2" y="184" font-size="11.5">HTML 2,457</text><rect x="266.2" y="175" width="11" height="11" rx="2" fill="#7fb86b"/><text class="muted" x="282.2" y="184" font-size="11.5">JSON 337</text><rect x="353.79999999999995" y="175" width="11" height="11" rx="2" fill="#9aa0a6"/><text class="muted" x="369.79999999999995" y="184" font-size="11.5">Other 315</text><rect x="448.09999999999997" y="175" width="11" height="11" rx="2" fill="#2aa198"/><text class="muted" x="464.09999999999997" y="184" font-size="11.5">YAML 108</text><rect x="535.6999999999999" y="175" width="11" height="11" rx="2" fill="#f05138"/><text class="muted" x="551.6999999999999" y="184" font-size="11.5">Swift 73</text><rect x="623.3" y="175" width="11" height="11" rx="2" fill="#ff9f1a"/><text class="muted" x="639.3" y="184" font-size="11.5">SVG 21</text>
-  <text class="muted" x="24" y="218" font-size="11.5">24,160 lines across 287 text files · updated 2026-07-02 · binary assets excluded</text>
+  <rect x="24" y="175" width="11" height="11" rx="2" fill="#f1c40f"/><text class="muted" x="40" y="184" font-size="11.5">JavaScript 5,220</text><rect x="165.2" y="175" width="11" height="11" rx="2" fill="#e34c26"/><text class="muted" x="181.2" y="184" font-size="11.5">HTML 2,543</text><rect x="266.2" y="175" width="11" height="11" rx="2" fill="#9aa0a6"/><text class="muted" x="282.2" y="184" font-size="11.5">Other 655</text><rect x="360.5" y="175" width="11" height="11" rx="2" fill="#7fb86b"/><text class="muted" x="376.5" y="184" font-size="11.5">JSON 479</text><rect x="448.1" y="175" width="11" height="11" rx="2" fill="#2aa198"/><text class="muted" x="464.1" y="184" font-size="11.5">YAML 108</text><rect x="535.7" y="175" width="11" height="11" rx="2" fill="#f05138"/><text class="muted" x="551.7" y="184" font-size="11.5">Swift 73</text><rect x="623.3000000000001" y="175" width="11" height="11" rx="2" fill="#ff9f1a"/><text class="muted" x="639.3000000000001" y="184" font-size="11.5">SVG 21</text>
+  <text class="muted" x="24" y="218" font-size="11.5">28,189 lines across 300 text files · updated 2026-07-04 · binary assets excluded</text>
 </svg>
