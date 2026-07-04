@@ -15,12 +15,18 @@ motion rows, blind-spot-honest verdicts (invariant C), fan-out for large reviews
 [2026-06-24-review-router-design.md](specs/2026-06-24-review-router-design.md); the v1.9.0 tag +
 GitHub release ship on the maintainer's go.
 
+## Shipped in 1.10.0: the recipe-consuming state checker
+
+BUILT and merged 2026-07-03: the JUCE design probe sweeps controls through their driveable states
+(source-verified force/snapshot/restore protocol), pixel-samples each state, and the native review
+checks the results — inertness deterministically, disabled-direction against Apple's sanctioned
+deltas, and an opt-in `--aesthetic apple-macos` recipe diff against the 1.8.0 control-recipe
+tables. On-device validation checklist ships in the CHANGELOG (the C++ was line-reviewed, not
+machine-compiled). Design/plan in `specs/2026-07-02-state-checker-*.md`.
+
 ## Active
 
-- **Recipe-consuming state checks** — the mechanical follow-on to the router's states row:
-  programmatically check control state styling against the 1.8.0 control-recipe tables
-  (`control-tokens-macos/-ios.md`), feeding the router's states/buttons rows and the native JUCE
-  probe. In brainstorming.
+- (next up for selection — see Queued)
 
 ## Shipped in 1.8.0: the platform token layer
 
