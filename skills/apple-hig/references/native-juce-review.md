@@ -47,15 +47,19 @@ reflow probe.
   (`setToggleState(x, dontSendNotification)`).
 - **Every other control** (`Slider`, `ComboBox`, `TextEditor`, `Label`) → `normal` / `disabled` only.
 - **Skipped:** controls currently reporting `isEnabled()==false` (a disabled ancestor makes restore
-  non-exact); components serving a cached component image (`setBufferedToImage` stale-pixel risk); and
-  `TextEditor` **text content is never swept** (rewriting it destroys undo history + caret).
+  non-exact); components serving a cached component image (`setBufferedToImage` stale-pixel risk);
+  controls whose root-space rect does not intersect the root's bounds (scrolled out of a viewport — they
+  would sample pure transparency; not counted in `sweptControls`); and `TextEditor` **text content is never
+  swept** (rewriting it destroys undo history + caret).
 
 Each state emits `{ rgb:[r,g,b], alpha:0..1, grid?:16×[r,g,b] }` — the mean colour over the control's
 rect **inset 20% per edge** (min 2px) out of a snapshot of the probed **root** (never the control itself:
 `createComponentSnapshot` uses `ignoreAlphaLevel=true`, which would hide a control's own `setAlpha()`
-dimming). `alpha` is always present; a fully transparent sample emits `rgb:[0,0,0]` with `alpha:0` (the
-checker treats low-alpha as not-measurable). The top-level `sweep` block carries `sweptControls`,
-`blindSpots`, and `sideEffects`.
+dimming). `alpha` is always present; a fully transparent sample emits `rgb:[0,0,0]` with `alpha:0`. The
+**checker side** (`scripts/native-review.mjs`, `LOW_ALPHA_NOT_MEASURABLE = 0.05`) treats any state sampled
+below mean alpha 0.05 as **not measurable** — excluded from tier-1's present-state set and never compared
+as a colour by tiers 2/3 (transparent channels are unpremultiply noise, not colours). The top-level `sweep`
+block carries `sweptControls`, `blindSpots`, and `sideEffects`.
 
 **Declared side effects** (unsuppressable; the sweep restores logical state exactly but these behavioural
 leaks are inherent — emitted verbatim in `sweep.sideEffects`):

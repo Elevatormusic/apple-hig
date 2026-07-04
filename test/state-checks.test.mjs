@@ -379,6 +379,45 @@ test('N3: tier 2 fires via the CONTRAST path on a schema-valid hex-string bg', (
   assert.ok(!/alpha/.test(t2[0].message), 'not the alpha fallback');
 });
 
+// --------------------------------------------------------------------------------------------------------
+// S4 REVIEW REPROS — the low-alpha not-measurable guard (research 2026-07-02, J6-alpha-transparent-body):
+// unpainted pixels read alpha≈0 with MEANINGLESS colour channels (and low-alpha pixels suffer unpremultiply
+// quantisation). A scrolled-out-of-viewport control sampled pure transparency in every state → tier 1 read
+// four byte-identical [0,0,0]@0 samples as "unstyled". States below alpha 0.05 must be excluded from
+// tier-1's present-state set and from tier-2/3 sampling.
+// --------------------------------------------------------------------------------------------------------
+
+test('low-alpha: four identical fully-transparent states produce ZERO findings (the reviewer repro)', () => {
+  const t = () => ({ rgb: [0, 0, 0], alpha: 0 });
+  const e = el('offscreen', { normal: t(), over: t(), down: t(), disabled: t() });
+  const f = stateFindings(desc([e]));
+  assert.equal(f.length, 0, 'transparent samples are not-measurable — no inertness signal, no tier-2');
+});
+
+test('low-alpha: tier 2 must not compare an alpha-0.02 disabled state as a colour', () => {
+  // Contrast over white would read disabled [20,20,20] as FAR louder than normal — but at alpha 0.02 the
+  // channels are unpremultiply noise, not a colour (J6). Must not fire.
+  const e = el('ghost-disabled', { normal: st([100, 100, 100], 0.9), disabled: { rgb: [20, 20, 20], alpha: 0.02 } },
+    { bgIntrospectable: true, bg: [255, 255, 255] });
+  assert.equal(stateFindings(desc([e])).filter((x) => x.category === 'disabled-louder').length, 0);
+});
+
+test('low-alpha: tier 3 must not sample an alpha-0.02 state (no false identity violation)', () => {
+  // CA 02 Bordered Tinted Light carries the Idle==Disabled identity. Idle is sampled exactly on the recipe
+  // composite ([0,122,230]); disabled is transparent noise → excluded from sampling → nothing fires.
+  const e = el('ghost-tinted', { normal: st([0, 122, 230]), disabled: { rgb: [255, 0, 0], alpha: 0.02 } },
+    { recipe: { context: 'CONTENT AREA', group: 'Buttons', variant: '02 — Bordered Tinted' }, appearance: 'Light' });
+  const f = stateFindings(desc([e]), { aestheticProfile: 'apple-macos' });
+  assert.equal(f.filter((x) => x.category === 'recipe-state-diff').length, 0);
+});
+
+test('low-alpha boundary: states at exactly alpha 0.05 ARE measurable (tier 1 still fires on 4 identical)', () => {
+  const c = [100, 100, 100];
+  const e = el('boundary', { normal: st(c, 0.05), over: st(c, 0.05), down: st(c, 0.05), disabled: st(c, 0.05) });
+  const t1 = stateFindings(desc([e])).filter((x) => x.category === 'unstyled-control-states');
+  assert.equal(t1.length, 1, 'alpha 0.05 is the inclusive floor — these states count as present');
+});
+
 test('N3: tier 3 composites a translucent recipe stack over a hex-string bg', () => {
   // CA 01 Bordered (Light) Idle = #000000 α0.08 — translucent, so the expectation only exists by
   // compositing over the element bg. With the schema's hex-string bg: a matching sample stays clean and a

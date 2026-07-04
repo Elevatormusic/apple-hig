@@ -347,7 +347,18 @@ namespace hig
     {
         if (elementObj == nullptr) return false;
 
-        const auto rootRect = root.getLocalArea (c.getParentComponent(), c.getBounds());
+        // Root-space rect — same ternary as elementVar: the root in its OWN space is (0,0,w,h); getLocalArea
+        // against its desktop parent would offset it by the window/title-bar and sample the wrong pixels
+        // when a single control IS the probed root.
+        const auto rootRect = (&c == &root) ? root.getLocalBounds()
+                                            : root.getLocalArea (c.getParentComponent(), c.getBounds());
+
+        // A control scrolled out of the root's viewport (e.g. inside a juce::Viewport) samples pure
+        // transparency in every state — alpha-0 data that can only mislead. Skip the sweep entirely and do
+        // NOT count it in sweptControls.
+        if (! rootRect.intersects (root.getLocalBounds()))
+            return false;
+
         auto* states = new juce::DynamicObject();
 
         auto* btn = dynamic_cast<juce::Button*> (&c);
@@ -415,6 +426,13 @@ namespace hig
                 btn->setToggleState (false, juce::dontSendNotification);
                 btn->setState (juce::Button::buttonNormal);
                 states->setProperty ("toggledOff", sweepSampleControl (root, rootRect));
+
+                // Per-state ISOLATION: return the toggle to its SAVED value before the disabled sample below —
+                // otherwise a control saved ON is sampled disabled-at-off and tiers 2/3 compare on-idle vs
+                // off-disabled (every checked checkbox / selected radio). Change-gated no-op when saved off
+                // (verified: 6.1.6 juce_Button.cpp:165 — setToggleState early-outs when unchanged);
+                // group-safe: same-radioGroupId siblings are saved/restored regardless.
+                btn->setToggleState (savedToggle, juce::dontSendNotification);
             }
         }
 
@@ -448,7 +466,8 @@ namespace hig
     // correlating each swept control to its element entry by traversal index. Skips: non-controls; controls
     // reporting isEnabled()==false (a disabled ancestor makes restore non-exact — J8 gate); and components
     // with a cached component image (setBufferedToImage stale-cache risk — medium-confidence research risk).
-    // Accumulates blindSpots/sideEffects and the swept count.
+    // Accumulates the swept count only (blindSpots/sideEffects are the fixed declarations emitted by
+    // describeComponentTree's sweep block).
     inline void sweepStates (juce::Component& root, juce::Component& c, juce::Array<juce::var>& elements,
                              int& index, int& sweptControls)
     {
@@ -491,8 +510,20 @@ namespace hig
         int sweptControls = 0;
         if (sweep)
         {
+            // J8 focus protocol: setEnabled(false) on a focused child moves focus to the parent / gives it
+            // away and does NOT return it on re-enable (verified: juce_Component.cpp setEnabled focus branch,
+            // lines 3147-3154). Save the focused component before the sweep and re-grab after all restores —
+            // BEST-EFFORT: grabKeyboardFocus may legitimately fail when the window peer lacks OS focus
+            // (verified J4: takeKeyboardFocus bails on '! peer->isFocused()'), and headless probes usually
+            // have nothing focused at all. The sweep is one synchronous message-thread block, so the pointer
+            // cannot dangle mid-sweep (no message-loop dispatch can delete a component under us).
+            auto* focused = juce::Component::getCurrentlyFocusedComponent();
+
             int sweepIndex = 0;                                  // re-walk with a fresh index (mirrors collect)
             sweepStates (root, root, elements, sweepIndex, sweptControls);
+
+            if (focused != nullptr && focused->isShowing())
+                focused->grabKeyboardFocus();
         }
 
         auto* meta = new juce::DynamicObject();

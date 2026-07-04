@@ -77,7 +77,16 @@ const SWEEP_STATES = ['normal', 'over', 'down', 'disabled', 'toggledOn', 'toggle
 const RGB_TOL = 2;      // per-channel |Δ| ≤ 2 (of 255) counts as identical (research: V4 hover overlay ≈ 5% is a REAL delta)
 const ALPHA_TOL = 0.01; // |Δalpha| ≤ 0.01 counts as identical
 
+// J6-alpha-transparent-body (research 2026-07-02): unpainted/transparent pixels read alpha≈0 with
+// MEANINGLESS colour channels, and low-alpha pixels suffer unpremultiply quantisation. A state sampled below
+// this mean alpha is NOT MEASURABLE — excluded from tier-1's present-state set and never compared as a colour
+// by tiers 2/3 (a scrolled-out-of-viewport control would otherwise read as "unstyled" from four identical
+// transparent samples). The probe additionally skips controls whose rect misses the root viewport entirely.
+const LOW_ALPHA_NOT_MEASURABLE = 0.05;
+
 const hasRgb = (s) => s && Array.isArray(s.rgb) && s.rgb.length === 3 && s.rgb.every((n) => typeof n === 'number');
+// A sample tiers may treat as a COLOUR: well-formed rgb AND enough alpha to be a measurement.
+const measurableState = (s) => hasRgb(s) && (s.alpha ?? 1) >= LOW_ALPHA_NOT_MEASURABLE;
 const chDiff = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]), Math.abs(a[2] - b[2]));
 
 // Two swept samples are "the same" iff mean rgb within RGB_TOL on every channel AND every co-indexed grid
@@ -106,7 +115,9 @@ const isPrimaryAction = (el) => el.primary === true || el.prominent === true || 
 function tier1Inertness(el) {
   const states = el.states;
   if (!states || typeof states !== 'object') return null;
-  const present = SWEEP_STATES.filter((k) => states[k] && hasRgb(states[k]));
+  // Low-alpha samples are excluded from the present set (J6): a scrolled-out-of-viewport control samples
+  // four identical transparent states — that is missing DATA, not missing STYLING.
+  const present = SWEEP_STATES.filter((k) => states[k] && measurableState(states[k]));
   if (present.length < 2) return null; // nothing to compare (only `normal`, or none measurable)
   // Inert = every swept pair equal. Compare each to the first; equality here is transitive within tolerance.
   const first = states[present[0]];
@@ -188,6 +199,9 @@ function tier2DisabledDirection(el) {
   const n = el.states?.normal;
   const d = el.states?.disabled;
   if (!n || !d) return null; // only when both normal AND disabled samples exist
+  // A low-alpha sample's channels are unpremultiply noise, not a colour (J6) — comparing them would read a
+  // transparent disabled state as louder/dimmer garbage. Both sides must be measurable.
+  if (!measurableState(n) || !measurableState(d)) return null;
   const an = n.alpha ?? 1;
   const ad = d.alpha ?? 1;
   const bg = bgRgb(el);
@@ -362,7 +376,7 @@ function tier3RecipeDiff(el, recipes) {
     if (skipState[ra] || skipState[rb]) continue;            // one side is export-defined → not ours to judge
     const da = descriptorStateFor(states, ra);
     const db = descriptorStateFor(states, rb);
-    if (!hasRgb(da) || !hasRgb(db)) continue;                // need both samples — a missing partner un-checks nothing
+    if (!measurableState(da) || !measurableState(db)) continue; // need both samples MEASURABLE (rgb + alpha ≥ floor, J6) — a missing/transparent partner un-checks nothing
     if (chDiff(da.rgb, db.rgb) > RECIPE_DIFF_TOL) {
       identityCovered.add(ra); identityCovered.add(rb);      // violated → owned; suppress the value-diff echo
       out.push({
@@ -381,7 +395,7 @@ function tier3RecipeDiff(el, recipes) {
     const exp = expected[recipeState];
     if (!exp) continue;                                      // no reproducible literal / ambiguous → nothing to diff
     const sample = descriptorStateFor(states, recipeState);
-    if (!hasRgb(sample)) continue;
+    if (!measurableState(sample)) continue;                  // low-alpha = not a colour (J6) — never recipe-diffed
     if (chDiff(sample.rgb, exp.rgb) > RECIPE_DIFF_TOL) {
       out.push({
         category: 'recipe-state-diff', severity: 'advisory', element: el.id, evidence: 'extracted',
