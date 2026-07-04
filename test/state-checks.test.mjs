@@ -361,3 +361,37 @@ test('D5: a 3-state all-identical sweep still fires unstyled-control-states at m
   assert.equal(t1.length, 1);
   assert.equal(t1[0].severity, 'medium');
 });
+
+// --------------------------------------------------------------------------------------------------------
+// N3 (S3 reviewer) — the descriptor schema types `bg` as a HEX STRING ("#RRGGBB"); tiers 2/3 guarded on
+// Array.isArray(el.bg), so on schema-valid descriptors the contrast path and the tier-3 bg composite were
+// unreachable dead paths (the alpha fallback always ruled).
+// --------------------------------------------------------------------------------------------------------
+
+test('N3: tier 2 fires via the CONTRAST path on a schema-valid hex-string bg', () => {
+  // Alphas are EQUAL (both 1) so the alpha fallback CANNOT produce this finding — only the contrast path
+  // can. bg is the schema's hex-string form, exactly as the probe emits it.
+  const e = el('hex-bg-louder', { normal: st([160, 160, 160], 1), disabled: st([20, 20, 20], 1) },
+    { bgIntrospectable: true, bg: '#FFFFFF' });
+  const t2 = stateFindings(desc([e])).filter((x) => x.category === 'disabled-louder');
+  assert.equal(t2.length, 1, 'hex-string bg must engage the contrast path');
+  assert.match(t2[0].message, /contrast .*:1 exceeds normal .*:1/, 'the metric in the message proves the contrast path ran');
+  assert.ok(!/alpha/.test(t2[0].message), 'not the alpha fallback');
+});
+
+test('N3: tier 3 composites a translucent recipe stack over a hex-string bg', () => {
+  // CA 01 Bordered (Light) Idle = #000000 α0.08 — translucent, so the expectation only exists by
+  // compositing over the element bg. With the schema's hex-string bg: a matching sample stays clean and a
+  // wildly-off sample MUST fire (before the fix, expected resolved to null and both were silently skipped).
+  const matching = el('hex-bg-match', { normal: st([235, 235, 235]) },
+    { recipe: { context: 'CONTENT AREA', group: 'Buttons', variant: '01 — Bordered' }, appearance: 'Light',
+      bgIntrospectable: true, bg: '#FFFFFF' });
+  const wrong = el('hex-bg-wrong', { normal: st([40, 40, 40]) },
+    { recipe: { context: 'CONTENT AREA', group: 'Buttons', variant: '01 — Bordered' }, appearance: 'Light',
+      bgIntrospectable: true, bg: '#FFFFFF' });
+  const f = stateFindings(desc([matching, wrong]), { aestheticProfile: 'apple-macos' });
+  assert.equal(f.filter((x) => x.category === 'recipe-state-diff' && x.element === 'hex-bg-match').length, 0,
+    'sample matches the recipe composited over the hex bg → clean');
+  assert.equal(f.filter((x) => x.category === 'recipe-state-diff' && x.element === 'hex-bg-wrong').length, 1,
+    'sample far off the composite → fires (the bg pass-through is alive)');
+});

@@ -170,19 +170,34 @@ function hueDelta(a, b) {
   return Math.min(d, 360 - d);
 }
 
+// Normalize the element's introspectable background to a numeric [r,g,b] — or null when unusable. The
+// DESCRIPTOR SCHEMA types `bg` as a hex STRING ("#RRGGBB", or the literal 'not introspectable');
+// contrastFindings() needs no parsing because contrastRatio's toRgb accepts hex natively, but tiers 2/3 do
+// numeric work (hue rotation, recipe compositing) — guarding on Array.isArray(el.bg) alone made the contrast
+// path unreachable on every schema-valid descriptor (N3). Accept the schema's hex string (parsed via the
+// same hexToRgb the recipe layers use) AND the [r,g,b] array form used by internal/test callers.
+function bgRgb(el) {
+  if (!el.bgIntrospectable) return null;
+  const bg = el.bg;
+  if (Array.isArray(bg) && bg.length >= 3 && bg.slice(0, 3).every((v) => typeof v === 'number')) return bg.slice(0, 3);
+  if (typeof bg === 'string' && /^#?[0-9a-fA-F]{6}$/.test(bg.trim())) return hexToRgb(bg.trim());
+  return null;
+}
+
 function tier2DisabledDirection(el) {
   const n = el.states?.normal;
   const d = el.states?.disabled;
   if (!n || !d) return null; // only when both normal AND disabled samples exist
   const an = n.alpha ?? 1;
   const ad = d.alpha ?? 1;
-  if (el.bgIntrospectable && Array.isArray(el.bg) && hasRgb(n) && hasRgb(d)) {
+  const bg = bgRgb(el);
+  if (bg && hasRgb(n) && hasRgb(d)) {
     // A substantial hue rotation at similar alpha is a colour SWAP — export-style state feedback (Apple's
     // prominent variants swap accent colours rather than dim; research 2026-07-02, directionModel), not a
     // dimming failure. Raw contrast direction is meaningless across a swap — skip.
     if (hueDelta(n.rgb, d.rgb) > HUE_SWAP_DEG && Math.abs(ad - an) <= ALPHA_LOUDER_MARGIN) return null;
-    const cn = contrastRatio(n.rgb, el.bg);
-    const cd = contrastRatio(d.rgb, el.bg);
+    const cn = contrastRatio(n.rgb, bg);
+    const cd = contrastRatio(d.rgb, bg);
     if (cd > cn + CONTRAST_LOUDER_MARGIN) {
       return {
         category: 'disabled-louder', severity: 'low', element: el.id, evidence: 'extracted',
@@ -330,7 +345,7 @@ function tier3RecipeDiff(el, recipes) {
     const addrs = new Set(fillCells.map((c) => `${c.variant ?? ''}\u0000${c.rowKey ?? ''}`));
     if (addrs.size > 1) { expected[recipeState] = null; continue; }
     if (recipeCellSkipped(cells)) { skipState[recipeState] = true; continue; }
-    const bg = (el.bgIntrospectable && Array.isArray(el.bg)) ? el.bg : null;
+    const bg = bgRgb(el); // schema hex-string bg OR internal [r,g,b] — normalized for the composite (N3)
     expected[recipeState] = recipeExpectedColor(cells, recipes.resolve, bg);
   }
 
