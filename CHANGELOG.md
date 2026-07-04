@@ -3,6 +3,40 @@
 All notable changes to the apple-hig plugin. This project follows [Keep a Changelog](https://keepachangelog.com/)
 and [semantic versioning](https://semver.org/).
 
+## [1.10.0] — 2026-07-03
+
+The recipe-consuming state checker: the JUCE design probe now **sweeps controls through their
+driveable states** — Button family `normal/hover/pressed/disabled/toggle`, other controls
+`enabled/disabled` — pixel-samples each state, and the native review checks the results
+deterministically.
+
+### Added
+- **Probe-side state sweep** (`references/juce-design-probe.h`): a verified
+  save→force→snapshot→restore protocol whose ordering and restore rules were checked against JUCE
+  6.1.6–8 sources — radio-group siblings are saved and restored together, focus is preserved via
+  JUCE's own `FocusRestorer` pattern, and controls outside the viewport are skipped. Each state
+  emits per-state samples (mean RGB + composite alpha + a 4×4 grid) into the descriptor. Blind
+  spots (window-inactive, focus visuals, non-Button hover, Slider/ComboBox pressed) and side
+  effects are declared, feeding the 1.9.0 blind-spot verdict.
+- **Three check tiers** (`scripts/native-review.mjs`): (1) **inertness** — a control identical
+  across *all* swept states is the "unstyled states" bug (info-only for 2-state sweeps, since stock
+  JUCE sliders are identical enabled-vs-disabled by design); (2) **disabled-not-louder**, threshold-
+  gated against Apple's own sanctioned deltas; (3) an opt-in `--aesthetic apple-macos` **recipe
+  diff** against the 1.8.0 control-recipe tables, parsed at review time by the new dependency-free
+  `scripts/recipe-tokens.mjs`. Apple's 17 sanctioned idle==state identities are ground truth —
+  equalities are checked, not just differences — and low-alpha samples are treated as
+  not-measurable, never as colours.
+- **Descriptor contract:** additive `states`/`sweep`/`recipe`/`appearance`/`primary` fields, where
+  `recipe` requires `appearance` so dark apps never diff against Light recipes; golden-fixture
+  sweeps + end-to-end assertions cover the new native path.
+
+### Notes
+- The C++ sweep was reviewed line-by-line against the verified JUCE claims (a simulated compile
+  against 6.1.6 sources) but **not machine-compiled** — before relying on sweep output, maintainers
+  should run the on-device checklist in the release notes: a real compile (6.1.6 + 8.x), restore
+  exactness with a checked radio group, focus round-trip, listener-driven visibility changes
+  mid-sweep, ancestor-buffered subtrees, Direct2D readback timing, and a viewport spot-check.
+
 ## [1.9.0] — 2026-07-02
 
 The review router: reviews are now driven by a routing table
