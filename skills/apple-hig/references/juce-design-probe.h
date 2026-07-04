@@ -515,14 +515,19 @@ namespace hig
             // lines 3147-3154). Save the focused component before the sweep and re-grab after all restores —
             // BEST-EFFORT: grabKeyboardFocus may legitimately fail when the window peer lacks OS focus
             // (verified J4: takeKeyboardFocus bails on '! peer->isFocused()'), and headless probes usually
-            // have nothing focused at all. The sweep is one synchronous message-thread block, so the pointer
-            // cannot dangle mid-sweep (no message-loop dispatch can delete a component under us).
-            auto* focused = juce::Component::getCurrentlyFocusedComponent();
+            // have nothing focused at all. WeakReference, NOT a raw pointer: the sweep's forced transitions
+            // fire SYNCHRONOUS state/enablement listeners, and app code in those listeners may delete
+            // components mid-sweep — deletion does not require the message loop. This is JUCE's own
+            // FocusRestorer pattern (verified: 6.1.6 juce_Component.cpp:180-195 — WeakReference + isShowing +
+            // modal guard before grabKeyboardFocus); Button.cpp guards this same synchronous-listener
+            // re-entrancy class with its deletionWatcher WeakReferences (6.1.6 Button.cpp:167/250).
+            juce::WeakReference<juce::Component> focused (juce::Component::getCurrentlyFocusedComponent());
 
             int sweepIndex = 0;                                  // re-walk with a fresh index (mirrors collect)
             sweepStates (root, root, elements, sweepIndex, sweptControls);
 
-            if (focused != nullptr && focused->isShowing())
+            if (focused != nullptr && focused->isShowing()
+                 && ! focused->isCurrentlyBlockedByAnotherModalComponent())
                 focused->grabKeyboardFocus();
         }
 
