@@ -88,6 +88,11 @@ test('a grid with 15 entries (not 16) is rejected', () => {
   assert.ok(validateDescriptor(asDesc(el)).some((e) => /grid/i.test(e)));
 });
 
+test('a grid with 17 entries (not 16) is rejected', () => {
+  const el = swept({ states: { normal: { rgb: [0, 0, 0], alpha: 1, grid: Array.from({ length: 17 }, () => [0, 0, 0]) } } });
+  assert.ok(validateDescriptor(asDesc(el)).some((e) => /grid/i.test(e)));
+});
+
 test('a grid entry of the wrong shape is rejected', () => {
   const g = grid16([0, 0, 0]); g[5] = [0, 0]; // a 2-tuple where a triplet is required
   const el = swept({ states: { normal: { rgb: [0, 0, 0], alpha: 1, grid: g } } });

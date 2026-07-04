@@ -10,7 +10,7 @@ const repo = fileURLToPath(new URL('../', import.meta.url));
 test('the CLI reviews a descriptor file and prints findings + coverage + verdict', () => {
   const out = execFileSync('node', ['scripts/native-review.mjs', 'test/fixtures/native/ears-like.json'], { cwd: repo, encoding: 'utf8' });
   assert.match(out, /verdict:/);
-  assert.match(out, /Coverage: 6\/7/);
+  assert.match(out, /Coverage: 9\/10/);
   assert.match(out, /contrast|clip|duplicate/);
   assert.match(out, /never verified-pass/);
 });
@@ -32,9 +32,9 @@ test('contrast is scored only on measurable nodes and flags the near-invisible l
 
 test('coverage reports the introspectable fraction', () => {
   const c = coverage(fx.elements);
-  assert.equal(c.total, 7);
-  assert.equal(c.measurable, 6);
-  assert.ok(Math.abs(c.ratio - 6 / 7) < 1e-9);
+  assert.equal(c.total, 10);
+  assert.equal(c.measurable, 9);
+  assert.ok(Math.abs(c.ratio - 9 / 10) < 1e-9);
 });
 
 test('geometry flags the duplicate status row, the sub-target button, and the clipped caption', () => {
@@ -68,4 +68,54 @@ test('the assembled native review tags extracted, reports coverage, and never ve
   assert.notEqual(r.verdict, 'verified-pass');
   assert.ok(['advisory-pass', 'fail', 'incomplete'].includes(r.verdict));
   assert.ok(r.coverage.ratio > 0 && r.coverage.ratio < 1);
+});
+
+// =========================================================================================================
+// STATE-SWEEP END-TO-END (Task S5) — the golden fixture carries three swept controls exercised THROUGH the
+// real reviewNativeDescriptor path. This proves the whole native state-checker path end-to-end on realistic
+// (EARS-like, fictional) descriptor data, alongside the no-false-positive side.
+// =========================================================================================================
+
+test('e2e: the seeded-inert swept control yields the medium unstyled-control-states finding', () => {
+  const r = reviewNativeDescriptor(fx);
+  const f = r.findings.filter((x) => x.category === 'unstyled-control-states' && x.element === 'bypassButton');
+  assert.equal(f.length, 1, 'the pixel-identical 4-state bypass button reads as unstyled');
+  assert.equal(f[0].severity, 'medium', 'not a primary action → medium, not high');
+  assert.equal(f[0].evidence, 'extracted');
+});
+
+test('e2e: the healthy swept control yields NO state findings (no false positive)', () => {
+  const r = reviewNativeDescriptor(fx);
+  const stateCats = ['unstyled-control-states', 'two-state-inert', 'disabled-louder', 'recipe-state-diff', 'recipe-diff-unavailable'];
+  const f = r.findings.filter((x) => x.element === 'applyButton' && stateCats.includes(x.category));
+  assert.equal(f.length, 0, 'a properly-styled control (distinct states, disabled dimmer) fires no state finding');
+});
+
+test('e2e: the 2-state swept control yields ONLY the info two-state-inert note (never medium)', () => {
+  const r = reviewNativeDescriptor(fx);
+  const f = r.findings.filter((x) => x.element === 'muteToggle');
+  const info = f.filter((x) => x.category === 'two-state-inert');
+  assert.equal(info.length, 1, 'a 2-state identical sweep is a sanctioned info note');
+  assert.equal(info[0].severity, 'info');
+  assert.equal(f.filter((x) => x.category === 'unstyled-control-states').length, 0, 'never the medium finding on 2 states');
+});
+
+test('e2e: the review result blindSpots equals the fixture sweep.blindSpots (pass-through)', () => {
+  const r = reviewNativeDescriptor(fx);
+  assert.deepEqual(r.blindSpots, fx.sweep.blindSpots);
+});
+
+test('e2e: the sweep is verdict-neutral and capped below verified-pass (unchanged)', () => {
+  // The verdict is driven by the pre-existing high-severity contrast finding (lowContrastNote 1.19:1) → `fail`.
+  // The added swept controls contribute only medium/info state findings, so they must NOT change the verdict:
+  // reviewing the SAME fixture with the sweep block stripped must yield the identical verdict. And the native
+  // path is always capped below verified-pass (it is not a pixel render).
+  const noSweep = { ...fx, elements: fx.elements.filter((e) => !e.states), sweep: undefined };
+  const r = reviewNativeDescriptor(fx);
+  const base = reviewNativeDescriptor(noSweep);
+  assert.equal(r.verdict, base.verdict, 'the state sweep does not change the verdict');
+  assert.notEqual(r.verdict, 'verified-pass', 'a native review is never verified-pass');
+  const swept = new Set(['bypassButton', 'applyButton', 'muteToggle']);
+  assert.ok(!r.findings.some((f) => swept.has(f.element) && (f.severity === 'high' || f.severity === 'critical')),
+    'no swept control contributes a blocking (high/critical) finding');
 });
