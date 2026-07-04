@@ -23,7 +23,7 @@ deterministically.
   JUCE sliders are identical enabled-vs-disabled by design); (2) **disabled-not-louder**, threshold-
   gated against Apple's own sanctioned deltas; (3) an opt-in `--aesthetic apple-macos` **recipe
   diff** against the 1.8.0 control-recipe tables, parsed at review time by the new dependency-free
-  `scripts/recipe-tokens.mjs`. Apple's 17 sanctioned idle==state identities are ground truth —
+  `scripts/recipe-tokens.mjs`. Apple's 18 sanctioned Disabled==Idle identities (plus 3 Clicked==Idle) are ground truth —
   equalities are checked, not just differences — and low-alpha samples are treated as
   not-measurable, never as colours.
 - **Descriptor contract:** additive `states`/`sweep`/`recipe`/`appearance`/`primary` fields, where
