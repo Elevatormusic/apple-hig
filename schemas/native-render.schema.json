@@ -44,8 +44,45 @@
           "checked": { "type": "boolean" },
           "measurable": { "type": "boolean", "description": "false = custom-painted; exclude from contrast scoring" },
           "snapshotMayBeBlank": { "type": "boolean", "description": "GPU/Web/Video subtree; do not pixel-score" },
-          "textOverflows": { "type": "boolean", "description": "probe-computed: text exceeds its bounds (clip/truncation)" }
-        }
+          "textOverflows": { "type": "boolean", "description": "probe-computed: text exceeds its bounds (clip/truncation)" },
+
+          "states": {
+            "type": "object",
+            "description": "State-sweep samples (Task S3, additive/optional). Keys are state names — normal/over/down/disabled/toggledOn/toggledOff are the sweep vocabulary, but unknown keys are accepted permissively; every VALUE is strictly shaped. `normal` is REQUIRED whenever states is present (always sampled).",
+            "required": ["normal"],
+            "additionalProperties": { "$ref": "#/$defs/stateSample" }
+          },
+          "recipe": {
+            "type": "object",
+            "description": "Address into the parsed macOS control recipes (tier-3 diff). An element carrying a recipe MUST also carry `appearance` — see the object-level conditional below (prevents a Dark app silently diffing against a Light recipe via the default).",
+            "required": ["context", "group"],
+            "properties": {
+              "context": { "type": "string" },
+              "group": { "type": "string" },
+              "variant": { "type": "string" },
+              "rowKey": { "type": "string" }
+            }
+          },
+          "appearance": { "enum": ["Light", "Dark"], "description": "the appearance the sweep was sampled under; required when `recipe` is present" },
+          "primary": { "type": "boolean", "description": "the control is a primary action / prominent CTA — raises inert-state findings to high severity" }
+        },
+        "allOf": [
+          {
+            "$comment": "An element with a recipe must also declare its appearance (S2 review): a Dark app must not silently diff against the Light recipe via the default.",
+            "if": { "required": ["recipe"] },
+            "then": { "required": ["appearance"] }
+          }
+        ]
+      }
+    },
+    "sweep": {
+      "type": "object",
+      "description": "Top-level sweep summary (additive/optional): how many controls were swept, plus the proven-unforceable blind spots and the declared restore-safe side effects.",
+      "required": ["sweptControls", "blindSpots", "sideEffects"],
+      "properties": {
+        "sweptControls": { "type": "integer", "minimum": 0 },
+        "blindSpots": { "type": "array", "items": { "type": "string" }, "description": "proven-unforceable states (window-inactive, focus-when-unfocused, hover on non-Buttons) — inherited into the report under invariant C" },
+        "sideEffects": { "type": "array", "items": { "type": "string" }, "description": "unsuppressable but restore-safe effects the sweep declares (state listeners, async Value callbacks, focus move on disable)" }
       }
     }
   },
@@ -54,6 +91,18 @@
       "type": "object",
       "required": ["x", "y", "w", "h"],
       "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number" }, "h": { "type": "number" } }
+    },
+    "byte": { "type": "integer", "minimum": 0, "maximum": 255 },
+    "rgb": { "type": "array", "items": { "$ref": "#/$defs/byte" }, "minItems": 3, "maxItems": 3 },
+    "stateSample": {
+      "type": "object",
+      "description": "one swept state: mean colour + mean composite alpha + an optional coarse 4x4 (16-entry) downsample grid",
+      "required": ["rgb", "alpha"],
+      "properties": {
+        "rgb": { "$ref": "#/$defs/rgb" },
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1 },
+        "grid": { "type": "array", "items": { "$ref": "#/$defs/rgb" }, "minItems": 16, "maxItems": 16, "description": "4x4 downsample; optional (the probe may omit it), exactly 16 rgb triplets when present" }
+      }
     }
   }
 }
