@@ -327,7 +327,7 @@ function tier3RecipeDiff(el, recipes) {
     // against an arbitrary fills[0] false-flags correct controls. >1 distinct (variant, rowKey) among the
     // matched fill cells → skip the state entirely (skip, never guess).
     const fillCells = cells.filter((c) => c.kind === 'fill' && Array.isArray(c.layers) && c.layers.length);
-    const addrs = new Set(fillCells.map((c) => `${c.variant ?? ''} ${c.rowKey ?? ''}`));
+    const addrs = new Set(fillCells.map((c) => `${c.variant ?? ''}\u0000${c.rowKey ?? ''}`));
     if (addrs.size > 1) { expected[recipeState] = null; continue; }
     if (recipeCellSkipped(cells)) { skipState[recipeState] = true; continue; }
     const bg = (el.bgIntrospectable && Array.isArray(el.bg)) ? el.bg : null;
