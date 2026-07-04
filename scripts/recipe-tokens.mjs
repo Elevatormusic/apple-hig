@@ -77,7 +77,7 @@ function makeAlias(rawArrow) {
   const raw = rawArrow.trim();
   // target = the bold-stripped, arrow-prefix-stripped path — the string the pinned test dedupes on (→ 29).
   const target = stripBold(raw).replace(/^->\s*/, '').trim();
-  return { kind: 'alias', raw, target, aliasRaw: raw, blend: detectBlend(target) };
+  return { raw, target, blend: detectBlend(target) };
 }
 
 // Find every "-> ..." occurrence inside a single already-annotation-stripped, layer-separated segment. A
@@ -177,19 +177,22 @@ function makeResolver(index) {
 
 // ---------------------------------------------------------------------------------------------------------
 // Cell classification. `kind`:
-//   'key'                  row-key cells (first column) and value-column ENUM cells (Light/Dark/— appearance)
+//   'key'                  the 109 first-column row-key cells ONLY (positional, one per data row)
+//   'enum'                 value-column enum cells (the 24 Appearance-column Light/Dark labels)
 //   'absent'               "—" (U+2014)
-//   'equals-content-area'  "= Content Area"
+//   'equals-content-area'  "= Content Area" (prose-only in the reference — always source:'prose')
 //   'fill'                 one or more colour/alias layers (draw order, layer 0 = bottom)
 //   'border'               "N px COLOR/ALIAS" strokes (incl. bold-width focus-ring)
 //   'shadow'               "blur N · COLOR · OFFSET · spread N"  OR a "N-layer stack ▼" stackref
 //   'numeric'              a lone number / offset pair
 //   'unparseable'          nothing matched (must be 0 on the reference files)
+// `source`: 'table' for the 382 real table cells; 'prose' for synthetic cells derived from the section-level
+// prose rules. The pinned 382/109/273 counts are computed over source !== 'prose' only.
 // ---------------------------------------------------------------------------------------------------------
 
 const ENUM_KEYS = new Set([
   'Idle', 'Clicked', 'Disabled', 'Focus Ring', 'Light', 'Dark', '(other states)',
-  'Centerpoint, Idle', 'Clicked - Glow', 'Clicked - Shadow', 'Color Area Outline', '—',
+  'Centerpoint, Idle', 'Clicked - Glow', 'Clicked - Shadow', 'Color Area Outline',
 ]);
 
 const NUMERIC_RE = /^[−-]?~?\d+(?:\.\d+)?$/;
@@ -325,25 +328,28 @@ function parseControlDoc(text) {
 }
 
 // The Content-Area Fills ladder shape (6 tiers × Default/Selected) — used to expand an OG "= Content Area"
-// section into one equals-content-area cell per Content-Area value cell it stands in for.
+// section into one equals-content-area cell per Content-Area value cell it stands in for. Column names match
+// the CA Fills table header verbatim so a CA/OG join on (group, column, rowKey) is symmetric.
 const FILLS_TIERS = ['1 Primary', '2 Secondary', '3 Tertiary', '4 Quaternary', '5 Quinary', '6 Seximal'];
-const FILLS_LADDERS = ['Default', 'Selected'];
+const FILLS_LADDERS = ['Default (Light = Dark)', 'Selected (Light = Dark)'];
 const RECIPE_STATES = ['Idle', 'Clicked', 'Disabled']; // Apple's sparse triple (no 02/hover)
 const OG_ABSENT_BUTTON_VARIANTS = ['02 — Bordered Tinted', '03 — Bordered Destructive'];
 
+// Every cell emitted here is SYNTHETIC (derived from a section-level prose rule, not a table) and carries
+// source:'prose' so the pinned table-cell counts (382/109/273) never see it.
 function emitProseCells(trimmed, addr, cells, arrows) {
-  // SECTION-EQUALITY: "**= Content Area**" body line (OG Fills — Default & Selected). Expand to one
-  // equals-content-area cell per Content-Area Fills value cell (6 tiers × {Default, Selected}).
+  // SECTION-EQUALITY: "**= Content Area**" body line (OG Fills — Default & Selected, line 339). Expand to
+  // one equals-content-area cell per Content-Area Fills value cell (6 tiers × {Default, Selected}).
   if (/^\*{0,2}=\s*Content Area\*{0,2}\b/.test(trimmed) && addr.group && /^Fills/i.test(addr.group)) {
     for (const ladder of FILLS_LADDERS)
       for (const tier of FILLS_TIERS)
-        cells.push({ ...addr, kind: 'equals-content-area', state: tier, rowKey: tier, column: ladder, text: '= Content Area' });
+        cells.push({ ...addr, kind: 'equals-content-area', source: 'prose', state: tier, rowKey: tier, column: ladder, text: '= Content Area' });
     return;
   }
 
-  // OG-TOGGLE-PROSE: "**Fills = Content Area's Dark 3-layer recipe ...**" — the one value notation the cell
-  // grammar cannot express (hex-elided continuation alphas). Transcribed here into explicit fill layers per
-  // state × appearance (Idle/Disabled = the 3-layer white stack; Clicked = `#FFFFFF` α0).
+  // OG-TOGGLE-PROSE (fills, line 344): "**Fills = Content Area's Dark 3-layer recipe ...**" — the one value
+  // notation the cell grammar cannot express (hex-elided continuation alphas). Transcribed into explicit fill
+  // layers per state × appearance (Idle/Disabled = the 3-layer white stack; Clicked = `#FFFFFF` α0).
   if (/^\*{0,2}Fills = Content Area's Dark 3-layer recipe/i.test(trimmed)) {
     const stack = [
       { hex: '#FFFFFF', alpha: 0.65 },
@@ -354,19 +360,34 @@ function emitProseCells(trimmed, addr, cells, arrows) {
     for (const appearance of ['Light', 'Dark'])
       for (const state of RECIPE_STATES) {
         const layers = state === 'Clicked' ? clicked.map((l) => ({ ...l })) : stack.map((l) => ({ ...l }));
-        cells.push({ ...addr, kind: 'fill', appearance, state, rowKey: state, column: 'Fills (draw order)', layers });
+        cells.push({ ...addr, kind: 'fill', source: 'prose', appearance, state, rowKey: state, column: 'Fills (draw order)', layers });
       }
     return;
   }
 
-  // SECTION-ABSENT: "— *(...)* —" body line. The Over-Glass export omits button variants 02 and 03 entirely
-  // (line 299); emit an absent cell per omitted variant × state so get() reports the omission rather than
-  // silently returning nothing. (The slider-knob OG absence at line 393 defers to the Content-Area knob and
-  // is represented structurally by that section carrying no table.)
-  if (/^—\s*\*\(.+\)\*\s*—?$/.test(trimmed) && addr.context === 'OVER-GLASS' && /Bordered/i.test(addr.variant || '')) {
-    for (const v of OG_ABSENT_BUTTON_VARIANTS)
+  // OG-TOGGLE-PROSE (shadows, line 346): "**Shadows: all populated cells = the 6-layer stack ▼**" — every
+  // populated OG toggle-shadow cell references the Content-Area 6-layer stack. Emit one stackref shadow cell
+  // per state × appearance, mirroring the CA toggle-shadow table shape.
+  if (/^\*{0,2}Shadows: all populated cells = the 6-layer stack/i.test(trimmed)) {
+    for (const appearance of ['Light', 'Dark'])
       for (const state of RECIPE_STATES)
-        cells.push({ ...addr, kind: 'absent', variant: v, group: 'Buttons', state, rowKey: state, column: 'Light', text: '—' });
+        cells.push({ ...addr, kind: 'shadow', source: 'prose', stackRef: 6, appearance, state, rowKey: state, column: 'Shadow', text: '6-layer stack ▼' });
+    return;
+  }
+
+  // SECTION-ABSENT: "— *(...)* —" body line (lines 299 and 393).
+  if (/^—\s*\*\(.+\)\*\s*—?$/.test(trimmed) && addr.context === 'OVER-GLASS') {
+    if (/Bordered/i.test(addr.variant || '')) {
+      // Line 299: the Over-Glass export omits button variants 02 and 03 entirely — emit an absent cell per
+      // omitted variant × state so get() reports the omission rather than silently returning nothing.
+      for (const v of OG_ABSENT_BUTTON_VARIANTS)
+        for (const state of RECIPE_STATES)
+          cells.push({ ...addr, kind: 'absent', source: 'prose', variant: v, group: 'Buttons', state, rowKey: state, column: 'Light', text: '—' });
+    } else {
+      // Line 393 (Knobs — Sliders): no OG slider-knob recipe — one absent cell at the section's addressing
+      // ("use the Content Area Light/Idle knob" is guidance, not a recipe; never invent values).
+      cells.push({ ...addr, kind: 'absent', source: 'prose', state: null, rowKey: null, column: null, text: '—' });
+    }
     return;
   }
 }
@@ -403,8 +424,8 @@ function classifyTable(tbl, addr, cells, arrows) {
 
   for (const row of data) {
     const rowKey = (row[0] ?? '').trim();
-    // Row-key cell → kind 'key'
-    cells.push({ ...addr, kind: 'key', rowKey, text: rowKey, column: h[0] });
+    // Row-key cell → kind 'key' (positional: first column only)
+    cells.push({ ...addr, kind: 'key', source: 'table', rowKey, text: rowKey, column: h[0] });
 
     for (let ci = 1; ci < row.length; ci++) {
       const rawCell = (row[ci] ?? '').trim();
@@ -427,6 +448,7 @@ function classifyTable(tbl, addr, cells, arrows) {
 
       const cell = classifyCell(rawCell, {
         ...addr,
+        source: 'table',
         appearance: cellAppearance,
         state,
         rowKey,
@@ -443,30 +465,30 @@ function classifyCell(rawCell, addr, arrows) {
   // 1. ABSENT
   if (/^—$/.test(rawCell)) return { ...base, kind: 'absent' };
 
-  // 2. EQUALITY
-  if (/^\*{0,2}=\s*Content Area\*{0,2}$/.test(rawCell)) return { ...base, kind: 'equals-content-area' };
+  // NOTE: no cell-level "= Content Area" rule — the ground truth verified ZERO table cells carry the
+  // equality marker; it exists only as the SECTION-EQUALITY prose rule (see emitProseCells).
 
-  // 3. Value-column ENUM (Shape C "Appearance" column: Light | Dark, and other bare enum tokens that appear
-  //    in a value position). These carry no colour — the research groups them with row keys as "key/enum",
-  //    so kind:'key' (they are addressing/label cells, never fills).
-  if (ENUM_KEYS.has(rawCell)) return { ...base, kind: 'key' };
+  // 2. Value-column ENUM (Shape C "Appearance" column: Light | Dark, and other bare enum tokens that appear
+  //    in a value position). These carry no colour — a distinct 'enum' kind so kind:'key' stays reserved for
+  //    the 109 positional first-column row keys.
+  if (ENUM_KEYS.has(rawCell)) return { ...base, kind: 'enum' };
 
   // Strip a trailing italic annotation before layer/stack parsing (the annotation may hold a shadow recipe;
   // we keep the full text on the cell for downstream, but split on the stripped body).
   const body = stripAnnotation(rawCell);
 
-  // 4. STACKREF ("6-layer stack ▼") → a shadow reference.
+  // 3. STACKREF ("6-layer stack ▼") → a shadow reference.
   const stackM = body.match(STACKREF_RE);
   if (stackM) return { ...base, kind: 'shadow', stackRef: Number(stackM[1]) };
 
-  // 5. NUMERIC (lone number or offset pair).
+  // 4. NUMERIC (lone number or offset pair).
   if (NUMERIC_RE.test(body) || OFFSET_PAIR_RE.test(body)) return { ...base, kind: 'numeric', value: body };
 
-  // 6. SHADOW literal (4 " · " fields, blur.../spread...).
+  // 5. SHADOW literal (4 " · " fields, blur.../spread...).
   const shadow = parseShadow(body);
   if (shadow) return { ...base, kind: 'shadow', ...shadow };
 
-  // 7. BORDER (gate on / px\b/).
+  // 6. BORDER (gate on / px\b/).
   if (BORDER_GATE_RE.test(body)) {
     const strokes = parseBorder(body);
     if (strokes) {
@@ -475,7 +497,7 @@ function classifyCell(rawCell, addr, arrows) {
     }
   }
 
-  // 8. FILL LAYERS (colour/alias, draw order).
+  // 7. FILL LAYERS (colour/alias, draw order).
   const layers = parseFillLayers(body);
   if (layers) {
     for (const l of layers) if (l.aliasRaw) arrows.push(makeAlias(l.aliasRaw));
@@ -522,14 +544,16 @@ export function parseRecipes({ controlTokensText, designTokensText }) {
 
   const tables = extractTables(splitLines(controlTokensText));
 
-  // Address index for get(). Key on the addressing fields; a cell may match multiple states/appearances.
+  // Address index for get(). A cell whose appearance is null is appearance-AGNOSTIC (e.g. the CA Fills
+  // ladder is Light=Dark by design) and matches ANY requested appearance — without this, appearance-null
+  // cells would be unreachable whenever a caller passes 'Light'/'Dark'.
   function get(context, group, variant, appearance, state) {
     return cells.filter((c) =>
       c.kind !== 'key' &&
       eqOrAny(c.context, context) &&
       eqOrAny(c.group, group) &&
       eqOrAny(c.variant, variant) &&
-      eqOrAny(c.appearance, appearance) &&
+      (c.appearance == null || eqOrAny(c.appearance, appearance)) &&
       eqOrAny(c.state, state));
   }
 
